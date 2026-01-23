@@ -1,1 +1,7 @@
-<Solution />
+<Solution>
+  <Folder Name="/API/">
+    <Project Path="API/FolioWebAPI/FolioWebAPI.csproj" />
+  </Folder>
+  <Folder Name="/Core/" />
+  <Folder Name="/Infrastructure/" />
+</Solution>
