@@ -5,5 +5,7 @@
   <Folder Name="/Core/">
     <Project Path="Core/Folio.Core/Folio.Core.csproj" />
   </Folder>
-  <Folder Name="/Infrastructure/" />
+  <Folder Name="/Infrastructure/">
+    <Project Path="Infrastructure/Folio.Infrastructure/Folio.Infrastructure.csproj" />
+  </Folder>
 </Solution>
