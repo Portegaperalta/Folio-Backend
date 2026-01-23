@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Folio.Core.Domain
+﻿namespace Folio.Core.Domain
 {
     public class Folder
     {
