@@ -1,6 +1,6 @@
 ﻿namespace Folio.Core.Domain
 {
-    internal class Bookmark
+    public class Bookmark
     {
         //Attributes
         public Guid Id { get; private set; }
