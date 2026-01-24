@@ -52,9 +52,9 @@ namespace Folio.Core.Application.Services
                 ArgumentNullException.ThrowIfNull("Folder entity cannot be null");
             }
 
-            var folder = await _folderRepository.GetByIdAsync(userId, folderEntity!.Id);
+            var folderExists = await _folderRepository.ExistsAsync(folderEntity!.Id);
 
-            if (folder is null)
+            if (folderExists is false)
             {
                 throw new NullReferenceException($"Folder with id:{folderEntity.Id} not found");
             }
