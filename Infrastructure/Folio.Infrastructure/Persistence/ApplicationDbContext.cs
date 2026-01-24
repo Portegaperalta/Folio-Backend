@@ -15,7 +15,7 @@ namespace Folio.Infrastructure.Persistence
             base.OnModelCreating(modelBuilder);
         }
 
-        DbSet<Folder> Folders { get; set; }
-        DbSet<Bookmark> Bookmarks { get; set; }
+        public DbSet<Folder> Folders { get; set; }
+        public DbSet<Bookmark> Bookmarks { get; set; }
     }
 }
