@@ -1,0 +1,76 @@
+﻿using Folio.Core.Domain;
+using Folio.Core.Interfaces;
+using Folio.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+
+namespace Folio.Infrastructure.Repositories
+{
+    public class FolderRepository : IFolderRepository
+    {
+        private readonly ApplicationDbContext _dbContext;
+
+        public FolderRepository(ApplicationDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+        public async Task<IEnumerable<Folder>> GetAllAsync(int userId)
+        {
+            return await _dbContext.Folders
+                                   .Where(f => f.UserId == userId)
+                                   .Include(f => f.Bookmarks)
+                                   .ToListAsync();
+        }
+
+        public async Task<Folder?> GetByIdAsync(int userId,int folderId)
+        {
+            return await _dbContext.Folders
+                                   .Where(f => f.Id == folderId)
+                                   .Include(f => f.Bookmarks)
+                                   .FirstOrDefaultAsync();
+        }
+
+        public async Task AddAsync(Folder folderEntity)
+        {
+            _dbContext.Folders.Add(folderEntity);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(Folder folderEntity)
+        {
+            _dbContext.Folders.Update(folderEntity);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(Folder folderEntity)
+        {
+            _dbContext.Folders.Remove(folderEntity);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<bool> ExistsAsync(int folderId)
+        {
+            var folder = await _dbContext.Folders
+                                         .Where(f => f.Id == folderId)
+                                         .AsNoTracking()
+                                         .FirstOrDefaultAsync();
+
+            if (folder is null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<int> CountByUserAsync(int userId)
+        {
+            var folderCount = await _dbContext.Folders
+                                        .Where(f => f.UserId == userId)
+                                        .CountAsync();
+
+            return folderCount;
+        }
+    }
+}
+

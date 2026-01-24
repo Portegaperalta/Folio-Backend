@@ -10,6 +10,9 @@
         public DateTime? LastVisitedTime { get; private set; }
         public int UserId { get; private set; }
 
+        private readonly List<Bookmark> _bookmarks  = [];
+        public IReadOnlyCollection<Bookmark> Bookmarks => _bookmarks.AsReadOnly();
+
         //Constructor
         public Folder(string name,int userId)
         {
@@ -46,5 +49,30 @@
         public void UnmarkFavorite() => this.IsMarkedFavorite = false;
 
         public void Visit() => this.LastVisitedTime = DateTime.UtcNow;
+
+        public void AddBookmark(Bookmark newBookmark)
+        {
+            if (newBookmark is null)
+            {
+                ArgumentNullException.ThrowIfNull(newBookmark);
+            }
+
+            if (newBookmark.FolderId != this.Id)
+            {
+                throw new ArgumentException("Bookmark doesn't belong to this folder");
+            }
+
+            this._bookmarks.Add(newBookmark);
+        }
+
+        public void RemoveBookmark(Guid bookmarkId)
+        {
+            var bookmark = this._bookmarks.FirstOrDefault(b => b.Id == bookmarkId);
+            
+            if (bookmark is not null)
+            {
+                this._bookmarks.Remove(bookmark);
+            }
+        }
     }
 }
