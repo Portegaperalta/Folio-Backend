@@ -39,11 +39,13 @@ namespace Folio.Infrastructure.Repositories
             _dbContext.Bookmarks.Update(bookmarkEntity);
             await _dbContext.SaveChangesAsync();
         }
+
         public async Task DeleteAsync(Bookmark bookmarkEntity)
         {
             _dbContext.Bookmarks.Remove(bookmarkEntity);
             await _dbContext.SaveChangesAsync();
         }
+
         public async Task<bool> ExistsAsync(Guid bookmarkId)
         {
             var bookmark = await _dbContext.Bookmarks
