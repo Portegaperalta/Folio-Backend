@@ -74,7 +74,6 @@ namespace Folio.Core.Application.Services
             await _folderRepository.DeleteAsync(folderEntity);
         }
 
-
         public async Task MarkUserFolderAsFavoriteAync(int userId, int folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
@@ -84,7 +83,7 @@ namespace Folio.Core.Application.Services
                 throw new NullReferenceException($"Folder with id: {folderId} not found");
             }
 
-            folder.IsMarkedFavorite = true;
+            folder.MarkFavorite();
 
             await _folderRepository.UpdateAsync(folder);
         }
