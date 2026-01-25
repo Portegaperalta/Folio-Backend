@@ -75,7 +75,7 @@ namespace Folio.Core.Application.Services
         }
 
 
-        public async Task MarkFolderAsFavoriteAync(int userId, int folderId)
+        public async Task MarkUserFolderAsFavoriteAync(int userId, int folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
