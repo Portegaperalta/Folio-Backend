@@ -62,7 +62,7 @@ namespace Folio.Core.Application.Services
             await _folderRepository.UpdateAsync(folderEntity);
         }
 
-        public async Task DeleteAsync(Folder folderEntity)
+        public async Task DeleteUserFolderAsync(Folder folderEntity)
         {
             bool folderExists = await _folderRepository.ExistsAsync(folderEntity.Id);
 
