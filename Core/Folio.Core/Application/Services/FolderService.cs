@@ -73,5 +73,20 @@ namespace Folio.Core.Application.Services
 
             await _folderRepository.DeleteAsync(folderEntity);
         }
+
+
+        public async Task MarkFolderAsFavoriteAync(int userId, int folderId)
+        {
+            var folder = await _folderRepository.GetByIdAsync(userId, folderId);
+
+            if (folder is null)
+            {
+                throw new NullReferenceException($"Folder with id: {folderId} not found");
+            }
+
+            folder.IsMarkedFavorite = true;
+
+            await _folderRepository.UpdateAsync(folder);
+        }
     }
 }
