@@ -64,6 +64,13 @@ namespace Folio.Core.Application.Services
 
         public async Task DeleteAsync(Folder folderEntity)
         {
+            bool folderExists = await _folderRepository.ExistsAsync(folderEntity.Id);
+
+            if (folderExists is false)
+            {
+                throw new ArgumentException($"Folder with id {folderEntity.Id} not found");
+            }
+
             await _folderRepository.DeleteAsync(folderEntity);
         }
     }
