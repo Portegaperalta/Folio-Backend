@@ -45,7 +45,7 @@ namespace Folio.Core.Application.Services
             await _folderRepository.AddAsync(folderEntity!);
         }
 
-        public async Task UpdateUserFolderAsync(int userId,Folder folderEntity)
+        public async Task UpdateUserFolderAsync(Folder folderEntity)
         {
             if (folderEntity is null)
             {
