@@ -56,7 +56,7 @@ namespace Folio.Core.Application.Services
 
             if (folderExists is false)
             {
-                throw new NullReferenceException($"Folder with id:{folderEntity.Id} not found");
+                throw new ArgumentException($"Folder with id:{folderEntity.Id} not found");
             }
 
             await _folderRepository.UpdateAsync(folderEntity);
@@ -94,7 +94,7 @@ namespace Folio.Core.Application.Services
 
             if (folder is null)
             {
-                throw new NullReferenceException($"Folder with id: {folderId} not found");
+                throw new ArgumentException($"Folder with id: {folderId} not found");
             }
 
             folder.MarkFavorite();
@@ -108,7 +108,7 @@ namespace Folio.Core.Application.Services
 
             if (folder is null)
             {
-                throw new NullReferenceException($"Folder with id: {folderId} not found");
+                throw new ArgumentException($"Folder with id: {folderId} not found");
             }
 
             folder.UnmarkFavorite();
@@ -122,7 +122,7 @@ namespace Folio.Core.Application.Services
 
             if (folder is null)
             {
-                throw new NullReferenceException($"Folder with id: {folderId} not found");
+                throw new ArgumentException($"Folder with id: {folderId} not found");
             }
 
             folder.Visit();
