@@ -3,12 +3,12 @@
     public class Folder
     {
         //Attributes
-        public int Id { get; private set; }
-        public string Name { get; private set; }
-        public bool IsMarkedFavorite { get; private set; }
-        public DateTime CreationDate { get; private set; }
-        public DateTime? LastVisitedTime { get; private set; }
-        public int UserId { get; private set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public bool IsMarkedFavorite { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime? LastVisitedTime { get; set; }
+        public int UserId { get; set; }
 
         private readonly List<Bookmark> _bookmarks  = [];
         public IReadOnlyCollection<Bookmark> Bookmarks => _bookmarks.AsReadOnly();
