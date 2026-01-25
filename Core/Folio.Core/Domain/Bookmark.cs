@@ -3,13 +3,13 @@
     public class Bookmark
     {
         //Attributes
-        public Guid Id { get; private set; }
-        public string Name { get; private set; }
-        public string Url { get; private set; }
-        public bool IsMarkedFavorite { get; private set; }
-        public DateTime CreationDate { get; private set; }
-        public DateTime? LastVisitedTime { get; private set; }
-        public int FolderId { get; private set; }
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Url { get; set; }
+        public bool IsMarkedFavorite { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime? LastVisitedTime { get; set; }
+        public int FolderId { get; set; }
 
         //Constructor
         public Bookmark(string name,string url,int folderId)
