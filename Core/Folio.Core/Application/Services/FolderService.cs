@@ -74,6 +74,20 @@ namespace Folio.Core.Application.Services
             await _folderRepository.DeleteAsync(folderEntity);
         }
 
+        public async Task ChangeUserFolderNameAsync(int userId,int folderId, string newFolderName)
+        {
+            var folder = await _folderRepository.GetByIdAsync(userId, folderId);
+
+            if (folder is null)
+            {
+                throw new ArgumentException($"Folder with id {folderId} not found");
+            }
+
+            folder.ChangeName(newFolderName);
+
+            await _folderRepository.UpdateAsync(folder);
+        }
+
         public async Task MarkUserFolderAsFavoriteAync(int userId, int folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
