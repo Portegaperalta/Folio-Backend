@@ -14,10 +14,13 @@ namespace Folio.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<Bookmark>> GetAllAsync(int folderId) 
+        public async Task<IEnumerable<Bookmark>> GetAllAsync(int userId, int folderId) 
         {
             return await _dbContext.Bookmarks
-                                   .Where(b => b.FolderId == folderId)
+                                   .Include(b => b.Folder)
+                                   .Where(b => 
+                                   b.FolderId == folderId &&
+                                   b.UserId == userId)
                                    .ToListAsync();
         }
 
