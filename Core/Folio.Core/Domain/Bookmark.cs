@@ -10,9 +10,11 @@
         public DateTime CreationDate { get; set; }
         public DateTime? LastVisitedTime { get; set; }
         public int FolderId { get; set; }
+        public int UserId { get; set; }
+        public Folder? Folder { get; set; }
 
         //Constructor
-        public Bookmark(string name,string url,int folderId)
+        public Bookmark(string name, string url, int folderId, int userId)
         {
             if (string.IsNullOrWhiteSpace(name) is true)
             {
@@ -29,12 +31,18 @@
                 throw new ArgumentException("Folder ID cannot be less or equal than zero");
             }
 
+            if (userId <= 0)
+            {
+                throw new ArgumentException("User ID cannot be less or equal than zero");
+            }
+
             this.Name = name;
             this.Url = url;
             this.IsMarkedFavorite = false;
             this.CreationDate = DateTime.UtcNow;
             this.LastVisitedTime = null;
             this.FolderId = folderId;
+            this.UserId = userId;
         }
 
         //Behavioural methods
