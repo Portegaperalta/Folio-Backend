@@ -1,10 +1,12 @@
 ﻿using Folio.Core.Domain;
+using Folio.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Folio.Infrastructure.Persistence
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser,IdentityRole<int>, int>
     {
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
@@ -13,6 +15,16 @@ namespace Folio.Infrastructure.Persistence
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Folder>()
+                        .HasOne<ApplicationUser>()
+                        .WithMany()
+                        .HasForeignKey(f => f.UserId);
+
+            modelBuilder.Entity<Bookmark>()
+                        .HasOne<ApplicationUser>()
+                        .WithMany()
+                        .HasForeignKey(b => b.UserId);
         }
 
         public DbSet<Folder> Folders { get; set; }
