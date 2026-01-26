@@ -21,11 +21,14 @@ namespace Folio.Infrastructure.Repositories
                                    .ToListAsync();
         }
 
-        public async Task<Bookmark?> GetByIdAsync(Guid bookmarkId) 
+        public async Task<Bookmark?> GetByIdAsync(int userId,int folderId,Guid bookmarkId) 
         {
             return await _dbContext.Bookmarks
-                                   .Where(b => b.Id == bookmarkId)
-                                   .FirstOrDefaultAsync();
+                                   .Include(b => b.Folder)
+                                   .FirstOrDefaultAsync(b =>
+                                   b.Id == bookmarkId &&
+                                   b.FolderId == folderId &&
+                                   b.Folder.UserId == userId);
         }
 
         public async Task AddAsync(Bookmark bookmarkEntity)
