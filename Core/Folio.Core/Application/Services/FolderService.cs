@@ -45,14 +45,14 @@ namespace Folio.Core.Application.Services
             await _folderRepository.AddAsync(folderEntity!);
         }
 
-        public async Task UpdateUserFolderAsync(Folder folderEntity)
+        public async Task UpdateUserFolderAsync(int userId,Folder folderEntity)
         {
             if (folderEntity is null)
             {
                 ArgumentNullException.ThrowIfNull("Folder entity cannot be null");
             }
 
-            var folderExists = await _folderRepository.ExistsAsync(folderEntity!.Id);
+            var folderExists = await _folderRepository.ExistsAsync(userId,folderEntity!.Id);
 
             if (folderExists is false)
             {
@@ -62,9 +62,9 @@ namespace Folio.Core.Application.Services
             await _folderRepository.UpdateAsync(folderEntity);
         }
 
-        public async Task DeleteUserFolderAsync(Folder folderEntity)
+        public async Task DeleteUserFolderAsync(int userId,Folder folderEntity)
         {
-            bool folderExists = await _folderRepository.ExistsAsync(folderEntity.Id);
+            bool folderExists = await _folderRepository.ExistsAsync(userId,folderEntity.Id);
 
             if (folderExists is false)
             {
