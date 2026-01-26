@@ -6,6 +6,7 @@ namespace Folio.Core.Interfaces
     {
         Task<IEnumerable<Bookmark>> GetAllAsync(int userId,int folderId);
         Task<Bookmark?> GetByIdAsync(int userId,int folderId,Guid bookmarkId);
+        Task<Bookmark?> GetByIdAsNoTrackingAsync(int userId, int folderId, Guid bookmarkId);
         Task AddAsync(Bookmark bookmarkEntity);
         Task UpdateAsync(Bookmark bookmarkEntity);
         Task DeleteAsync(Bookmark bookmarkEntity);

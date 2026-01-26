@@ -34,6 +34,24 @@ namespace Folio.Infrastructure.Repositories
                                    b.UserId == userId);
         }
 
+        public async Task<Bookmark?> GetByIdAsNoTrackingAsync(int userId, int folderId, Guid bookmarkId)
+        {
+            var bookmarkAsNoTracking = await _dbContext.Bookmarks
+                                                       .Include(b => b.Folder)
+                                                       .AsNoTracking()
+                                                       .FirstOrDefaultAsync(b =>
+                                                       b.Id == bookmarkId &&
+                                                       b.FolderId == folderId &&
+                                                       b.UserId == userId);
+
+            if (bookmarkAsNoTracking is null)
+            {
+                return null;
+            }
+
+            return bookmarkAsNoTracking;
+        }
+
         public async Task AddAsync(Bookmark bookmarkEntity)
         {
             _dbContext.Bookmarks.Add(bookmarkEntity);
