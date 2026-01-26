@@ -48,10 +48,12 @@ namespace Folio.Infrastructure.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<bool> ExistsAsync(int folderId)
+        public async Task<bool> ExistsAsync(int userId,int folderId)
         {
             var folder = await _dbContext.Folders
-                                         .Where(f => f.Id == folderId)
+                                         .Where(f => 
+                                         f.Id == folderId &&
+                                         f.UserId == userId)
                                          .AsNoTracking()
                                          .FirstOrDefaultAsync();
 

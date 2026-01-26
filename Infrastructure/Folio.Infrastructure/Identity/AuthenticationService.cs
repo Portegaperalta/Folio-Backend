@@ -1,0 +1,41 @@
+﻿using Folio.Core.Domain;
+using Folio.Core.Interfaces;
+using Microsoft.AspNetCore.Identity;
+
+namespace Folio.Infrastructure.Identity
+{
+    public class AuthenticationService : IAuthenticationService
+    {
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public AuthenticationService(UserManager<ApplicationUser> userManager)
+        {
+            _userManager = userManager;
+        }
+
+        public async Task<User> RegisterAsync(string name, string email, string password)
+        {
+            var applicationUser = new ApplicationUser
+            {
+              Name = name,
+              Email = email,
+              UserName = email,
+              CreationDate = DateTime.UtcNow,
+              IsDeleted = false
+            };
+
+            var result = _userManager.CreateAsync(applicationUser, password);
+
+            if (result.IsCompletedSuccessfully is not true)
+            {
+                throw new InvalidOperationException(result.Exception!.Message);
+            }
+
+            return UserMapper.ToDomainEntity(applicationUser);
+        }
+
+        public async Task<User?> LoginAsync(string email, string password);
+        public async Task<User?> GetUserByIdAsync(int userId);
+        public async Task<User?> GetUserByEmailAsync(string email);
+    }
+}
