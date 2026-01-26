@@ -31,7 +31,7 @@ namespace Folio.Infrastructure.Repositories
                                    .FirstOrDefaultAsync(b =>
                                    b.Id == bookmarkId &&
                                    b.FolderId == folderId &&
-                                   b.Folder.UserId == userId);
+                                   b.UserId == userId);
         }
 
         public async Task AddAsync(Bookmark bookmarkEntity)
