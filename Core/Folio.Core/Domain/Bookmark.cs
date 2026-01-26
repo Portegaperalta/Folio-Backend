@@ -10,6 +10,7 @@
         public DateTime CreationDate { get; set; }
         public DateTime? LastVisitedTime { get; set; }
         public int FolderId { get; set; }
+        public Folder? Folder { get; set; }
 
         //Constructor
         public Bookmark(string name,string url,int folderId)
