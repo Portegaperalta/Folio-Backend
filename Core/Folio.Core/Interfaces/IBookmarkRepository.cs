@@ -9,7 +9,7 @@ namespace Folio.Core.Interfaces
         Task AddAsync(Bookmark bookmarkEntity);
         Task UpdateAsync(Bookmark bookmarkEntity);
         Task DeleteAsync(Bookmark bookmarkEntity);
-        Task<bool> ExistsAsync(Guid bookmarkId);
+        Task<bool> ExistsAsync(int userId,Guid bookmarkId);
         Task<int> CountByFolderAsync(int userId,int folderId);
     }
 }
