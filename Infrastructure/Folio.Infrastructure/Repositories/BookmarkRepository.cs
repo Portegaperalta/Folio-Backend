@@ -41,7 +41,7 @@ namespace Folio.Infrastructure.Repositories
         }
 
         public async Task UpdateAsync(Bookmark bookmarkEntity)
-        {
+        { 
             _dbContext.Bookmarks.Update(bookmarkEntity);
             await _dbContext.SaveChangesAsync();
         }
@@ -67,10 +67,12 @@ namespace Folio.Infrastructure.Repositories
             return true;
         }
 
-        public async Task<int> CountByFolderAsync(int folderId)
+        public async Task<int> CountByFolderAsync(int userId,int folderId)
         {
             var bookmarkCount = await _dbContext.Bookmarks
-                                                .Where(b => b.FolderId == folderId)
+                                                .Where(b => 
+                                                b.FolderId == folderId &&
+                                                b.UserId == userId)
                                                 .CountAsync();
 
             return bookmarkCount;
