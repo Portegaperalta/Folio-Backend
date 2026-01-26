@@ -25,6 +25,9 @@ namespace Folio.Infrastructure.Persistence
                         .HasOne<ApplicationUser>()
                         .WithMany()
                         .HasForeignKey(b => b.UserId);
+
+            modelBuilder.Entity<ApplicationUser>().ToTable("Users");
+            modelBuilder.Entity<IdentityRole<int>>().ToTable("Roles");
         }
 
         public DbSet<Folder> Folders { get; set; }
