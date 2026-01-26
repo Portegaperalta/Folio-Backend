@@ -52,10 +52,12 @@ namespace Folio.Infrastructure.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<bool> ExistsAsync(Guid bookmarkId)
+        public async Task<bool> ExistsAsync(int userId,Guid bookmarkId)
         {
             var bookmark = await _dbContext.Bookmarks
-                            .Where(b => b.Id == bookmarkId)
+                            .Where(b =>
+                            b.Id == bookmarkId &&
+                            b.UserId == userId)
                             .AsNoTracking()
                             .FirstOrDefaultAsync();
 
