@@ -6,7 +6,5 @@ namespace Folio.Core.Interfaces
     {
         Task<User> RegisterAsync(string name, string email, string password);
         Task<User?> LoginAsync(string email, string password);
-        Task<User?> GetUserByIdAsync(int userId);
-        Task<User?> GetUserByEmailAsync(string email);
     }
 }
