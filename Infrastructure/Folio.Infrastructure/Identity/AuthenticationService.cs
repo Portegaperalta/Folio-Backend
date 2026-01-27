@@ -8,7 +8,8 @@ namespace Folio.Infrastructure.Identity
     {
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public AuthenticationService(UserManager<ApplicationUser> userManager)
+        public AuthenticationService(
+            UserManager<ApplicationUser> userManager)
         {
             _userManager = userManager;
         }
@@ -34,8 +35,25 @@ namespace Folio.Infrastructure.Identity
             return UserMapper.ToDomainEntity(applicationUser);
         }
 
-        public async Task<User?> LoginAsync(string email, string password);
-        public async Task<User?> GetUserByIdAsync(int userId);
-        public async Task<User?> GetUserByEmailAsync(string email);
+        public async Task<User?> LoginAsync(string email, string password)
+        {
+            var applicationUser = await _userManager.FindByEmailAsync(email);
+
+            if (applicationUser is null)
+            {
+                throw new UnauthorizedAccessException("Invalid credentials");
+            }
+
+            var validPassword = await _userManager.CheckPasswordAsync(applicationUser, password);
+
+            if (validPassword is false)
+            {
+                throw new UnauthorizedAccessException("Invalid credentials");
+            }
+
+            var userEntity = UserMapper.ToDomainEntity(applicationUser);
+
+            return userEntity;
+        }
     }
 }
