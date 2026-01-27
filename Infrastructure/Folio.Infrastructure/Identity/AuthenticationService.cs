@@ -55,8 +55,5 @@ namespace Folio.Infrastructure.Identity
 
             return userEntity;
         }
-
-        public async Task<User?> GetUserByIdAsync(int userId)
-        public async Task<User?> GetUserByEmailAsync(string email);
     }
 }
