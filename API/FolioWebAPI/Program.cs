@@ -60,6 +60,16 @@ namespace FolioWebAPI
 
             var app = builder.Build();
 
+            if (app.Environment.IsDevelopment())
+            {
+                using var scope = app.Services.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                if (dbContext.Database.IsRelational())
+                {
+                    dbContext.Database.Migrate();
+                }
+            }
+
             // Middlewares Area
 
             if (app.Environment.IsDevelopment())
