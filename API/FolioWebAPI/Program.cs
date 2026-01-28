@@ -1,7 +1,8 @@
 
 using Folio.Core.Application.Services;
 using FolioWebAPI.Mappers;
-using Microsoft.Extensions.DependencyInjection;
+using Folio.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace FolioWebAPI
 {
@@ -19,6 +20,10 @@ namespace FolioWebAPI
             builder.Services.AddScoped<BookmarkMapper>();
             builder.Services.AddScoped<FolderService>();
             builder.Services.AddScoped<BookmarkService>();
+
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseNpgsql(
+                builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddOpenApi();
 
