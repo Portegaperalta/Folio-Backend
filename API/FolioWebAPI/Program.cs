@@ -3,6 +3,8 @@ using Folio.Core.Application.Services;
 using FolioWebAPI.Mappers;
 using Folio.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace FolioWebAPI
 {
@@ -24,6 +26,22 @@ namespace FolioWebAPI
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(
                 builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Services.AddAuthentication().AddJwtBearer(options =>
+            {
+                options.MapInboundClaims = false;
+
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = 
+                     new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtKey"]!)),
+                     ClockSkew = TimeSpan.Zero
+                };
+            });
 
             builder.Services.AddOpenApi();
 
