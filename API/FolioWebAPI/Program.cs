@@ -1,4 +1,6 @@
 
+using FolioWebAPI.Mappers;
+
 namespace FolioWebAPI
 {
     public class Program
@@ -10,6 +12,10 @@ namespace FolioWebAPI
             // Services Area
 
             builder.Services.AddControllers();
+
+            builder.Services.AddScoped<FolderMapper>();
+            builder.Services.AddScoped<BookmarkMapper>();
+
             builder.Services.AddOpenApi();
 
             var app = builder.Build();
