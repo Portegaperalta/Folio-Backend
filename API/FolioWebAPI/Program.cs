@@ -1,6 +1,7 @@
 
-using FolioWebAPI.Mappers;
 using Folio.Core.Application.Services;
+using FolioWebAPI.Mappers;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FolioWebAPI
 {
@@ -21,6 +22,8 @@ namespace FolioWebAPI
 
             builder.Services.AddOpenApi();
 
+            builder.Services.AddSwaggerGen();
+
             var app = builder.Build();
 
             // Middlewares Area
@@ -29,6 +32,8 @@ namespace FolioWebAPI
             {
                 app.MapOpenApi();
             }
+
+            app.UseSwagger();
 
             app.UseHttpsRedirection();
 
