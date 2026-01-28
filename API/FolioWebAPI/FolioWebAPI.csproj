@@ -12,7 +12,10 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
-    <Folder Include="Mappers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Folio.Core\Folio.Core.csproj" />
   </ItemGroup>
 
 </Project>
