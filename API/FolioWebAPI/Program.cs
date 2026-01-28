@@ -1,6 +1,5 @@
 
 using FolioWebAPI.Mappers;
-using Folio.Core.Application;
 using Folio.Core.Application.Services;
 
 namespace FolioWebAPI
