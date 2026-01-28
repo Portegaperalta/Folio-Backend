@@ -1,5 +1,7 @@
 
 using FolioWebAPI.Mappers;
+using Folio.Core.Application;
+using Folio.Core.Application.Services;
 
 namespace FolioWebAPI
 {
@@ -15,6 +17,8 @@ namespace FolioWebAPI
 
             builder.Services.AddScoped<FolderMapper>();
             builder.Services.AddScoped<BookmarkMapper>();
+            builder.Services.AddScoped<FolderService>();
+            builder.Services.AddScoped<BookmarkService>();
 
             builder.Services.AddOpenApi();
 
