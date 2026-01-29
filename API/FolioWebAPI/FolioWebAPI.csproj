@@ -13,10 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\Core\Folio.Core\Folio.Core.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Folio.Infrastructure\Folio.Infrastructure.csproj" />
   </ItemGroup>
