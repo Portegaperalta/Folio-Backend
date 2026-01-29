@@ -1,6 +1,7 @@
 ﻿using Folio.Core.Application.Services;
 using Folio.Core.Interfaces;
 using FolioWebAPI.DTOs.Folder;
+using FolioWebAPI.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,11 +13,15 @@ namespace FolioWebAPI.Controllers
     {
         private readonly FolderService _folderService;
         private readonly ICurrentUserService _currentUserService;
+        private readonly FolderMapper _folderMapper;
 
-        public FoldersController(FolderService folderService, ICurrentUserService currentUserService)
+        public FoldersController(FolderService folderService,
+            ICurrentUserService currentUserService, 
+            FolderMapper folderMapper)
         {
             _folderService = folderService;
             _currentUserService = currentUserService;
+            _folderMapper = folderMapper;
         }
 
         [HttpGet]
