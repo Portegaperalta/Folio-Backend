@@ -62,5 +62,23 @@ namespace FolioWebAPI.Controllers
 
             return Ok(folderDTO);
         }
+
+        // POST
+        [HttpPost]
+        public async Task<ActionResult> Create([FromForm] FolderCreationDTO folderCreationDTO)
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+
+            if (currentUser is null)
+            {
+                return Unauthorized("Invalid email or password");
+            }
+
+            var folderEntity = _folderMapper.ToEntity(currentUser.Id, folderCreationDTO);
+
+            await _folderService.CreateUserFolder(folderEntity);
+
+            return CreatedAtRoute("GetUserFolder", new {id = folderEntity.Id});
+        }
     }
 }
