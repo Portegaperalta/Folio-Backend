@@ -9,6 +9,7 @@ namespace FolioWebAPI.Controllers
 {
     [ApiController]
     [Route("api/folders")]
+    [Authorize]
     public class FoldersController : ControllerBase
     {
         private readonly FolderService _folderService;
@@ -26,7 +27,6 @@ namespace FolioWebAPI.Controllers
 
         //GET
         [HttpGet]
-        [Authorize]
         public async Task<ActionResult<IEnumerable<FolderDTO>>> GetAll()
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
