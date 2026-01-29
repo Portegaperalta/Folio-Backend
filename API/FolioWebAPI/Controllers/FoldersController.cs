@@ -78,7 +78,12 @@ namespace FolioWebAPI.Controllers
 
             await _folderService.CreateUserFolder(folderEntity);
 
-            return CreatedAtRoute("GetUserFolder", new {id = folderEntity.Id});
+            var folderDTO = _folderMapper.ToDto(folderEntity);
+
+            return CreatedAtRoute("GetUserFolder", new {id = folderEntity.Id}, folderDTO);
         }
+
+        // PUT
+
     }
 }
