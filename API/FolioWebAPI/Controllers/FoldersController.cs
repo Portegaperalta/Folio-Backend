@@ -24,6 +24,7 @@ namespace FolioWebAPI.Controllers
             _folderMapper = folderMapper;
         }
 
+        //GET
         [HttpGet]
         [Authorize]
         public async Task<ActionResult<IEnumerable<FolderDTO>>> GetAll()
@@ -38,6 +39,28 @@ namespace FolioWebAPI.Controllers
             var folders = await _folderService.GetAllUserFoldersAsync(currentUser.Id);
 
             return Ok(folders);
+        }
+
+        [HttpGet("{folderId:int}")]
+        public async Task<ActionResult<FolderDTO?>> GetById([FromRoute] int folderId)
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+
+            if (currentUser is null)
+            {
+                return Unauthorized("Invalid email or password");
+            }
+
+            var folder = await _folderService.GetUserFolderByIdAsync(currentUser.Id, folderId);
+
+            if (folder is null)
+            {
+                return NotFound($"Folder with Id:{folderId} not found");
+            }
+
+            var folderDTO = _folderMapper.ToDto(folder);
+
+            return Ok(folderDTO);
         }
     }
 }
