@@ -21,9 +21,8 @@ namespace Folio.Infrastructure.Identity
         {
             var claims = new List<Claim>
             {
-                new(JwtRegisteredClaimNames.Sub, userEntity.Id.ToString()),
-                new(JwtRegisteredClaimNames.Email, userEntity.Email),
-                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim("id",userEntity.Id.ToString()),
+                new Claim("email", userEntity.Email),
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey));
