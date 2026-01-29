@@ -26,7 +26,7 @@ namespace FolioWebAPI.Controllers
         }
 
         //GET
-        [HttpGet]
+        [HttpGet(Name = "GetAllUserFolders")]
         public async Task<ActionResult<IEnumerable<FolderDTO>>> GetAll()
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -41,7 +41,7 @@ namespace FolioWebAPI.Controllers
             return Ok(folders);
         }
 
-        [HttpGet("{folderId:int}")]
+        [HttpGet("{folderId:int}", Name = "GetUserFolder")]
         public async Task<ActionResult<FolderDTO?>> GetById([FromRoute] int folderId)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
