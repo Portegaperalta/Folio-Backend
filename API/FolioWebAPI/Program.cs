@@ -22,6 +22,9 @@ namespace FolioWebAPI
 
             // SERVICES AREA
 
+            builder.Services.AddDataProtection();
+
+            // controllers services
             builder.Services.AddControllers();
             
             // services, repositories and mapper services
@@ -38,7 +41,7 @@ namespace FolioWebAPI
             options.UseNpgsql(
                 builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // identity services
+            // auth and identity services
             builder.Services.AddIdentityCore<ApplicationUser>()
                             .AddEntityFrameworkStores<ApplicationDbContext>()
                             .AddDefaultTokenProviders();
