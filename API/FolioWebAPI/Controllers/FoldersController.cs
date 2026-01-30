@@ -26,7 +26,7 @@ namespace FolioWebAPI.Controllers
         }
 
         //GET
-        [HttpGet]
+        [HttpGet(Name = "GetAllUserFolders")]
         public async Task<ActionResult<IEnumerable<FolderDTO>>> GetAll()
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -41,7 +41,7 @@ namespace FolioWebAPI.Controllers
             return Ok(folders);
         }
 
-        [HttpGet("{folderId:int}")]
+        [HttpGet("{folderId:int}", Name = "GetUserFolder")]
         public async Task<ActionResult<FolderDTO?>> GetById([FromRoute] int folderId)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -61,6 +61,82 @@ namespace FolioWebAPI.Controllers
             var folderDTO = _folderMapper.ToDto(folder);
 
             return Ok(folderDTO);
+        }
+
+        // POST
+        [HttpPost]
+        public async Task<ActionResult> Create([FromForm] FolderCreationDTO folderCreationDTO)
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+
+            if (currentUser is null)
+            {
+                return Unauthorized("Invalid email or password");
+            }
+
+            var folderEntity = _folderMapper.ToEntity(currentUser.Id, folderCreationDTO);
+
+            await _folderService.CreateUserFolder(folderEntity);
+
+            var folderDTO = _folderMapper.ToDto(folderEntity);
+
+            return CreatedAtRoute("GetUserFolder", new {id = folderEntity.Id}, folderDTO);
+        }
+
+        // PUT
+        [HttpPut("{folderId:int}")]
+        public async Task<ActionResult> Update([FromRoute] int folderId, [FromForm] FolderUpdateDTO folderUpdateDTO)
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+
+            if (currentUser is null)
+            {
+                return Unauthorized("Invalid email or password");
+            }
+
+            var folder = await _folderService.GetUserFolderByIdAsync(currentUser.Id, folderId);
+
+            if (folder is null)
+            {
+                return NotFound($"Folder with id {folderId} not found");
+            }
+
+            if (folderUpdateDTO.Name is not null)
+            {
+                folder.Name = folderUpdateDTO.Name;
+            }
+
+            if (folderUpdateDTO.IsMarkedFavorite is not null)
+            {
+                folder.IsMarkedFavorite = folderUpdateDTO.IsMarkedFavorite.Value;
+            }
+
+            await _folderService.UpdateUserFolderAsync(currentUser.Id, folder);
+
+            return NoContent();
+        }
+
+        // DELETE
+        [HttpDelete("{folderId:int}")]
+        public async Task<ActionResult> Delete([FromRoute] int folderId)
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+
+            if (currentUser is null)
+            {
+                return Unauthorized("Invalid email or password");
+            }
+
+            var folder = await _folderService.GetUserFolderByIdAsync(currentUser.Id, folderId);
+
+            if (folder is null)
+            {
+                return NotFound($"Folder with id {folderId} not found");
+            }
+
+            await _folderService.DeleteUserFolderAsync(currentUser.Id, folder);
+
+            return NoContent();
         }
     }
 }
