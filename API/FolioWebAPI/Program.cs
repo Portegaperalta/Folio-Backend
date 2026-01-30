@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi;
+using Folio.Core.Interfaces;
+using FolioWebAPI.Services;
 
 namespace FolioWebAPI
 {
@@ -19,6 +21,7 @@ namespace FolioWebAPI
 
             builder.Services.AddControllers();
 
+            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
             builder.Services.AddScoped<FolderMapper>();
             builder.Services.AddScoped<BookmarkMapper>();
             builder.Services.AddScoped<FolderService>();
