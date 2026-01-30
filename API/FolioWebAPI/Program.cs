@@ -8,6 +8,8 @@ using System.Text;
 using Microsoft.OpenApi;
 using Folio.Core.Interfaces;
 using FolioWebAPI.Services;
+using Folio.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
 
 namespace FolioWebAPI
 {
@@ -21,7 +23,7 @@ namespace FolioWebAPI
 
             builder.Services.AddControllers();
 
-            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+            builder.Services.AddTransient<ICurrentUserService, CurrentUserService>();
             builder.Services.AddScoped<FolderMapper>();
             builder.Services.AddScoped<BookmarkMapper>();
             builder.Services.AddScoped<FolderService>();
@@ -30,6 +32,10 @@ namespace FolioWebAPI
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(
                 builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Services.AddIdentityCore<ApplicationUser>()
+                            .AddEntityFrameworkStores<ApplicationDbContext>()
+                            .AddDefaultTokenProviders();
 
             builder.Services.AddAuthentication().AddJwtBearer(options =>
             {
