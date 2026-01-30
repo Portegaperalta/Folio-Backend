@@ -39,7 +39,8 @@ namespace FolioWebAPI
             // db context services
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(
-                builder.Configuration.GetConnectionString("DefaultConnection")));
+                builder.Configuration.GetConnectionString("DefaultConnection"),
+                b => b.MigrationsAssembly("FolioWebAPI")));
 
             // auth and identity services
             builder.Services.AddIdentityCore<ApplicationUser>()
