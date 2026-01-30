@@ -20,10 +20,11 @@ namespace FolioWebAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Services Area
+            // SERVICES AREA
 
             builder.Services.AddControllers();
-
+            
+            // services, repositories and mapper services
             builder.Services.AddTransient<ICurrentUserService, CurrentUserService>();
             builder.Services.AddScoped<FolderMapper>();
             builder.Services.AddScoped<BookmarkMapper>();
@@ -32,13 +33,18 @@ namespace FolioWebAPI
             builder.Services.AddScoped<IFolderRepository, FolderRepository>();
             builder.Services.AddScoped<IBookmarkRepository, BookmarkRepository>();
 
+            // db context services
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(
                 builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            // identity services
             builder.Services.AddIdentityCore<ApplicationUser>()
                             .AddEntityFrameworkStores<ApplicationDbContext>()
                             .AddDefaultTokenProviders();
+
+            builder.Services.AddScoped<UserManager<ApplicationUser>>();
+            builder.Services.AddScoped<SignInManager<ApplicationUser>>();
 
             builder.Services.AddAuthentication().AddJwtBearer(options =>
             {
@@ -58,6 +64,7 @@ namespace FolioWebAPI
 
             builder.Services.AddOpenApi();
 
+            //swagger services
             builder.Services.AddSwaggerGen(options =>
             {
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -82,7 +89,7 @@ namespace FolioWebAPI
                 }
             }
 
-            // Middlewares Area
+            // MIDDLEWARES AREA
 
             if (app.Environment.IsDevelopment())
             {
