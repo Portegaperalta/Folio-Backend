@@ -45,6 +45,7 @@ namespace FolioWebAPI
 
             builder.Services.AddScoped<UserManager<ApplicationUser>>();
             builder.Services.AddScoped<SignInManager<ApplicationUser>>();
+            builder.Services.AddHttpContextAccessor();
 
             builder.Services.AddAuthentication().AddJwtBearer(options =>
             {
