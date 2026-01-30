@@ -10,6 +10,7 @@ using Folio.Core.Interfaces;
 using FolioWebAPI.Services;
 using Folio.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
+using Folio.Infrastructure.Repositories;
 
 namespace FolioWebAPI
 {
@@ -28,6 +29,8 @@ namespace FolioWebAPI
             builder.Services.AddScoped<BookmarkMapper>();
             builder.Services.AddScoped<FolderService>();
             builder.Services.AddScoped<BookmarkService>();
+            builder.Services.AddScoped<IFolderRepository, FolderRepository>();
+            builder.Services.AddScoped<IBookmarkRepository, BookmarkRepository>();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(
