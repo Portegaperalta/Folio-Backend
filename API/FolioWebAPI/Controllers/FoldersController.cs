@@ -115,5 +115,28 @@ namespace FolioWebAPI.Controllers
 
             return NoContent();
         }
+
+        // DELETE
+        [HttpDelete("{folderId:int}")]
+        public async Task<ActionResult> Delete([FromRoute] int folderId)
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+
+            if (currentUser is null)
+            {
+                return Unauthorized("Invalid email or password");
+            }
+
+            var folder = await _folderService.GetUserFolderByIdAsync(currentUser.Id, folderId);
+
+            if (folder is null)
+            {
+                return NotFound($"Folder with id {folderId} not found");
+            }
+
+            await _folderService.DeleteUserFolderAsync(currentUser.Id, folder);
+
+            return NoContent();
+        }
     }
 }
