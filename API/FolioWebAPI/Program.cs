@@ -11,6 +11,7 @@ using FolioWebAPI.Services;
 using Folio.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Folio.Infrastructure.Repositories;
+using FolioWebAPI.Middlewares;
 
 namespace FolioWebAPI
 {
@@ -107,6 +108,8 @@ namespace FolioWebAPI
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
+
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.MapControllers();
 
