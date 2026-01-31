@@ -28,7 +28,7 @@ namespace FolioWebAPI
             builder.Services.AddControllers();
             
             // services, repositories and mapper services
-            builder.Services.AddTransient<ICurrentUserService, CurrentUserService>();
+            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
             builder.Services.AddScoped<FolderMapper>();
             builder.Services.AddScoped<BookmarkMapper>();
             builder.Services.AddScoped<FolderService>();
