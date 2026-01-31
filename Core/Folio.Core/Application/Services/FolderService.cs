@@ -64,6 +64,11 @@ namespace Folio.Core.Application.Services
                 throw new ArgumentException($"Folder with id:{folderEntity.Id} not found");
             }
 
+            if (folderEntity.UserId != userId)
+            {
+                throw new UnauthorizedAccessException("Folder with id {folderId} does not exists");
+            }
+
             await _folderRepository.UpdateAsync(folderEntity);
         }
 
