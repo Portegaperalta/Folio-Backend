@@ -29,6 +29,7 @@ namespace FolioWebAPI.Controllers
         {
             var user = new ApplicationUser
             {
+                Name = registerCredentialsDTO.Name,
                 UserName = registerCredentialsDTO.Email,
                 Email = registerCredentialsDTO.Email,
                 PhoneNumber = registerCredentialsDTO.PhoneNumber
