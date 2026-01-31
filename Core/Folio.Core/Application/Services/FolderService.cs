@@ -129,11 +129,9 @@ namespace Folio.Core.Application.Services
 
         public async Task DeleteUserFolderAsync(int userId,Folder folderEntity)
         {
-            bool folderExists = await _folderRepository.ExistsAsync(userId,folderEntity.Id);
-
-            if (folderExists is false)
+            if (folderEntity is null)
             {
-                throw new ArgumentException($"Folder with id {folderEntity.Id} not found");
+                ArgumentNullException.ThrowIfNull(folderEntity);
             }
 
             if (folderEntity.UserId != userId)
