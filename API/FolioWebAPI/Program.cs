@@ -35,6 +35,7 @@ namespace FolioWebAPI
             builder.Services.AddScoped<BookmarkService>();
             builder.Services.AddScoped<IFolderRepository, FolderRepository>();
             builder.Services.AddScoped<IBookmarkRepository, BookmarkRepository>();
+            builder.Services.AddTransient<ITokenGenerator, TokenGenerator>();
 
             // db context services
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
