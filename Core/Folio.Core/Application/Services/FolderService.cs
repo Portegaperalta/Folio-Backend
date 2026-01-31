@@ -50,29 +50,6 @@ namespace Folio.Core.Application.Services
             await _folderRepository.AddAsync(folderEntity!);
         }
 
-        public async Task UpdateUserFolderAsync(int userId,Folder folderEntity)
-        {
-            if (folderEntity is null)
-            {
-                ArgumentNullException.ThrowIfNull("Folder entity cannot be null");
-            }
-
-            var folderExists = await _folderRepository.ExistsAsync(userId,folderEntity!.Id);
-
-            if (folderExists is false)
-            {
-                throw new ArgumentException($"Folder with id:{folderEntity.Id} not found");
-            }
-
-            if (folderEntity.UserId != userId)
-            {
-                throw new UnauthorizedAccessException
-                    ($"User with id: {userId} does not have access to folder with id: {folderEntity.Id}");
-            }
-
-            await _folderRepository.UpdateAsync(folderEntity);
-        }
-
         public async Task DeleteUserFolderAsync(int userId,Folder folderEntity)
         {
             bool folderExists = await _folderRepository.ExistsAsync(userId,folderEntity.Id);
