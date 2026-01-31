@@ -32,7 +32,7 @@ namespace Folio.Core.Application.Services
                 return null;
             }
 
-            if (folder.Id != userId)
+            if (folder.UserId != userId)
             {
                 throw new UnauthorizedAccessException($"Folder with id {folderId} does not exists");
             }
