@@ -50,25 +50,7 @@ namespace Folio.Core.Application.Services
             await _folderRepository.AddAsync(folderEntity!);
         }
 
-        public async Task DeleteUserFolderAsync(int userId,Folder folderEntity)
-        {
-            bool folderExists = await _folderRepository.ExistsAsync(userId,folderEntity.Id);
-
-            if (folderExists is false)
-            {
-                throw new ArgumentException($"Folder with id {folderEntity.Id} not found");
-            }
-
-            if (folderEntity.UserId != userId)
-            {
-                throw new UnauthorizedAccessException
-                    ($"User with id: {userId} does not have access to folder with id: {folderEntity.Id}");
-            }
-
-            await _folderRepository.DeleteAsync(folderEntity);
-        }
-
-        public async Task ChangeUserFolderNameAsync(int userId,int folderId, string newFolderName)
+        public async Task ChangeUserFolderNameAsync(int userId, int folderId, string newFolderName)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
@@ -126,7 +108,7 @@ namespace Folio.Core.Application.Services
             await _folderRepository.UpdateAsync(folder);
         }
 
-        public async Task MarkUserFolderAsVisitedAsync(int userId,int folderId)
+        public async Task MarkUserFolderAsVisitedAsync(int userId, int folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
@@ -143,6 +125,24 @@ namespace Folio.Core.Application.Services
             folder.Visit();
 
             await _folderRepository.UpdateAsync(folder);
+        }
+
+        public async Task DeleteUserFolderAsync(int userId,Folder folderEntity)
+        {
+            bool folderExists = await _folderRepository.ExistsAsync(userId,folderEntity.Id);
+
+            if (folderExists is false)
+            {
+                throw new ArgumentException($"Folder with id {folderEntity.Id} not found");
+            }
+
+            if (folderEntity.UserId != userId)
+            {
+                throw new UnauthorizedAccessException
+                    ($"User with id: {userId} does not have access to folder with id: {folderEntity.Id}");
+            }
+
+            await _folderRepository.DeleteAsync(folderEntity);
         }
     }
 }
