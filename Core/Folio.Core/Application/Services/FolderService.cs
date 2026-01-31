@@ -81,6 +81,11 @@ namespace Folio.Core.Application.Services
                 throw new ArgumentException($"Folder with id {folderEntity.Id} not found");
             }
 
+            if (folderEntity.UserId != userId)
+            {
+                throw new UnauthorizedAccessException("Folder with id {folderId} does not exists");
+            }
+
             await _folderRepository.DeleteAsync(folderEntity);
         }
 
@@ -91,6 +96,11 @@ namespace Folio.Core.Application.Services
             if (folder is null)
             {
                 throw new ArgumentException($"Folder with id {folderId} not found");
+            }
+
+            if (folder.UserId != userId)
+            {
+                throw new UnauthorizedAccessException($"Folder with id {folderId} does not exists");
             }
 
             folder.ChangeName(newFolderName);
@@ -107,6 +117,11 @@ namespace Folio.Core.Application.Services
                 throw new ArgumentException($"Folder with id: {folderId} not found");
             }
 
+            if (folder.UserId != userId)
+            {
+                throw new UnauthorizedAccessException($"Folder with id {folderId} does not exists");
+            }
+
             folder.MarkFavorite();
 
             await _folderRepository.UpdateAsync(folder);
@@ -121,6 +136,11 @@ namespace Folio.Core.Application.Services
                 throw new ArgumentException($"Folder with id: {folderId} not found");
             }
 
+            if (folder.UserId != userId)
+            {
+                throw new UnauthorizedAccessException("Folder with id {folderId} does not exists");
+            }
+
             folder.UnmarkFavorite();
 
             await _folderRepository.UpdateAsync(folder);
@@ -133,6 +153,11 @@ namespace Folio.Core.Application.Services
             if (folder is null)
             {
                 throw new ArgumentException($"Folder with id: {folderId} not found");
+            }
+
+            if (folder.UserId != userId)
+            {
+                throw new UnauthorizedAccessException("Folder with id {folderId} does not exists");
             }
 
             folder.Visit();
