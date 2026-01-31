@@ -35,7 +35,7 @@ namespace FolioWebAPI.Controllers
                 PhoneNumber = registerCredentialsDTO.PhoneNumber
             };
 
-            var result = await _userManager.CreateAsync(user);
+            var result = await _userManager.CreateAsync(user, registerCredentialsDTO.Password);
 
             if (result.Succeeded is not true)
             {
