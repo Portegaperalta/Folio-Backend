@@ -32,6 +32,7 @@ namespace FolioWebAPI.Controllers
                 Name = registerCredentialsDTO.Name,
                 UserName = registerCredentialsDTO.Email,
                 Email = registerCredentialsDTO.Email,
+                CreationDate = DateTime.UtcNow.Date,
                 PhoneNumber = registerCredentialsDTO.PhoneNumber
             };
 
