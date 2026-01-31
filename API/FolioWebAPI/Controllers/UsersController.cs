@@ -32,10 +32,11 @@ namespace FolioWebAPI.Controllers
                 Name = registerCredentialsDTO.Name,
                 UserName = registerCredentialsDTO.Email,
                 Email = registerCredentialsDTO.Email,
+                CreationDate = DateTime.UtcNow.Date,
                 PhoneNumber = registerCredentialsDTO.PhoneNumber
             };
 
-            var result = await _userManager.CreateAsync(user);
+            var result = await _userManager.CreateAsync(user, registerCredentialsDTO.Password);
 
             if (result.Succeeded is not true)
             {
