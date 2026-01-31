@@ -8,6 +8,9 @@ using System.Text;
 using Microsoft.OpenApi;
 using Folio.Core.Interfaces;
 using FolioWebAPI.Services;
+using Folio.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
+using Folio.Infrastructure.Repositories;
 
 namespace FolioWebAPI
 {
@@ -17,19 +20,36 @@ namespace FolioWebAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Services Area
+            // SERVICES AREA
 
+            builder.Services.AddDataProtection();
+
+            // controllers services
             builder.Services.AddControllers();
-
-            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+            
+            // services, repositories and mapper services
+            builder.Services.AddTransient<ICurrentUserService, CurrentUserService>();
             builder.Services.AddScoped<FolderMapper>();
             builder.Services.AddScoped<BookmarkMapper>();
             builder.Services.AddScoped<FolderService>();
             builder.Services.AddScoped<BookmarkService>();
+            builder.Services.AddScoped<IFolderRepository, FolderRepository>();
+            builder.Services.AddScoped<IBookmarkRepository, BookmarkRepository>();
 
+            // db context services
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(
-                builder.Configuration.GetConnectionString("DefaultConnection")));
+                builder.Configuration.GetConnectionString("DefaultConnection"))
+            );
+
+            // auth and identity services
+            builder.Services.AddIdentityCore<ApplicationUser>()
+                            .AddEntityFrameworkStores<ApplicationDbContext>()
+                            .AddDefaultTokenProviders();
+
+            builder.Services.AddScoped<UserManager<ApplicationUser>>();
+            builder.Services.AddScoped<SignInManager<ApplicationUser>>();
+            builder.Services.AddHttpContextAccessor();
 
             builder.Services.AddAuthentication().AddJwtBearer(options =>
             {
@@ -42,13 +62,14 @@ namespace FolioWebAPI
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = 
-                     new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtKey"]!)),
+                     new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["jwtKey"]!)),
                      ClockSkew = TimeSpan.Zero
                 };
             });
 
             builder.Services.AddOpenApi();
 
+            //swagger services
             builder.Services.AddSwaggerGen(options =>
             {
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -73,7 +94,7 @@ namespace FolioWebAPI
                 }
             }
 
-            // Middlewares Area
+            // MIDDLEWARES AREA
 
             if (app.Environment.IsDevelopment())
             {

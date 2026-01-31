@@ -1,6 +1,6 @@
 ﻿using Folio.Core.Domain;
 using Folio.Core.Interfaces;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -10,30 +10,32 @@ namespace Folio.Infrastructure.Identity
 {
     public sealed class TokenGenerator : ITokenGenerator
     {
-        private readonly JwtOptions _jwtOptions;
+        private readonly IConfiguration _configuration;
 
-        public TokenGenerator(IOptions<JwtOptions> jwtOptions)
+        public TokenGenerator(IConfiguration configuration)
         {
-            _jwtOptions = jwtOptions.Value;
+            _configuration = configuration;
         }
 
         public string GenerateJwt(User userEntity)
         {
+            var jwtOptions = _configuration.GetSection("JwtOptions");
+
             var claims = new List<Claim>
             {
                 new Claim("id",userEntity.Id.ToString()),
                 new Claim("email", userEntity.Email),
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["jwtKey"]!));
 
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var securityToken = new JwtSecurityToken(
-                issuer: _jwtOptions.Issuer,
-                audience: _jwtOptions.Audience,
+                issuer: jwtOptions.GetValue<string>("Issuer"),
+                audience: jwtOptions.GetValue<string>("Audience"),
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_jwtOptions.ExpiryMinutes),
+                expires: DateTime.UtcNow.AddHours(jwtOptions.GetValue<double>("ExpiryHours")),
                 signingCredentials: credentials
                 );
 
