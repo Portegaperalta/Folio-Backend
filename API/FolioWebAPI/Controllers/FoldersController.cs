@@ -33,7 +33,7 @@ namespace FolioWebAPI.Controllers
 
             if (currentUser is null)
             {
-                return Unauthorized("Invalid email or password");
+                return Unauthorized("Authorization failed");
             }
 
             var folders = await _folderService.GetAllUserFoldersAsync(currentUser.Id);
@@ -48,7 +48,7 @@ namespace FolioWebAPI.Controllers
 
             if (currentUser is null)
             {
-                return Unauthorized("Invalid email or password");
+                return Unauthorized("Authorization failed");
             }
 
             var folder = await _folderService.GetUserFolderByIdAsync(currentUser.Id, folderId);
@@ -71,7 +71,7 @@ namespace FolioWebAPI.Controllers
 
             if (currentUser is null)
             {
-                return Unauthorized("Invalid email or password");
+                return Unauthorized("Authorization failed");
             }
 
             var folderEntity = _folderMapper.ToEntity(currentUser.Id, folderCreationDTO);
@@ -91,7 +91,7 @@ namespace FolioWebAPI.Controllers
 
             if (currentUser is null)
             {
-                return Unauthorized("Invalid email or password");
+                return Unauthorized("Authorization failed");
             }
 
             var folder = await _folderService.GetUserFolderByIdAsync(currentUser.Id, folderId);
@@ -124,7 +124,7 @@ namespace FolioWebAPI.Controllers
 
             if (currentUser is null)
             {
-                return Unauthorized("Invalid email or password");
+                return Unauthorized("Authorization failed");
             }
 
             var folder = await _folderService.GetUserFolderByIdAsync(currentUser.Id, folderId);
