@@ -57,5 +57,32 @@ namespace FolioWebAPI.Controllers
                 Token = token,
             };
         }
+
+        [HttpPost("login")]
+        public async Task<ActionResult<AuthenticationResponseDTO>> Login([FromForm] LoginCredentialsDTO loginCredentialsDTO)
+        {
+            var applicationUser = await _userManager.FindByNameAsync(loginCredentialsDTO.Email);
+
+            if (applicationUser is null)
+            {
+                return BadRequest("Authentication failed");
+            }
+
+            var result = await _signInManager.CheckPasswordSignInAsync(applicationUser, loginCredentialsDTO.Password, false);
+
+            if (result.Succeeded is not true)
+            {
+                return BadRequest("Authentication failed");
+            }
+
+            var userEntity = UserMapper.ToDomainEntity(applicationUser);
+
+            var token = _tokenGenerator.GenerateJwt(userEntity);
+
+            return new AuthenticationResponseDTO
+            { 
+                Token = token
+            };
+        }
     }
 }
