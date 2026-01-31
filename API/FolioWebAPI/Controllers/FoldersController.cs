@@ -33,7 +33,7 @@ namespace FolioWebAPI.Controllers
 
             if (currentUser is null)
             {
-                return Unauthorized("Invalid email or password");
+                return Unauthorized("Authorization failed");
             }
 
             var folders = await _folderService.GetAllUserFoldersAsync(currentUser.Id);
@@ -48,7 +48,7 @@ namespace FolioWebAPI.Controllers
 
             if (currentUser is null)
             {
-                return Unauthorized("Invalid email or password");
+                return Unauthorized("Authorization failed");
             }
 
             var folder = await _folderService.GetUserFolderByIdAsync(currentUser.Id, folderId);
@@ -71,7 +71,7 @@ namespace FolioWebAPI.Controllers
 
             if (currentUser is null)
             {
-                return Unauthorized("Invalid email or password");
+                return Unauthorized("Authorization failed");
             }
 
             var folderEntity = _folderMapper.ToEntity(currentUser.Id, folderCreationDTO);
@@ -80,7 +80,7 @@ namespace FolioWebAPI.Controllers
 
             var folderDTO = _folderMapper.ToDto(folderEntity);
 
-            return CreatedAtRoute("GetUserFolder", new {id = folderEntity.Id}, folderDTO);
+            return CreatedAtRoute("GetUserFolder", new {folderId = folderDTO.Id}, folderDTO);
         }
 
         // PUT
@@ -91,7 +91,7 @@ namespace FolioWebAPI.Controllers
 
             if (currentUser is null)
             {
-                return Unauthorized("Invalid email or password");
+                return Unauthorized("Authorization failed");
             }
 
             var folder = await _folderService.GetUserFolderByIdAsync(currentUser.Id, folderId);
@@ -103,15 +103,13 @@ namespace FolioWebAPI.Controllers
 
             if (folderUpdateDTO.Name is not null)
             {
-                folder.Name = folderUpdateDTO.Name;
+               await _folderService.ChangeUserFolderNameAsync(currentUser.Id, folderId, folderUpdateDTO.Name);
             }
 
             if (folderUpdateDTO.IsMarkedFavorite is not null)
             {
-                folder.IsMarkedFavorite = folderUpdateDTO.IsMarkedFavorite.Value;
+                await _folderService.MarkUserFolderAsFavoriteAync(currentUser.Id, folderId);
             }
-
-            await _folderService.UpdateUserFolderAsync(currentUser.Id, folder);
 
             return NoContent();
         }
@@ -124,7 +122,7 @@ namespace FolioWebAPI.Controllers
 
             if (currentUser is null)
             {
-                return Unauthorized("Invalid email or password");
+                return Unauthorized("Authorization failed");
             }
 
             var folder = await _folderService.GetUserFolderByIdAsync(currentUser.Id, folderId);

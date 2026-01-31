@@ -11,6 +11,7 @@ using FolioWebAPI.Services;
 using Folio.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Folio.Infrastructure.Repositories;
+using FolioWebAPI.Middlewares;
 
 namespace FolioWebAPI
 {
@@ -28,7 +29,7 @@ namespace FolioWebAPI
             builder.Services.AddControllers();
             
             // services, repositories and mapper services
-            builder.Services.AddTransient<ICurrentUserService, CurrentUserService>();
+            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
             builder.Services.AddScoped<FolderMapper>();
             builder.Services.AddScoped<BookmarkMapper>();
             builder.Services.AddScoped<FolderService>();
@@ -107,6 +108,8 @@ namespace FolioWebAPI
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
+
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.MapControllers();
 

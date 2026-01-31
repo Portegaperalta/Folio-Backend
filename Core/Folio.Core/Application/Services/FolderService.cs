@@ -32,6 +32,11 @@ namespace Folio.Core.Application.Services
                 return null;
             }
 
+            if (folder.UserId != userId)
+            {
+                throw new UnauthorizedAccessException($"User with id: {userId} does not have access to folder with id: {folderId}");
+            }
+
             return folder;
         }
 
@@ -45,42 +50,19 @@ namespace Folio.Core.Application.Services
             await _folderRepository.AddAsync(folderEntity!);
         }
 
-        public async Task UpdateUserFolderAsync(int userId,Folder folderEntity)
-        {
-            if (folderEntity is null)
-            {
-                ArgumentNullException.ThrowIfNull("Folder entity cannot be null");
-            }
-
-            var folderExists = await _folderRepository.ExistsAsync(userId,folderEntity!.Id);
-
-            if (folderExists is false)
-            {
-                throw new ArgumentException($"Folder with id:{folderEntity.Id} not found");
-            }
-
-            await _folderRepository.UpdateAsync(folderEntity);
-        }
-
-        public async Task DeleteUserFolderAsync(int userId,Folder folderEntity)
-        {
-            bool folderExists = await _folderRepository.ExistsAsync(userId,folderEntity.Id);
-
-            if (folderExists is false)
-            {
-                throw new ArgumentException($"Folder with id {folderEntity.Id} not found");
-            }
-
-            await _folderRepository.DeleteAsync(folderEntity);
-        }
-
-        public async Task ChangeUserFolderNameAsync(int userId,int folderId, string newFolderName)
+        public async Task ChangeUserFolderNameAsync(int userId, int folderId, string newFolderName)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
             if (folder is null)
             {
                 throw new ArgumentException($"Folder with id {folderId} not found");
+            }
+
+            if (folder.UserId != userId)
+            {
+                throw new UnauthorizedAccessException
+                    ($"User with id: {userId} does not have access to folder with id: {folderId}");
             }
 
             folder.ChangeName(newFolderName);
@@ -97,6 +79,11 @@ namespace Folio.Core.Application.Services
                 throw new ArgumentException($"Folder with id: {folderId} not found");
             }
 
+            if (folder.UserId != userId)
+            {
+                throw new UnauthorizedAccessException($"User with id: {userId} does not have access to folder with id: {folderId}");
+            }
+
             folder.MarkFavorite();
 
             await _folderRepository.UpdateAsync(folder);
@@ -111,12 +98,17 @@ namespace Folio.Core.Application.Services
                 throw new ArgumentException($"Folder with id: {folderId} not found");
             }
 
+            if (folder.UserId != userId)
+            {
+                throw new UnauthorizedAccessException($"User with id: {userId} does not have access to folder with id: {folderId}");
+            }
+
             folder.UnmarkFavorite();
 
             await _folderRepository.UpdateAsync(folder);
         }
 
-        public async Task MarkUserFolderAsVisitedAsync(int userId,int folderId)
+        public async Task MarkUserFolderAsVisitedAsync(int userId, int folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
@@ -125,9 +117,32 @@ namespace Folio.Core.Application.Services
                 throw new ArgumentException($"Folder with id: {folderId} not found");
             }
 
+            if (folder.UserId != userId)
+            {
+                throw new UnauthorizedAccessException($"User with id: {userId} does not have access to folder with id: {folderId}");
+            }
+
             folder.Visit();
 
             await _folderRepository.UpdateAsync(folder);
+        }
+
+        public async Task DeleteUserFolderAsync(int userId,Folder folderEntity)
+        {
+            bool folderExists = await _folderRepository.ExistsAsync(userId,folderEntity.Id);
+
+            if (folderExists is false)
+            {
+                throw new ArgumentException($"Folder with id {folderEntity.Id} not found");
+            }
+
+            if (folderEntity.UserId != userId)
+            {
+                throw new UnauthorizedAccessException
+                    ($"User with id: {userId} does not have access to folder with id: {folderEntity.Id}");
+            }
+
+            await _folderRepository.DeleteAsync(folderEntity);
         }
     }
 }
