@@ -103,15 +103,13 @@ namespace FolioWebAPI.Controllers
 
             if (folderUpdateDTO.Name is not null)
             {
-                folder.Name = folderUpdateDTO.Name;
+               await _folderService.ChangeUserFolderNameAsync(currentUser.Id, folderId, folderUpdateDTO.Name);
             }
 
             if (folderUpdateDTO.IsMarkedFavorite is not null)
             {
-                folder.IsMarkedFavorite = folderUpdateDTO.IsMarkedFavorite.Value;
+                await _folderService.MarkUserFolderAsFavoriteAync(currentUser.Id, folderId);
             }
-
-            await _folderService.UpdateUserFolderAsync(currentUser.Id, folder);
 
             return NoContent();
         }
