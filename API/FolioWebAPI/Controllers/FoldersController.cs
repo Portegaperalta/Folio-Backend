@@ -80,7 +80,7 @@ namespace FolioWebAPI.Controllers
 
             var folderDTO = _folderMapper.ToDto(folderEntity);
 
-            return CreatedAtRoute("GetUserFolder", new {id = folderEntity.Id}, folderDTO);
+            return CreatedAtRoute("GetUserFolder", new {folderId = folderDTO.Id}, folderDTO);
         }
 
         // PUT
