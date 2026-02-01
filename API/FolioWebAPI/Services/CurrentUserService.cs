@@ -16,7 +16,7 @@ namespace FolioWebAPI.Services
             _userManager = userManager;
         }
 
-        public int GetCurrentUserId()
+        public Guid GetCurrentUserId()
         {
             var userIdClaim = _httpContextAccessor.HttpContext!
                                                  .User
@@ -29,7 +29,7 @@ namespace FolioWebAPI.Services
                 throw new UnauthorizedAccessException("User not authenticated");
             }
 
-            return int.Parse(userIdClaim.Value);
+            return Guid.Parse(userIdClaim.Value);
         }
 
         public string GetCurrentUserEmail()
