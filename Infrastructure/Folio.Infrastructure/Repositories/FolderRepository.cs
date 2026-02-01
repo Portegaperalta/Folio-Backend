@@ -22,7 +22,7 @@ namespace Folio.Infrastructure.Repositories
                                    .ToListAsync();
         }
 
-        public async Task<Folder?> GetByIdAsync(Guid userId, int folderId)
+        public async Task<Folder?> GetByIdAsync(Guid userId, Guid folderId)
         {
             return await _dbContext.Folders
                                    .Where(f => f.Id == folderId)
