@@ -16,6 +16,11 @@ namespace Folio.Infrastructure.Persistence
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<ApplicationUser>()
+                        .Property(u => u.Id)
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValueSql("gen_random-uuid()");
+
             modelBuilder.Entity<Folder>()
                         .HasOne<ApplicationUser>()
                         .WithMany()
