@@ -13,6 +13,6 @@ namespace FolioWebAPI.DTOs.Bookmark
         public required string Url { get; set; }
 
         [Required(ErrorMessage = "The field {0} is required")]
-        public required int FolderId { get; set; }
+        public required Guid FolderId { get; set; }
     }
 }
