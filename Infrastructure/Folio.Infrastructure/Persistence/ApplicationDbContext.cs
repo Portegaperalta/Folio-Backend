@@ -19,7 +19,7 @@ namespace Folio.Infrastructure.Persistence
             modelBuilder.Entity<ApplicationUser>()
                         .Property(u => u.Id)
                         .ValueGeneratedOnAdd()
-                        .HasDefaultValueSql("gen_random-uuid()");
+                        .HasDefaultValueSql("gen_random_uuid()");
 
             modelBuilder.Entity<Folder>()
                         .HasOne<ApplicationUser>()
