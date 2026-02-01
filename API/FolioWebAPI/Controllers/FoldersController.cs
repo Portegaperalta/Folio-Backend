@@ -120,6 +120,21 @@ namespace FolioWebAPI.Controllers
             return NoContent();
         }
 
+        [HttpPut("{folderId:guid}/visit")]
+        public async Task<ActionResult> VisitFolder([FromRoute] Guid folderId)
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+
+            if (currentUser is null)
+            {
+                return Unauthorized("Authorization failed");
+            }
+
+            await _folderService.MarkUserFolderAsVisitedAsync(currentUser.Id, folderId);
+
+            return NoContent();
+        }
+
         // DELETE
         [HttpDelete("{folderId:guid}")]
         public async Task<ActionResult> Delete([FromRoute] Guid folderId)
