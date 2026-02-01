@@ -84,7 +84,7 @@ namespace FolioWebAPI.Controllers
         }
 
         // PUT
-        [HttpPut("{folderId:int}")]
+        [HttpPut("{folderId:guid}")]
         public async Task<ActionResult> Update([FromRoute] Guid folderId, [FromForm] FolderUpdateDTO folderUpdateDTO)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -108,8 +108,29 @@ namespace FolioWebAPI.Controllers
 
             if (folderUpdateDTO.IsMarkedFavorite is not null)
             {
-                await _folderService.MarkUserFolderAsFavoriteAync(currentUser.Id, folderId);
+                if (folderUpdateDTO.IsMarkedFavorite is true)
+                {
+                    await _folderService.MarkUserFolderAsFavoriteAync(currentUser.Id, folderId);
+                } else
+                {
+                    await _folderService.UnmarkUserFolderAsFavoriteAsync(currentUser.Id, folderId);
+                }
             }
+
+            return NoContent();
+        }
+
+        [HttpPut("{folderId:guid}/visit")]
+        public async Task<ActionResult> VisitFolder([FromRoute] Guid folderId)
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+
+            if (currentUser is null)
+            {
+                return Unauthorized("Authorization failed");
+            }
+
+            await _folderService.MarkUserFolderAsVisitedAsync(currentUser.Id, folderId);
 
             return NoContent();
         }

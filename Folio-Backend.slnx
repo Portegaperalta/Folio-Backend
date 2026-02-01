@@ -8,4 +8,7 @@
   <Folder Name="/Infrastructure/">
     <Project Path="Infrastructure/Folio.Infrastructure/Folio.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Folio-Backend-Tests/Folio-Backend-Tests.csproj" Id="2d661788-0159-468e-86a9-836fb080c953" />
+  </Folder>
 </Solution>
