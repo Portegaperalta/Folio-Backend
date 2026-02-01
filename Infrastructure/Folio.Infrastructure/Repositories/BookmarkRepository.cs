@@ -14,7 +14,7 @@ namespace Folio.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<Bookmark>> GetAllAsync(Guid userId, int folderId) 
+        public async Task<IEnumerable<Bookmark>> GetAllAsync(Guid userId, Guid folderId) 
         {
             return await _dbContext.Bookmarks
                                    .Include(b => b.Folder)
@@ -24,7 +24,7 @@ namespace Folio.Infrastructure.Repositories
                                    .ToListAsync();
         }
 
-        public async Task<Bookmark?> GetByIdAsync(Guid userId, int folderId,Guid bookmarkId) 
+        public async Task<Bookmark?> GetByIdAsync(Guid userId, Guid folderId, Guid bookmarkId) 
         {
             return await _dbContext.Bookmarks
                                    .Include(b => b.Folder)
@@ -34,7 +34,7 @@ namespace Folio.Infrastructure.Repositories
                                    b.UserId == userId);
         }
 
-        public async Task<Bookmark?> GetByIdAsNoTrackingAsync(Guid userId, int folderId, Guid bookmarkId)
+        public async Task<Bookmark?> GetByIdAsNoTrackingAsync(Guid userId, Guid folderId, Guid bookmarkId)
         {
             var bookmarkAsNoTracking = await _dbContext.Bookmarks
                                                        .Include(b => b.Folder)
@@ -87,7 +87,7 @@ namespace Folio.Infrastructure.Repositories
             return true;
         }
 
-        public async Task<int> CountByFolderAsync(Guid userId, int folderId)
+        public async Task<int> CountByFolderAsync(Guid userId, Guid folderId)
         {
             var bookmarkCount = await _dbContext.Bookmarks
                                                 .Where(b => 
