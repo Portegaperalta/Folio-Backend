@@ -108,7 +108,13 @@ namespace FolioWebAPI.Controllers
 
             if (folderUpdateDTO.IsMarkedFavorite is not null)
             {
-                await _folderService.MarkUserFolderAsFavoriteAync(currentUser.Id, folderId);
+                if (folderUpdateDTO.IsMarkedFavorite is true)
+                {
+                    await _folderService.MarkUserFolderAsFavoriteAync(currentUser.Id, folderId);
+                } else
+                {
+                    await _folderService.UnmarkUserFolderAsFavoriteAsync(currentUser.Id, folderId);
+                }
             }
 
             return NoContent();
