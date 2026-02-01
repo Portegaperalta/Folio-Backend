@@ -3,27 +3,22 @@
     public class Folder
     {
         //Attributes
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public bool IsMarkedFavorite { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime? LastVisitedTime { get; set; }
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
 
         private readonly List<Bookmark> _bookmarks  = [];
         public IReadOnlyCollection<Bookmark> Bookmarks => _bookmarks.AsReadOnly();
 
         //Constructor
-        public Folder(string name,int userId)
+        public Folder(string name,Guid userId)
         {
             if (string.IsNullOrWhiteSpace(name) is true)
             {
                 throw new ArgumentException("Name cannot be empty");
-            }
-
-            if (userId <= 0)
-            {
-                throw new ArgumentException("User id cannot be less or equal than zero");
             }
 
             this.Name = name;

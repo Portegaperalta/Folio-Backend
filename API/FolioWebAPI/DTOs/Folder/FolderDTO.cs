@@ -2,7 +2,7 @@
 {
     public class FolderDTO
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public required string Name { get; set; }
         public required bool IsMarkedFavorite { get; set; }
         public required DateTime CreationDate { get; set; }

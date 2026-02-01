@@ -4,13 +4,13 @@ namespace Folio.Core.Interfaces
 {
     public interface IBookmarkRepository
     {
-        Task<IEnumerable<Bookmark>> GetAllAsync(int userId,int folderId);
-        Task<Bookmark?> GetByIdAsync(int userId,int folderId,Guid bookmarkId);
-        Task<Bookmark?> GetByIdAsNoTrackingAsync(int userId, int folderId, Guid bookmarkId);
+        Task<IEnumerable<Bookmark>> GetAllAsync(Guid userId, Guid folderId);
+        Task<Bookmark?> GetByIdAsync(Guid userId, Guid folderId, Guid bookmarkId);
+        Task<Bookmark?> GetByIdAsNoTrackingAsync(Guid userId, Guid folderId, Guid bookmarkId);
         Task AddAsync(Bookmark bookmarkEntity);
         Task UpdateAsync(Bookmark bookmarkEntity);
         Task DeleteAsync(Bookmark bookmarkEntity);
-        Task<bool> ExistsAsync(int userId,Guid bookmarkId);
-        Task<int> CountByFolderAsync(int userId,int folderId);
+        Task<bool> ExistsAsync(Guid userId, Guid bookmarkId);
+        Task<int> CountByFolderAsync(Guid userId, Guid folderId);
     }
 }

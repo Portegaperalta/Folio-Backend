@@ -17,7 +17,7 @@ namespace FolioWebAPI.Mappers
             };
         }
 
-        public Folder ToEntity(int userId, FolderCreationDTO folderCreationDTO)
+        public Folder ToEntity(Guid userId, FolderCreationDTO folderCreationDTO)
         {
             return new Folder(folderCreationDTO.Name, userId);
         }

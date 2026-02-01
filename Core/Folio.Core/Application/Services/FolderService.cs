@@ -12,18 +12,13 @@ namespace Folio.Core.Application.Services
             _folderRepository = folderRepository;
         }
 
-        public async Task<IEnumerable<Folder>> GetAllUserFoldersAsync(int userId)
+        public async Task<IEnumerable<Folder>> GetAllUserFoldersAsync(Guid userId)
         {
-            if (userId <= 0)
-            {
-                throw new ArgumentException("User id must higher than 0");
-            }
-
             var folders = await _folderRepository.GetAllAsync(userId);
             return folders;
         }
 
-        public async Task<Folder?> GetUserFolderByIdAsync(int userId,int folderId)
+        public async Task<Folder?> GetUserFolderByIdAsync(Guid userId, Guid folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
@@ -50,7 +45,7 @@ namespace Folio.Core.Application.Services
             await _folderRepository.AddAsync(folderEntity!);
         }
 
-        public async Task ChangeUserFolderNameAsync(int userId, int folderId, string newFolderName)
+        public async Task ChangeUserFolderNameAsync(Guid userId, Guid folderId, string newFolderName)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
@@ -70,7 +65,7 @@ namespace Folio.Core.Application.Services
             await _folderRepository.UpdateAsync(folder);
         }
 
-        public async Task MarkUserFolderAsFavoriteAync(int userId, int folderId)
+        public async Task MarkUserFolderAsFavoriteAync(Guid userId, Guid folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
@@ -89,7 +84,7 @@ namespace Folio.Core.Application.Services
             await _folderRepository.UpdateAsync(folder);
         }
 
-        public async Task UnmarkUserFolderAsFavoriteAsync(int userId, int folderId)
+        public async Task UnmarkUserFolderAsFavoriteAsync(Guid userId, Guid folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
@@ -108,7 +103,7 @@ namespace Folio.Core.Application.Services
             await _folderRepository.UpdateAsync(folder);
         }
 
-        public async Task MarkUserFolderAsVisitedAsync(int userId, int folderId)
+        public async Task MarkUserFolderAsVisitedAsync(Guid userId, Guid folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
@@ -127,13 +122,11 @@ namespace Folio.Core.Application.Services
             await _folderRepository.UpdateAsync(folder);
         }
 
-        public async Task DeleteUserFolderAsync(int userId,Folder folderEntity)
+        public async Task DeleteUserFolderAsync(Guid userId, Folder folderEntity)
         {
-            bool folderExists = await _folderRepository.ExistsAsync(userId,folderEntity.Id);
-
-            if (folderExists is false)
+            if (folderEntity is null)
             {
-                throw new ArgumentException($"Folder with id {folderEntity.Id} not found");
+                ArgumentNullException.ThrowIfNull(folderEntity);
             }
 
             if (folderEntity.UserId != userId)

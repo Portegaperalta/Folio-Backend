@@ -4,12 +4,11 @@ namespace Folio.Core.Interfaces
 {
     public interface IFolderRepository
     {
-        Task<IEnumerable<Folder>> GetAllAsync(int userId);
-        Task<Folder?> GetByIdAsync(int userId,int folderId);
+        Task<IEnumerable<Folder>> GetAllAsync(Guid userId);
+        Task<Folder?> GetByIdAsync(Guid userId, Guid folderId);
         Task AddAsync(Folder folderEntity);
         Task UpdateAsync(Folder folderEntity);
         Task DeleteAsync(Folder folderEntity);
-        Task<bool> ExistsAsync(int userId,int folderId);
-        Task<int> CountByUserAsync(int userId);
+        Task<int> CountByUserAsync(Guid userId);
     }
 }
