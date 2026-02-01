@@ -8,7 +8,7 @@
         public bool IsMarkedFavorite { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime? LastVisitedTime { get; set; }
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
 
         private readonly List<Bookmark> _bookmarks  = [];
         public IReadOnlyCollection<Bookmark> Bookmarks => _bookmarks.AsReadOnly();
