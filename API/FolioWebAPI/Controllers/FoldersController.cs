@@ -41,8 +41,8 @@ namespace FolioWebAPI.Controllers
             return Ok(folders);
         }
 
-        [HttpGet("{folderId:int}", Name = "GetUserFolder")]
-        public async Task<ActionResult<FolderDTO?>> GetById([FromRoute] int folderId)
+        [HttpGet("{folderId:guid}", Name = "GetUserFolder")]
+        public async Task<ActionResult<FolderDTO?>> GetById([FromRoute] Guid folderId)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
 
@@ -85,7 +85,7 @@ namespace FolioWebAPI.Controllers
 
         // PUT
         [HttpPut("{folderId:int}")]
-        public async Task<ActionResult> Update([FromRoute] int folderId, [FromForm] FolderUpdateDTO folderUpdateDTO)
+        public async Task<ActionResult> Update([FromRoute] Guid folderId, [FromForm] FolderUpdateDTO folderUpdateDTO)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
 
@@ -115,8 +115,8 @@ namespace FolioWebAPI.Controllers
         }
 
         // DELETE
-        [HttpDelete("{folderId:int}")]
-        public async Task<ActionResult> Delete([FromRoute] int folderId)
+        [HttpDelete("{folderId:guid}")]
+        public async Task<ActionResult> Delete([FromRoute] Guid folderId)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
 
