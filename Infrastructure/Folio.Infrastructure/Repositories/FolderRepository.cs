@@ -14,7 +14,7 @@ namespace Folio.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<Folder>> GetAllAsync(int userId)
+        public async Task<IEnumerable<Folder>> GetAllAsync(Guid userId)
         {
             return await _dbContext.Folders
                                    .Where(f => f.UserId == userId)
@@ -22,7 +22,7 @@ namespace Folio.Infrastructure.Repositories
                                    .ToListAsync();
         }
 
-        public async Task<Folder?> GetByIdAsync(int userId,int folderId)
+        public async Task<Folder?> GetByIdAsync(Guid userId, int folderId)
         {
             return await _dbContext.Folders
                                    .Where(f => f.Id == folderId)
@@ -48,7 +48,7 @@ namespace Folio.Infrastructure.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<int> CountByUserAsync(int userId)
+        public async Task<int> CountByUserAsync(Guid userId)
         {
             var folderCount = await _dbContext.Folders
                                         .Where(f => f.UserId == userId)
