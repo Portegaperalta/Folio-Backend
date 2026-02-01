@@ -9,7 +9,6 @@ namespace Folio.Core.Interfaces
         Task AddAsync(Folder folderEntity);
         Task UpdateAsync(Folder folderEntity);
         Task DeleteAsync(Folder folderEntity);
-        Task<bool> ExistsAsync(int userId,int folderId);
         Task<int> CountByUserAsync(int userId);
     }
 }
