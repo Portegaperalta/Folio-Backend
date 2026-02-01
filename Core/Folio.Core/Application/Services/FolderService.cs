@@ -18,7 +18,7 @@ namespace Folio.Core.Application.Services
             return folders;
         }
 
-        public async Task<Folder?> GetUserFolderByIdAsync(Guid userId, int folderId)
+        public async Task<Folder?> GetUserFolderByIdAsync(Guid userId, Guid folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
@@ -45,7 +45,7 @@ namespace Folio.Core.Application.Services
             await _folderRepository.AddAsync(folderEntity!);
         }
 
-        public async Task ChangeUserFolderNameAsync(Guid userId, int folderId, string newFolderName)
+        public async Task ChangeUserFolderNameAsync(Guid userId, Guid folderId, string newFolderName)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
@@ -65,7 +65,7 @@ namespace Folio.Core.Application.Services
             await _folderRepository.UpdateAsync(folder);
         }
 
-        public async Task MarkUserFolderAsFavoriteAync(Guid userId, int folderId)
+        public async Task MarkUserFolderAsFavoriteAync(Guid userId, Guid folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
@@ -84,7 +84,7 @@ namespace Folio.Core.Application.Services
             await _folderRepository.UpdateAsync(folder);
         }
 
-        public async Task UnmarkUserFolderAsFavoriteAsync(Guid userId, int folderId)
+        public async Task UnmarkUserFolderAsFavoriteAsync(Guid userId, Guid folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
@@ -103,7 +103,7 @@ namespace Folio.Core.Application.Services
             await _folderRepository.UpdateAsync(folder);
         }
 
-        public async Task MarkUserFolderAsVisitedAsync(Guid userId, int folderId)
+        public async Task MarkUserFolderAsVisitedAsync(Guid userId, Guid folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
