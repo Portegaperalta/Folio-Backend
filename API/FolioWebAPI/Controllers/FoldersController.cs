@@ -84,7 +84,7 @@ namespace FolioWebAPI.Controllers
         }
 
         // PUT
-        [HttpPut("{folderId:int}")]
+        [HttpPut("{folderId:guid}")]
         public async Task<ActionResult> Update([FromRoute] Guid folderId, [FromForm] FolderUpdateDTO folderUpdateDTO)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
