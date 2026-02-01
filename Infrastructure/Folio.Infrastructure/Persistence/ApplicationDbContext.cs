@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Folio.Infrastructure.Persistence
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser,IdentityRole<int>, int>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser,IdentityRole<Guid>, Guid>
     {
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
@@ -27,7 +27,7 @@ namespace Folio.Infrastructure.Persistence
                         .HasForeignKey(b => b.UserId);
 
             modelBuilder.Entity<ApplicationUser>().ToTable("Users");
-            modelBuilder.Entity<IdentityRole<int>>().ToTable("Roles");
+            modelBuilder.Entity<IdentityRole<Guid>>().ToTable("Roles");
         }
 
         public DbSet<Folder> Folders { get; set; }
