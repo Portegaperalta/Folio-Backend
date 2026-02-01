@@ -18,7 +18,7 @@ namespace FolioWebAPI.Mappers
             };
         }
 
-        public Bookmark ToEntity(int userId,BookmarkCreationDTO bookmarkCreationDTO)
+        public Bookmark ToEntity(Guid userId,BookmarkCreationDTO bookmarkCreationDTO)
         {
             return new Bookmark(bookmarkCreationDTO.Name, 
                                 bookmarkCreationDTO.Url,
