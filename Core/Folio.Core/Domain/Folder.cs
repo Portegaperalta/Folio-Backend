@@ -14,16 +14,11 @@
         public IReadOnlyCollection<Bookmark> Bookmarks => _bookmarks.AsReadOnly();
 
         //Constructor
-        public Folder(string name,int userId)
+        public Folder(string name,Guid userId)
         {
             if (string.IsNullOrWhiteSpace(name) is true)
             {
                 throw new ArgumentException("Name cannot be empty");
-            }
-
-            if (userId <= 0)
-            {
-                throw new ArgumentException("User id cannot be less or equal than zero");
             }
 
             this.Name = name;
