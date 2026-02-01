@@ -4,7 +4,7 @@ namespace Folio.Core.Interfaces
 {
     public interface ICurrentUserService
     {
-        int GetCurrentUserId();
+        Guid GetCurrentUserId();
         string GetCurrentUserEmail();
         Task<User?> GetCurrentUserAsync();
     }
