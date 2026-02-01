@@ -10,11 +10,11 @@
         public DateTime CreationDate { get; set; }
         public DateTime? LastVisitedTime { get; set; }
         public int FolderId { get; set; }
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
         public Folder? Folder { get; set; }
 
         //Constructor
-        public Bookmark(string name, string url, int folderId, int userId)
+        public Bookmark(string name, string url, int folderId, Guid userId)
         {
             if (string.IsNullOrWhiteSpace(name) is true)
             {
@@ -29,11 +29,6 @@
             if (folderId <= 0)
             {
                 throw new ArgumentException("Folder ID cannot be less or equal than zero");
-            }
-
-            if (userId <= 0)
-            {
-                throw new ArgumentException("User ID cannot be less or equal than zero");
             }
 
             this.Name = name;
