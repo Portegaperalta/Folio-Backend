@@ -27,11 +27,6 @@ namespace Folio.Core.Application.Services
                 return null;
             }
 
-            if (folder.UserId != userId)
-            {
-                throw new UnauthorizedAccessException($"User with id: {userId} does not have access to folder with id: {folderId}");
-            }
-
             return folder;
         }
 
