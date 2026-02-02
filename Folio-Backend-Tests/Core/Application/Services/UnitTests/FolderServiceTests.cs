@@ -53,5 +53,20 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             //Assert
             Assert.IsNull(response);
         }
+
+        [TestMethod]
+        public async Task 
+            GetUserFolderByIdAsync_ReturnsNull_WhenFolderDoesNotBelongToUser()
+        {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockInvalidUserId, MockFolderId)
+                                .Returns((Folder?)null);
+
+            //Act
+            var response = await folderService.GetUserFolderByIdAsync(MockInvalidUserId, MockFolderId);
+
+            //Assert
+            Assert.IsNull(response);
+        }
     }
 }
