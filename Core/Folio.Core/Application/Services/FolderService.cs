@@ -43,7 +43,7 @@ namespace Folio.Core.Application.Services
 
             if (folder is null)
             {
-                throw new ArgumentException($"Folder with id {folderId} not found");
+                throw new ArgumentNullException($"Folder with id {folderId} not found");
             }
 
             folder.ChangeName(newFolderName);
