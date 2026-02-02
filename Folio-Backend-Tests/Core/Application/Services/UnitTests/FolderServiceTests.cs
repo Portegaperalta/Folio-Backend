@@ -23,5 +23,19 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             MockFolderEntity = Substitute.For<Folder>("folderMock",MockUserId);
             folderService = new FolderService(MockfolderRepository);
         }
+
+        [TestMethod]
+        public async Task GetAllUserFoldersAsync_ReturnsIEnumerableFolder()
+        {
+            //Arrange
+            MockfolderRepository.GetAllAsync(MockUserId).Returns(MockFolderList);
+
+            //Act
+            var response = await folderService.GetAllUserFoldersAsync(MockUserId);
+            var result = response.ToList();
+
+            //Assert
+            CollectionAssert.AreEqual(expected: MockFolderList.ToList(), actual: result);
+        }
     }
 }
