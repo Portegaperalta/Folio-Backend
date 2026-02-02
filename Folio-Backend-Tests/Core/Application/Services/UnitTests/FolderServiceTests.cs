@@ -10,6 +10,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
     {
         private readonly Guid MockUserId = Guid.NewGuid();
         private readonly Guid MockFolderId = Guid.NewGuid();
+        private readonly Guid MockInvalidUserId = Guid.NewGuid();
         private Folder MockFolderEntity = null!;
         IFolderRepository MockfolderRepository = null!;
         IEnumerable<Folder> MockFolderList = null!;
