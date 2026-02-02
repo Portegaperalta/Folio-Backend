@@ -21,7 +21,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         {
             MockFolderList = new List<Folder> { new Folder("folderMock", MockUserId) };
             MockfolderRepository = Substitute.For<IFolderRepository>();
-            MockFolderEntity = Substitute.For<Folder>("folderMock",MockUserId);
+            MockFolderEntity = new Folder("folderMock", MockUserId);
             folderService = new FolderService(MockfolderRepository);
         }
 
