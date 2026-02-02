@@ -52,17 +52,5 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             //Assert
             Assert.IsNull(response);
         }
-
-        [TestMethod]
-        public async Task 
-            GetUserFolderByIdAsync_ThrowsUnauthorizedAccessException_WhenFolderDoesNotBelongsToUser()
-        {
-            //Arrange
-
-
-            //Act
- 
-            //Assert
-        }
     }
 }
