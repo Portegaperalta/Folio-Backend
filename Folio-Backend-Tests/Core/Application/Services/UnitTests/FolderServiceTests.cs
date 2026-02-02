@@ -8,8 +8,8 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
     [TestClass]
     public class FolderServiceTests
     {
-        private Guid MockUserId = Guid.NewGuid();
-        private Guid MockFolderId = Guid.NewGuid();
+        private readonly Guid MockUserId = Guid.NewGuid();
+        private readonly Guid MockFolderId = Guid.NewGuid();
         private Folder MockFolderEntity = null!;
         IFolderRepository MockfolderRepository = null!;
         IEnumerable<Folder> MockFolderList = null!;
@@ -60,7 +60,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
 
             //Act
-
+ 
             //Assert
         }
     }
