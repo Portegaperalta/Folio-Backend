@@ -40,7 +40,8 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         }
 
         [TestMethod]
-        public async Task GetUserFolderByIdAsync_ReturnsNull_WhenFolderDoesNotExist()
+        public async Task 
+            GetUserFolderByIdAsync_ReturnsNull_WhenFolderDoesNotExistOrDoesNotBelongsToUser()
         {
             //Arrange
             MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
