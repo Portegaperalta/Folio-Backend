@@ -32,9 +32,9 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
             //Act
             var response = await folderService.GetAllUserFoldersAsync(MockUserId);
-            var result = response.ToList();
 
             //Assert
+            var result = response.ToList();
             CollectionAssert.AreEqual(expected: MockFolderList.ToList(), actual: result);
         }
 
@@ -50,6 +50,18 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
             //Assert
             Assert.IsNull(response);
+        }
+
+        [TestMethod]
+        public async Task 
+            GetUserFolderByIdAsync_ThrowsUnauthorizedAccessException_WhenFolderDoesNotBelongsToUser()
+        {
+            //Arrange
+
+
+            //Act
+
+            //Assert
         }
     }
 }
