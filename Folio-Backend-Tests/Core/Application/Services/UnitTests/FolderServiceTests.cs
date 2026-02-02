@@ -68,5 +68,16 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             //Assert
             Assert.IsNull(response);
         }
+
+        [TestMethod]
+        public async Task CreateUserFolder_ThrowsArgumentNullException_WhenFolderEntityIsNull()
+        {
+            //Arrange
+            Folder nullFolderEntity = null!;
+
+            //Act + Assert
+            var result = await Assert.ThrowsAsync <ArgumentNullException> (
+                () => folderService.CreateUserFolder(nullFolderEntity));
+        }
     }
 }
