@@ -79,5 +79,19 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             var result = await Assert.ThrowsAsync <ArgumentNullException> (
                 () => folderService.CreateUserFolder(nullFolderEntity));
         }
+
+        [TestMethod]
+        public async Task
+            ChangeUserFolderNameAsync_ThrowsArgumentNullException_WhenFolderDoesNotExist()
+        {
+            //Arrange
+            string expectedExceptionMessage = $"Folder with id {MockFolderId} not found";
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns((Folder?)null);
+
+            //Act + Assert
+            var result = await Assert.ThrowsAsync<ArgumentNullException>(
+                () => folderService.ChangeUserFolderNameAsync(MockUserId, MockFolderId, "newFolderName"));
+        }
     }
 }
