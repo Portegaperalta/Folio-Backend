@@ -8,8 +8,9 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
     [TestClass]
     public class FolderServiceTests
     {
-        private Guid MockUserId = Guid.NewGuid();
-        private Guid MockFolderId = Guid.NewGuid();
+        private readonly Guid MockUserId = Guid.NewGuid();
+        private readonly Guid MockFolderId = Guid.NewGuid();
+        private readonly Guid MockInvalidUserId = Guid.NewGuid();
         private Folder MockFolderEntity = null!;
         IFolderRepository MockfolderRepository = null!;
         IEnumerable<Folder> MockFolderList = null!;
@@ -20,7 +21,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         {
             MockFolderList = new List<Folder> { new Folder("folderMock", MockUserId) };
             MockfolderRepository = Substitute.For<IFolderRepository>();
-            MockFolderEntity = Substitute.For<Folder>("folderMock",MockUserId);
+            MockFolderEntity = new Folder("folderMock", MockUserId);
             folderService = new FolderService(MockfolderRepository);
         }
 
@@ -32,14 +33,15 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
             //Act
             var response = await folderService.GetAllUserFoldersAsync(MockUserId);
-            var result = response.ToList();
 
             //Assert
+            var result = response.ToList();
             CollectionAssert.AreEqual(expected: MockFolderList.ToList(), actual: result);
         }
 
         [TestMethod]
-        public async Task GetUserFolderByIdAsync_ReturnsNull_WhenFolderDoesNotExist()
+        public async Task 
+            GetUserFolderByIdAsync_ReturnsNull_WhenFolderDoesNotExist()
         {
             //Arrange
             MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
@@ -50,6 +52,46 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
             //Assert
             Assert.IsNull(response);
+        }
+
+        [TestMethod]
+        public async Task 
+            GetUserFolderByIdAsync_ReturnsNull_WhenFolderDoesNotBelongToUser()
+        {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockInvalidUserId, MockFolderId)
+                                .Returns((Folder?)null);
+
+            //Act
+            var response = await folderService.GetUserFolderByIdAsync(MockInvalidUserId, MockFolderId);
+
+            //Assert
+            Assert.IsNull(response);
+        }
+
+        [TestMethod]
+        public async Task CreateUserFolder_ThrowsArgumentNullException_WhenFolderEntityIsNull()
+        {
+            //Arrange
+            Folder nullFolderEntity = null!;
+
+            //Act + Assert
+            var result = await Assert.ThrowsAsync <ArgumentNullException> (
+                () => folderService.CreateUserFolder(nullFolderEntity));
+        }
+
+        [TestMethod]
+        public async Task
+            ChangeUserFolderNameAsync_ThrowsArgumentNullException_WhenFolderDoesNotExist()
+        {
+            //Arrange
+            string expectedExceptionMessage = $"Folder with id {MockFolderId} not found";
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns((Folder?)null);
+
+            //Act + Assert
+            var result = await Assert.ThrowsAsync<ArgumentNullException>(
+                () => folderService.ChangeUserFolderNameAsync(MockUserId, MockFolderId, "newFolderName"));
         }
     }
 }
