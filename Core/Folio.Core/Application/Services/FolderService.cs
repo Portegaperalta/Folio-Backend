@@ -32,12 +32,9 @@ namespace Folio.Core.Application.Services
 
         public async Task CreateUserFolder(Folder folderEntity)
         {
-            if (folderEntity is null)
-            {
-                ArgumentNullException.ThrowIfNull("Folder entity cannot be null");
-            }
+            ArgumentNullException.ThrowIfNull(folderEntity);
 
-            await _folderRepository.AddAsync(folderEntity!);
+            await _folderRepository.AddAsync(folderEntity);
         }
 
         public async Task ChangeUserFolderNameAsync(Guid userId, Guid folderId, string newFolderName)
