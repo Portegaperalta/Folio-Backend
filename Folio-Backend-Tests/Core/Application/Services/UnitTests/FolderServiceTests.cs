@@ -37,5 +37,19 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             //Assert
             CollectionAssert.AreEqual(expected: MockFolderList.ToList(), actual: result);
         }
+
+        [TestMethod]
+        public async Task GetUserFolderByIdAsync_ReturnsNull_WhenFolderDoesNotExist()
+        {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns((Folder?)null);
+
+            //Act
+            var response = await folderService.GetUserFolderByIdAsync(MockUserId, MockFolderId);
+
+            //Assert
+            Assert.IsNull(response);
+        }
     }
 }
