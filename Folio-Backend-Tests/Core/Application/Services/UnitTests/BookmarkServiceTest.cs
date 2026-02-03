@@ -24,5 +24,30 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             MockBookmarkList = new List<Bookmark> { MockBookmarkEntity };
             bookmarkService = new(MockBookmarkRepository);
         }
+
+        [TestMethod]
+        public async Task GetAllUserBookmarksAsync_ReturnsIEnumerableBookmark()
+        {
+            //Arrange
+            MockBookmarkRepository.GetAllAsync(MockUserId, MockFolderId)
+                                  .Returns(MockBookmarkList);
+
+            //Act
+            var response = await bookmarkService.GetAllUserBookmarksAsync(MockUserId, MockFolderId);
+
+            //Assert
+            var result = response.ToList();
+            CollectionAssert.AreEqual(expected: MockBookmarkList.ToList(), actual: result);
+        }
+
+        [TestMethod]
+        public async Task GetAllUserBookmarksAsync_CallsGetAllAsyncFromBookmarkRepository()
+        {
+            //Act
+            await bookmarkService.GetAllUserBookmarksAsync(MockUserId, MockFolderId);
+
+            //Assert
+            await MockBookmarkRepository.Received(1).GetAllAsync(MockUserId, MockFolderId);
+        }
     }
 }
