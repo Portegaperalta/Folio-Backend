@@ -73,6 +73,20 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             Assert.IsNull(response);
         }
 
+        [TestMethod]
+        public async Task GetUserFolderByIdAsync_ReturnsFolderEntity()
+        {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns(MockFolderEntity);
+
+            //Act
+            var result = await folderService.GetUserFolderByIdAsync(MockUserId, MockFolderId);
+
+            //Assert
+            Assert.AreEqual(expected: MockFolderEntity, actual: result);
+        }
+
         // CreateUserFolder tests
         [TestMethod]
         public async Task CreateUserFolder_ThrowsArgumentNullException_WhenFolderEntityIsNull()
