@@ -9,6 +9,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
     public class BookmarkServiceTest
     {
         private readonly Guid MockUserId = Guid.NewGuid();
+        private readonly Guid MockBookmarkId = Guid.NewGuid();
         private readonly Guid MockFolderId = Guid.NewGuid();
         private readonly string FakeUrl = "https://fakeurl.com";
         private Bookmark MockBookmarkEntity = null!;
@@ -48,6 +49,47 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
             //Assert
             await MockBookmarkRepository.Received(1).GetAllAsync(MockUserId, MockFolderId);
+        }
+
+        [TestMethod]
+        public async Task GetUserBookmarkByIdAsync_ReturnsNull_WhenBookmarkDoesNotExist()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns((Bookmark?)null);
+
+            //Act
+            var response = await bookmarkService.GetUserBookmarkByIdAsync(MockUserId, MockFolderId, MockBookmarkId);
+
+            //Assert
+            Assert.IsNull(response);
+        }
+
+        [TestMethod]
+        public async Task GetUserFolderByIdAsync_ReturnsNull_WhenBookmarkDoesNotBelongToUser()
+        {
+            //Arrange
+            Guid unauthorizedUserId = Guid.NewGuid();
+
+            //Act 
+            var result = await bookmarkService.GetUserBookmarkByIdAsync(unauthorizedUserId, MockFolderId, MockBookmarkId);
+
+            //Assert
+            Assert.IsNull(result);
+        }
+
+        [TestMethod]
+        public async Task GetUserBookmarkByIdAsync_ReturnsBookmarkEntity()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns(MockBookmarkEntity);
+
+            //Act
+            var result = await bookmarkService.GetUserBookmarkByIdAsync(MockUserId, MockFolderId, MockBookmarkId);
+
+            //Assert
+            Assert.AreEqual(expected: MockBookmarkEntity, actual: result);
         }
     }
 }
