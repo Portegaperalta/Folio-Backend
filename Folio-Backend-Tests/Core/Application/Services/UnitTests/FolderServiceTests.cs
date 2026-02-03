@@ -81,6 +81,16 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         }
 
         [TestMethod]
+        public async Task CreateUserFolder_CallsAddAsyncFromFolderRepository()
+        {
+            //Act
+            await folderService.CreateUserFolder(MockFolderEntity);
+
+            //Assert
+            await MockfolderRepository.Received(1).AddAsync(MockFolderEntity);
+        }
+
+        [TestMethod]
         public async Task
             ChangeUserFolderNameAsync_ThrowsArgumentNullException_WhenFolderDoesNotExist()
         {
