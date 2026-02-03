@@ -1,5 +1,6 @@
 ﻿using Folio.Core.Application.Services;
 using Folio.Core.Domain.Entities;
+using Folio.Core.Domain.Exceptions;
 using Folio.Core.Interfaces;
 using NSubstitute;
 
@@ -96,7 +97,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         // ChangeUserFolderNameAsync tests
         [TestMethod]
         public async Task
-            ChangeUserFolderNameAsync_ThrowsArgumentNullException_WhenFolderDoesNotExist()
+            ChangeUserFolderNameAsync_ThrowsFolderNotFoundException_WhenFolderDoesNotExist()
         {
             //Arrange
             string expectedExceptionMessage = $"Folder with id {MockFolderId} not found";
@@ -104,7 +105,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
                                 .Returns((Folder?)null);
 
             //Act + Assert
-            var result = await Assert.ThrowsAsync<ArgumentNullException>(
+            var result = await Assert.ThrowsAsync<FolderNotFoundException>(
                 () => folderService.ChangeUserFolderNameAsync(MockUserId, MockFolderId, "newFolderName"));
         }
 
