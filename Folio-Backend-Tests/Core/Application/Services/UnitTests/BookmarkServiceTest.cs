@@ -194,5 +194,31 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             //Assert
             await MockBookmarkRepository.Received(1).UpdateAsync(MockBookmarkEntity);
         }
+
+        [TestMethod]
+        public async Task MarkUserBookmarkAsFavorite_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns((Bookmark?)null);
+
+            //Act + Assert
+            await Assert.ThrowsAsync<BookmarkNotFoundException>(() =>
+            bookmarkService.MarkUserBookmarkAsFavorite(MockUserId, MockFolderId, MockBookmarkId));
+        }
+
+        [TestMethod]
+        public async Task MarkUserBookmarkAsFavorite_CallsUpdateAsyncFromBookmarkRepository()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns(MockBookmarkEntity);
+
+            //Act
+            await bookmarkService.MarkUserBookmarkAsFavorite(MockUserId, MockFolderId, MockBookmarkId);
+
+            //Assert
+            await MockBookmarkRepository.Received(1).UpdateAsync(MockBookmarkEntity);
+        }
     }
 }
