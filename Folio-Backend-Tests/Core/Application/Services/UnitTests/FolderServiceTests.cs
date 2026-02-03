@@ -103,5 +103,19 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             var result = await Assert.ThrowsAsync<ArgumentNullException>(
                 () => folderService.ChangeUserFolderNameAsync(MockUserId, MockFolderId, "newFolderName"));
         }
+
+        [TestMethod]
+        public async Task ChangeUserFolderNameAsync_CallsUpdateAsyncFromFolderRepository()
+        {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns(MockFolderEntity);
+
+            //Act
+            await folderService.ChangeUserFolderNameAsync(MockUserId, MockFolderId, "newFolderName");
+
+            //Assert
+            await MockfolderRepository.Received(1).UpdateAsync(MockFolderEntity);
+        }
     }
 }
