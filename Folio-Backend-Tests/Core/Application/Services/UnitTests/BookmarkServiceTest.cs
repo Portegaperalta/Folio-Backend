@@ -1,5 +1,6 @@
 ﻿using Folio.Core.Application.Services;
 using Folio.Core.Domain.Entities;
+using Folio.Core.Domain.Exceptions;
 using Folio.Core.Interfaces;
 using NSubstitute;
 
@@ -111,6 +112,33 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
             //Assert
             await MockBookmarkRepository.Received(1).AddAsync(MockBookmarkEntity);
+        }
+
+        [TestMethod]
+        public async Task 
+            DeleteUserBookmarkAsync_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns((Bookmark?)null);
+
+            //Act + Assert
+            await Assert.ThrowsAsync<BookmarkNotFoundException>(() =>
+            bookmarkService.DeleteUserBookmarkAsync(MockUserId, MockFolderId, MockBookmarkId));
+        }
+
+        [TestMethod]
+        public async Task DeleteUserBookmarkAsync_CallsDeleteAsyncFromBookmarkRepository()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns(MockBookmarkEntity);
+
+            //Act
+            await bookmarkService.DeleteUserBookmarkAsync(MockUserId, MockFolderId, MockBookmarkId);
+
+            //Assert
+            await MockBookmarkRepository.Received(1).DeleteAsync(MockBookmarkEntity);
         }
     }
 }
