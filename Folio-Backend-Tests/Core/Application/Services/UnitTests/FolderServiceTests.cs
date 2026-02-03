@@ -3,6 +3,7 @@ using Folio.Core.Domain.Entities;
 using Folio.Core.Domain.Exceptions;
 using Folio.Core.Interfaces;
 using NSubstitute;
+using NSubstitute.ReceivedExtensions;
 
 namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 {
@@ -136,6 +137,20 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             //Act + Assert
             await Assert.ThrowsAsync<FolderNotFoundException>(
                 () => folderService.MarkUserFolderAsFavoriteAsync(MockUserId, MockFolderId));
+        }
+
+        [TestMethod]
+        public async Task MarkUserFolderAsFavoriteAsync_CallsUpdateAsyncFromFolderRepository()
+        {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns(MockFolderEntity);
+
+            //Act
+            await folderService.MarkUserFolderAsFavoriteAsync(MockUserId, MockFolderId);
+
+            //Assert
+            await MockfolderRepository.Received(1).UpdateAsync(MockFolderEntity);
         }
     }
 }
