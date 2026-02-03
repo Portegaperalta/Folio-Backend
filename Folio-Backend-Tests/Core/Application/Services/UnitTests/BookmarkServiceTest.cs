@@ -143,7 +143,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
         [TestMethod]
         public async Task 
-            ChangeUserBookmarkName_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
+            ChangeUserBookmarkNameAsync_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
         {
             //Arrange
             MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
@@ -151,18 +151,18 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
             //Act + Assert
             await Assert.ThrowsAsync<BookmarkNotFoundException>(() =>
-            bookmarkService.ChangeUserBookmarkName(MockUserId, MockFolderId, MockBookmarkId, "newName"));
+            bookmarkService.ChangeUserBookmarkNameAsync(MockUserId, MockFolderId, MockBookmarkId, "newName"));
         }
 
         [TestMethod]
-        public async Task ChangeUserBookmarkName_CallsUpdateAsyncFromBookmarkRepository()
+        public async Task ChangeUserBookmarkNameAsync_CallsUpdateAsyncFromBookmarkRepository()
         {
             //Arrange
             MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
                                   .Returns(MockBookmarkEntity);
 
             //Act
-            await bookmarkService.ChangeUserBookmarkName(MockUserId, MockFolderId, MockBookmarkId, "newName");
+            await bookmarkService.ChangeUserBookmarkNameAsync(MockUserId, MockFolderId, MockBookmarkId, "newName");
 
             //Assert
             await MockBookmarkRepository.Received(1).UpdateAsync(MockBookmarkEntity);
@@ -170,7 +170,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
         [TestMethod]
         public async Task 
-            ChangeUserBookmarkUrl_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
+            ChangeUserBookmarkUrlAsync_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
         {
             //Arrange
             MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
@@ -178,25 +178,25 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
             //Act + Assert
             await Assert.ThrowsAsync<BookmarkNotFoundException>(() =>
-            bookmarkService.ChangeUserBookmarkUrl(MockUserId, MockFolderId, MockBookmarkId, FakeUrl));
+            bookmarkService.ChangeUserBookmarkUrlAsync(MockUserId, MockFolderId, MockBookmarkId, FakeUrl));
         }
 
         [TestMethod]
-        public async Task ChangeUserBookmarkUrl_CallsUpdateAsyncFromBookmarkRepository()
+        public async Task ChangeUserBookmarkUrlAsync_CallsUpdateAsyncFromBookmarkRepository()
         {
             //Arrange
             MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
                                   .Returns(MockBookmarkEntity);
 
             //Act
-            await bookmarkService.ChangeUserBookmarkUrl(MockUserId, MockFolderId, MockBookmarkId, FakeUrl);
+            await bookmarkService.ChangeUserBookmarkUrlAsync(MockUserId, MockFolderId, MockBookmarkId, FakeUrl);
 
             //Assert
             await MockBookmarkRepository.Received(1).UpdateAsync(MockBookmarkEntity);
         }
 
         [TestMethod]
-        public async Task MarkUserBookmarkAsFavorite_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
+        public async Task MarkUserBookmarkAsFavoriteAsync_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
         {
             //Arrange
             MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
@@ -204,25 +204,25 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
             //Act + Assert
             await Assert.ThrowsAsync<BookmarkNotFoundException>(() =>
-            bookmarkService.MarkUserBookmarkAsFavorite(MockUserId, MockFolderId, MockBookmarkId));
+            bookmarkService.MarkUserBookmarkAsFavoriteAsync(MockUserId, MockFolderId, MockBookmarkId));
         }
 
         [TestMethod]
-        public async Task MarkUserBookmarkAsFavorite_CallsUpdateAsyncFromBookmarkRepository()
+        public async Task MarkUserBookmarkAsFavoriteAsync_CallsUpdateAsyncFromBookmarkRepository()
         {
             //Arrange
             MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
                                   .Returns(MockBookmarkEntity);
 
             //Act
-            await bookmarkService.MarkUserBookmarkAsFavorite(MockUserId, MockFolderId, MockBookmarkId);
+            await bookmarkService.MarkUserBookmarkAsFavoriteAsync(MockUserId, MockFolderId, MockBookmarkId);
 
             //Assert
             await MockBookmarkRepository.Received(1).UpdateAsync(MockBookmarkEntity);
         }
 
         [TestMethod]
-        public async Task UnmarkUserBookmarkAsFavorite_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
+        public async Task UnmarkUserBookmarkAsFavoriteAsync_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
         {
             //Arrange
             MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
@@ -230,18 +230,18 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
             //Act + Assert
             await Assert.ThrowsAsync<BookmarkNotFoundException>(() =>
-            bookmarkService.UnmarkUserBookmarkAsFavorite(MockUserId, MockFolderId, MockBookmarkId));
+            bookmarkService.UnmarkUserBookmarkAsFavoriteAsync(MockUserId, MockFolderId, MockBookmarkId));
         }
 
         [TestMethod]
-        public async Task UnmarkUserBookmarkAsFavorite_CallsUpdateAsyncFromBookmarkRepository()
+        public async Task UnmarkUserBookmarkAsFavoriteAsync_CallsUpdateAsyncFromBookmarkRepository()
         {
             //Arrange
             MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
                                   .Returns(MockBookmarkEntity);
 
             //Act
-            await bookmarkService.UnmarkUserBookmarkAsFavorite(MockUserId, MockFolderId, MockBookmarkId);
+            await bookmarkService.UnmarkUserBookmarkAsFavoriteAsync(MockUserId, MockFolderId, MockBookmarkId);
 
             //Assert
             await MockBookmarkRepository.Received(1).UpdateAsync(MockBookmarkEntity);
