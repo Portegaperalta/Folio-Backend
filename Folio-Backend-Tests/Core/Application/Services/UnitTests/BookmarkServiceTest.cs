@@ -91,5 +91,26 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             //Assert
             Assert.AreEqual(expected: MockBookmarkEntity, actual: result);
         }
+
+        [TestMethod]
+        public async Task CreateUserBookmarkAsync_ReturnsArgumentNullException_WhenBookmarkEntityIsNull()
+        {
+            //Arrange
+            Bookmark nullBookmarkEntity = null!;
+
+            //Act + Assert
+            await Assert.ThrowsAsync<ArgumentNullException>(() => 
+            bookmarkService.CreateUserBookmarkAsync(nullBookmarkEntity));
+        }
+
+        [TestMethod]
+        public async Task CreateUserBookmarkAsync_CallsAddAsyncFromBookmarkRepository()
+        {
+            //Act
+            await bookmarkService.CreateUserBookmarkAsync(MockBookmarkEntity);
+
+            //Assert
+            await MockBookmarkRepository.Received(1).AddAsync(MockBookmarkEntity);
+        }
     }
 }
