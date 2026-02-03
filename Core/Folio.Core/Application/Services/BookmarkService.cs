@@ -32,20 +32,14 @@ namespace Folio.Core.Application.Services
 
         public async Task CreateUserBookmarkAsync(Bookmark bookmarkEntity)
         {
-            if (bookmarkEntity is null)
-            {
-                ArgumentNullException.ThrowIfNull("Bookmark entity cannot be null");
-            }
+            ArgumentNullException.ThrowIfNull(bookmarkEntity);
 
             await _bookmarkRepository.AddAsync(bookmarkEntity!);
         }
 
         public async Task UpdateUserBookmarkAsync(Guid userId, Bookmark bookmarkEntity)
         {
-            if (bookmarkEntity is null)
-            {
-                ArgumentNullException.ThrowIfNull("Bookmark entity cannot be null");
-            }
+            ArgumentNullException.ThrowIfNull(bookmarkEntity);
 
             bool bookmarkExists = await _bookmarkRepository.ExistsAsync(userId,bookmarkEntity!.Id);
 

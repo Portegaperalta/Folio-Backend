@@ -1,5 +1,6 @@
 ﻿using Folio.Core.Application.Services;
 using Folio.Core.Domain.Entities;
+using Folio.Core.Domain.Exceptions;
 using Folio.Core.Interfaces;
 using NSubstitute;
 
@@ -90,6 +91,186 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
             //Assert
             Assert.AreEqual(expected: MockBookmarkEntity, actual: result);
+        }
+
+        [TestMethod]
+        public async Task CreateUserBookmarkAsync_ThrowsArgumentNullException_WhenBookmarkEntityIsNull()
+        {
+            //Arrange
+            Bookmark nullBookmarkEntity = null!;
+
+            //Act + Assert
+            await Assert.ThrowsAsync<ArgumentNullException>(() => 
+            bookmarkService.CreateUserBookmarkAsync(nullBookmarkEntity));
+        }
+
+        [TestMethod]
+        public async Task CreateUserBookmarkAsync_CallsAddAsyncFromBookmarkRepository()
+        {
+            //Act
+            await bookmarkService.CreateUserBookmarkAsync(MockBookmarkEntity);
+
+            //Assert
+            await MockBookmarkRepository.Received(1).AddAsync(MockBookmarkEntity);
+        }
+
+        [TestMethod]
+        public async Task 
+            DeleteUserBookmarkAsync_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns((Bookmark?)null);
+
+            //Act + Assert
+            await Assert.ThrowsAsync<BookmarkNotFoundException>(() =>
+            bookmarkService.DeleteUserBookmarkAsync(MockUserId, MockFolderId, MockBookmarkId));
+        }
+
+        [TestMethod]
+        public async Task DeleteUserBookmarkAsync_CallsDeleteAsyncFromBookmarkRepository()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns(MockBookmarkEntity);
+
+            //Act
+            await bookmarkService.DeleteUserBookmarkAsync(MockUserId, MockFolderId, MockBookmarkId);
+
+            //Assert
+            await MockBookmarkRepository.Received(1).DeleteAsync(MockBookmarkEntity);
+        }
+
+        [TestMethod]
+        public async Task 
+            ChangeUserBookmarkName_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns((Bookmark?)null);
+
+            //Act + Assert
+            await Assert.ThrowsAsync<BookmarkNotFoundException>(() =>
+            bookmarkService.ChangeUserBookmarkName(MockUserId, MockFolderId, MockBookmarkId, "newName"));
+        }
+
+        [TestMethod]
+        public async Task ChangeUserBookmarkName_CallsUpdateAsyncFromBookmarkRepository()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns(MockBookmarkEntity);
+
+            //Act
+            await bookmarkService.ChangeUserBookmarkName(MockUserId, MockFolderId, MockBookmarkId, "newName");
+
+            //Assert
+            await MockBookmarkRepository.Received(1).UpdateAsync(MockBookmarkEntity);
+        }
+
+        [TestMethod]
+        public async Task 
+            ChangeUserBookmarkUrl_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns((Bookmark?)null);
+
+            //Act + Assert
+            await Assert.ThrowsAsync<BookmarkNotFoundException>(() =>
+            bookmarkService.ChangeUserBookmarkUrl(MockUserId, MockFolderId, MockBookmarkId, FakeUrl));
+        }
+
+        [TestMethod]
+        public async Task ChangeUserBookmarkUrl_CallsUpdateAsyncFromBookmarkRepository()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns(MockBookmarkEntity);
+
+            //Act
+            await bookmarkService.ChangeUserBookmarkUrl(MockUserId, MockFolderId, MockBookmarkId, FakeUrl);
+
+            //Assert
+            await MockBookmarkRepository.Received(1).UpdateAsync(MockBookmarkEntity);
+        }
+
+        [TestMethod]
+        public async Task MarkUserBookmarkAsFavorite_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns((Bookmark?)null);
+
+            //Act + Assert
+            await Assert.ThrowsAsync<BookmarkNotFoundException>(() =>
+            bookmarkService.MarkUserBookmarkAsFavorite(MockUserId, MockFolderId, MockBookmarkId));
+        }
+
+        [TestMethod]
+        public async Task MarkUserBookmarkAsFavorite_CallsUpdateAsyncFromBookmarkRepository()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns(MockBookmarkEntity);
+
+            //Act
+            await bookmarkService.MarkUserBookmarkAsFavorite(MockUserId, MockFolderId, MockBookmarkId);
+
+            //Assert
+            await MockBookmarkRepository.Received(1).UpdateAsync(MockBookmarkEntity);
+        }
+
+        [TestMethod]
+        public async Task UnmarkUserBookmarkAsFavorite_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns((Bookmark?)null);
+
+            //Act + Assert
+            await Assert.ThrowsAsync<BookmarkNotFoundException>(() =>
+            bookmarkService.UnmarkUserBookmarkAsFavorite(MockUserId, MockFolderId, MockBookmarkId));
+        }
+
+        [TestMethod]
+        public async Task UnmarkUserBookmarkAsFavorite_CallsUpdateAsyncFromBookmarkRepository()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns(MockBookmarkEntity);
+
+            //Act
+            await bookmarkService.UnmarkUserBookmarkAsFavorite(MockUserId, MockFolderId, MockBookmarkId);
+
+            //Assert
+            await MockBookmarkRepository.Received(1).UpdateAsync(MockBookmarkEntity);
+        }
+
+        [TestMethod]
+        public async Task MarkUserBookmarkAsVisitedAsync_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns((Bookmark?)null);
+
+            //Act + Assert
+            await Assert.ThrowsAsync<BookmarkNotFoundException>(() =>
+            bookmarkService.MarkUserBookmarkAsVisitedAsync(MockUserId, MockFolderId, MockBookmarkId));
+        }
+
+        [TestMethod]
+        public async Task MarkUserBookmarkAsVisitedAsync_CallsUpdateAsyncFromBookmarkRepository()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns(MockBookmarkEntity);
+
+            //Act
+            await bookmarkService.MarkUserBookmarkAsVisitedAsync(MockUserId, MockFolderId, MockBookmarkId);
+
+            //Assert
+            await MockBookmarkRepository.Received(1).UpdateAsync(MockBookmarkEntity);
         }
     }
 }
