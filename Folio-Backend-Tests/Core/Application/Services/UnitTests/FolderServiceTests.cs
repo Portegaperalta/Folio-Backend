@@ -181,6 +181,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             await MockfolderRepository.Received(1).UpdateAsync(MockFolderEntity);
         }
 
+        // MarkUserFolderAsVisitedAsync tests
         [TestMethod]
         public async Task 
             MarkUserFolderAsVisitedAsync_ThrowsFolderNotFoundException_WhenFolderDoesNotExist()
@@ -209,6 +210,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             await MockfolderRepository.Received(1).UpdateAsync(MockFolderEntity);
         }
 
+        // DeleteUserFolderAsync tests
         [TestMethod]
         public async Task 
             DeleteUserFolderAsync_ThrowsArgumentNullException_WhenFolderEntityIsNull()
