@@ -25,6 +25,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             folderService = new FolderService(MockfolderRepository);
         }
 
+        // GetAllUserFoldersAsnyc tests
         [TestMethod]
         public async Task GetAllUserFoldersAsync_ReturnsIEnumerableFolder()
         {
@@ -39,6 +40,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             CollectionAssert.AreEqual(expected: MockFolderList.ToList(), actual: result);
         }
 
+        // GetUserFolderByIdAsyn tests
         [TestMethod]
         public async Task 
             GetUserFolderByIdAsync_ReturnsNull_WhenFolderDoesNotExist()
@@ -69,6 +71,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             Assert.IsNull(response);
         }
 
+        // CreateUserFolder tests
         [TestMethod]
         public async Task CreateUserFolder_ThrowsArgumentNullException_WhenFolderEntityIsNull()
         {
@@ -90,6 +93,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             await MockfolderRepository.Received(1).AddAsync(MockFolderEntity);
         }
 
+        // ChangeUserFolderNameAsync tests
         [TestMethod]
         public async Task
             ChangeUserFolderNameAsync_ThrowsArgumentNullException_WhenFolderDoesNotExist()
@@ -104,6 +108,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
                 () => folderService.ChangeUserFolderNameAsync(MockUserId, MockFolderId, "newFolderName"));
         }
 
+        // ChangeUserFolderNameAsync tests
         [TestMethod]
         public async Task ChangeUserFolderNameAsync_CallsUpdateAsyncFromFolderRepository()
         {
