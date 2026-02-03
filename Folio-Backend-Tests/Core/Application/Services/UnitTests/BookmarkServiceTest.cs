@@ -93,7 +93,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         }
 
         [TestMethod]
-        public async Task CreateUserBookmarkAsync_ReturnsArgumentNullException_WhenBookmarkEntityIsNull()
+        public async Task CreateUserBookmarkAsync_ThrowsArgumentNullException_WhenBookmarkEntityIsNull()
         {
             //Arrange
             Bookmark nullBookmarkEntity = null!;
