@@ -123,5 +123,19 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             //Assert
             await MockfolderRepository.Received(1).UpdateAsync(MockFolderEntity);
         }
+
+        // MarkUserFolderAsFavoriteAsync tests
+        [TestMethod]
+        public async Task 
+            MarkUserFolderAsFavoriteAsync_ThrowsFolderNotFoundException_WhenFolderDoesNotExist()
+        {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns((Folder?)null);
+
+            //Act + Assert
+            await Assert.ThrowsAsync<FolderNotFoundException>(
+                () => folderService.MarkUserFolderAsFavoriteAsync(MockUserId, MockFolderId));
+        }
     }
 }
