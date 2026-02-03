@@ -1,4 +1,4 @@
-﻿using Folio.Core.Domain;
+﻿using Folio.Core.Domain.Entities;
 
 namespace Folio.Core.Interfaces
 {

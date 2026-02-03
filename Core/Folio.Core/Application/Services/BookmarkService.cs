@@ -1,4 +1,5 @@
-﻿using Folio.Core.Domain;
+﻿using Folio.Core.Domain.Entities;
+using Folio.Core.Domain.Exceptions;
 using Folio.Core.Interfaces;
 
 namespace Folio.Core.Application.Services
@@ -50,7 +51,7 @@ namespace Folio.Core.Application.Services
 
             if (bookmarkExists is false)
             {
-                throw new ArgumentException($"Bookmark with id:{bookmarkEntity.Id} not found");
+                throw new BookmarkNotFoundException(bookmarkEntity.Id);
             }
 
             await _bookmarkRepository.UpdateAsync(bookmarkEntity);
@@ -62,7 +63,7 @@ namespace Folio.Core.Application.Services
 
             if (bookmark is null)
             {
-                throw new ArgumentException($"Bookmark with id {bookmarkId} not found");
+                throw new BookmarkNotFoundException(bookmarkId);
             }
 
             await _bookmarkRepository.DeleteAsync(bookmark);
@@ -75,7 +76,7 @@ namespace Folio.Core.Application.Services
 
             if (bookmark is null)
             {
-                throw new ArgumentException($"Bookmark with id {bookmarkId} not found");
+                throw new BookmarkNotFoundException(bookmarkId);
             }
 
             bookmark.ChangeName(newBookmarkName);
@@ -90,7 +91,7 @@ namespace Folio.Core.Application.Services
 
             if (bookmark is null)
             {
-                throw new ArgumentException($"Bookmark with id {bookmarkId} not found");
+                throw new BookmarkNotFoundException(bookmarkId);
             }
 
             bookmark.ChangeUrl(newBookmarkUrl);
@@ -104,7 +105,7 @@ namespace Folio.Core.Application.Services
 
             if (bookmark is null)
             {
-                throw new ArgumentException($"Bookmark with id {bookmarkId} not found");
+                throw new BookmarkNotFoundException(bookmarkId);
             }
 
             bookmark.MarkFavorite();
@@ -118,7 +119,7 @@ namespace Folio.Core.Application.Services
 
             if (bookmark is null)
             {
-                throw new ArgumentException($"Bookmark with id {bookmarkId} not found");
+                throw new BookmarkNotFoundException(bookmarkId);
             }
 
             bookmark.UnmarkFavorite();
@@ -132,7 +133,7 @@ namespace Folio.Core.Application.Services
 
             if (bookmark is null)
             {
-                throw new ArgumentException($"Bookmark with id {bookmarkId} not found");
+                throw new BookmarkNotFoundException(bookmarkId);
             }
 
             bookmark.Visit();

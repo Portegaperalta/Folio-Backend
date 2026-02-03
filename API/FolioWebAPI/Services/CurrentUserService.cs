@@ -1,4 +1,4 @@
-﻿using Folio.Core.Domain;
+﻿using Folio.Core.Domain.Entities;
 using Folio.Core.Interfaces;
 using Folio.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;

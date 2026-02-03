@@ -1,7 +1,9 @@
 ﻿using Folio.Core.Application.Services;
-using Folio.Core.Domain;
+using Folio.Core.Domain.Entities;
+using Folio.Core.Domain.Exceptions;
 using Folio.Core.Interfaces;
 using NSubstitute;
+using NSubstitute.ReceivedExtensions;
 
 namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 {
@@ -25,6 +27,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             folderService = new FolderService(MockfolderRepository);
         }
 
+        // GetAllUserFoldersAsnyc tests
         [TestMethod]
         public async Task GetAllUserFoldersAsync_ReturnsIEnumerableFolder()
         {
@@ -39,6 +42,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             CollectionAssert.AreEqual(expected: MockFolderList.ToList(), actual: result);
         }
 
+        // GetUserFolderByIdAsyn tests
         [TestMethod]
         public async Task 
             GetUserFolderByIdAsync_ReturnsNull_WhenFolderDoesNotExist()
@@ -70,6 +74,21 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         }
 
         [TestMethod]
+        public async Task GetUserFolderByIdAsync_ReturnsFolderEntity()
+        {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns(MockFolderEntity);
+
+            //Act
+            var result = await folderService.GetUserFolderByIdAsync(MockUserId, MockFolderId);
+
+            //Assert
+            Assert.AreEqual(expected: MockFolderEntity, actual: result);
+        }
+
+        // CreateUserFolder tests
+        [TestMethod]
         public async Task CreateUserFolder_ThrowsArgumentNullException_WhenFolderEntityIsNull()
         {
             //Arrange
@@ -81,8 +100,19 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         }
 
         [TestMethod]
+        public async Task CreateUserFolder_CallsAddAsyncFromFolderRepository()
+        {
+            //Act
+            await folderService.CreateUserFolder(MockFolderEntity);
+
+            //Assert
+            await MockfolderRepository.Received(1).AddAsync(MockFolderEntity);
+        }
+
+        // ChangeUserFolderNameAsync tests
+        [TestMethod]
         public async Task
-            ChangeUserFolderNameAsync_ThrowsArgumentNullException_WhenFolderDoesNotExist()
+            ChangeUserFolderNameAsync_ThrowsFolderNotFoundException_WhenFolderDoesNotExist()
         {
             //Arrange
             string expectedExceptionMessage = $"Folder with id {MockFolderId} not found";
@@ -90,8 +120,131 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
                                 .Returns((Folder?)null);
 
             //Act + Assert
-            var result = await Assert.ThrowsAsync<ArgumentNullException>(
+            var result = await Assert.ThrowsAsync<FolderNotFoundException>(
                 () => folderService.ChangeUserFolderNameAsync(MockUserId, MockFolderId, "newFolderName"));
+        }
+
+        // ChangeUserFolderNameAsync tests
+        [TestMethod]
+        public async Task ChangeUserFolderNameAsync_CallsUpdateAsyncFromFolderRepository()
+        {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns(MockFolderEntity);
+
+            //Act
+            await folderService.ChangeUserFolderNameAsync(MockUserId, MockFolderId, "newFolderName");
+
+            //Assert
+            await MockfolderRepository.Received(1).UpdateAsync(MockFolderEntity);
+        }
+
+        // MarkUserFolderAsFavoriteAsync tests
+        [TestMethod]
+        public async Task 
+            MarkUserFolderAsFavoriteAsync_ThrowsFolderNotFoundException_WhenFolderDoesNotExist()
+        {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns((Folder?)null);
+
+            //Act + Assert
+            await Assert.ThrowsAsync<FolderNotFoundException>(
+                () => folderService.MarkUserFolderAsFavoriteAsync(MockUserId, MockFolderId));
+        }
+
+        [TestMethod]
+        public async Task MarkUserFolderAsFavoriteAsync_CallsUpdateAsyncFromFolderRepository()
+        {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns(MockFolderEntity);
+
+            //Act
+            await folderService.MarkUserFolderAsFavoriteAsync(MockUserId, MockFolderId);
+
+            //Assert
+            await MockfolderRepository.Received(1).UpdateAsync(MockFolderEntity);
+        }
+
+        // UnmarkUserFolderAsFavoriteAsync tests
+        [TestMethod]
+        public async Task 
+            UnmarkUserFolderAsFavoriteAsync_ThrowsFolderNotFoundException_WhenFolderDoesNotExist()
+        {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns((Folder?)null);
+
+            //Act + Assert
+            await Assert.ThrowsAsync<FolderNotFoundException>(
+                () => folderService.UnmarkUserFolderAsFavoriteAsync(MockUserId, MockFolderId));
+        }
+
+        [TestMethod]
+        public async Task UnmarkUserFolderAsFavoriteAsync_CallsUpdateAsyncFromFolderRepository()
+        {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns(MockFolderEntity);
+
+            //Act
+            await folderService.UnmarkUserFolderAsFavoriteAsync(MockUserId, MockFolderId);
+
+            //Assert
+            await MockfolderRepository.Received(1).UpdateAsync(MockFolderEntity);
+        }
+
+        // MarkUserFolderAsVisitedAsync tests
+        [TestMethod]
+        public async Task 
+            MarkUserFolderAsVisitedAsync_ThrowsFolderNotFoundException_WhenFolderDoesNotExist()
+        {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns((Folder?)null);
+
+            //Act + Assert
+            await Assert.ThrowsAsync<FolderNotFoundException>(
+                () => folderService.MarkUserFolderAsVisitedAsync(MockUserId, MockFolderId));
+        }
+
+        [TestMethod]
+        public async Task
+            MarkUserFolderAsVisitedAsync_CallsUpdateAsyncFromFolderRepository()
+        {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns(MockFolderEntity);
+
+            //Act
+            await folderService.MarkUserFolderAsVisitedAsync(MockUserId, MockFolderId);
+
+            //Assert
+            await MockfolderRepository.Received(1).UpdateAsync(MockFolderEntity);
+        }
+
+        // DeleteUserFolderAsync tests
+        [TestMethod]
+        public async Task 
+            DeleteUserFolderAsync_ThrowsArgumentNullException_WhenFolderEntityIsNull()
+        {
+            //Arrange
+            Folder nullFolderEntity = null!;
+
+            //Act + Assert
+            await Assert.ThrowsAsync<ArgumentNullException>(
+                () => folderService.DeleteUserFolderAsync(MockUserId, nullFolderEntity));
+        }
+
+        [TestMethod]
+        public async Task DeleteUserFolderAsync_CallsDeleteAsyncFromFolderRepository()
+        {
+            //Act
+            await folderService.DeleteUserFolderAsync(MockUserId, MockFolderEntity);
+
+            //Assert
+            await MockfolderRepository.Received(1).DeleteAsync(MockFolderEntity);
         }
     }
 }

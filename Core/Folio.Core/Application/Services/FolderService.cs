@@ -1,4 +1,5 @@
-﻿using Folio.Core.Domain;
+﻿using Folio.Core.Domain.Entities;
+using Folio.Core.Domain.Exceptions;
 using Folio.Core.Interfaces;
 
 namespace Folio.Core.Application.Services
@@ -43,7 +44,7 @@ namespace Folio.Core.Application.Services
 
             if (folder is null)
             {
-                throw new ArgumentNullException($"Folder with id {folderId} not found");
+                throw new FolderNotFoundException(folderId);
             }
 
             folder.ChangeName(newFolderName);
@@ -51,13 +52,13 @@ namespace Folio.Core.Application.Services
             await _folderRepository.UpdateAsync(folder);
         }
 
-        public async Task MarkUserFolderAsFavoriteAync(Guid userId, Guid folderId)
+        public async Task MarkUserFolderAsFavoriteAsync(Guid userId, Guid folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
             if (folder is null)
             {
-                throw new ArgumentException($"Folder with id: {folderId} not found");
+                throw new FolderNotFoundException(folderId);
             }
 
             folder.MarkFavorite();
@@ -71,7 +72,7 @@ namespace Folio.Core.Application.Services
 
             if (folder is null)
             {
-                throw new ArgumentException($"Folder with id: {folderId} not found");
+                throw new FolderNotFoundException(folderId);
             }
 
             folder.UnmarkFavorite();
@@ -85,7 +86,7 @@ namespace Folio.Core.Application.Services
 
             if (folder is null)
             {
-                throw new ArgumentException($"Folder with id: {folderId} not found");
+                throw new FolderNotFoundException(folderId);
             }
 
             folder.Visit();

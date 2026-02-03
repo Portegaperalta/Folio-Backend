@@ -1,4 +1,4 @@
-﻿namespace Folio.Core.Application.Exceptions
+﻿namespace Folio.Core.Domain.Exceptions
 {
     public class ForbiddenAccessException : Exception
     {

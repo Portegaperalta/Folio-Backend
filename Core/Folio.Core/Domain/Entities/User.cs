@@ -1,4 +1,4 @@
-﻿namespace Folio.Core.Domain
+﻿namespace Folio.Core.Domain.Entities
 {
     public class User
     {

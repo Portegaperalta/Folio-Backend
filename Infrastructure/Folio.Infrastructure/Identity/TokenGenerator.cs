@@ -1,4 +1,4 @@
-﻿using Folio.Core.Domain;
+﻿using Folio.Core.Domain.Entities;
 using Folio.Core.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
