@@ -1,5 +1,5 @@
 ﻿using Folio.Core.Application.Services;
-using Folio.Core.Domain;
+using Folio.Core.Domain.Entities;
 using Folio.Core.Interfaces;
 using NSubstitute;
 
