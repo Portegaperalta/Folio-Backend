@@ -27,6 +27,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             bookmarkService = new(MockBookmarkRepository);
         }
 
+        // GetAllUserBookmarksAsync tests
         [TestMethod]
         public async Task GetAllUserBookmarksAsync_ReturnsIEnumerableBookmark()
         {
@@ -52,6 +53,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             await MockBookmarkRepository.Received(1).GetAllAsync(MockUserId, MockFolderId);
         }
 
+        // GetUserBookmarkByIdAsync tests
         [TestMethod]
         public async Task GetUserBookmarkByIdAsync_ReturnsNull_WhenBookmarkDoesNotExist()
         {
@@ -93,6 +95,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             Assert.AreEqual(expected: MockBookmarkEntity, actual: result);
         }
 
+        // CreateUserBookmarkAsync tests
         [TestMethod]
         public async Task CreateUserBookmarkAsync_ThrowsArgumentNullException_WhenBookmarkEntityIsNull()
         {
@@ -114,6 +117,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             await MockBookmarkRepository.Received(1).AddAsync(MockBookmarkEntity);
         }
 
+        // DeleteUserBookmarkAsync tests
         [TestMethod]
         public async Task 
             DeleteUserBookmarkAsync_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
@@ -141,6 +145,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             await MockBookmarkRepository.Received(1).DeleteAsync(MockBookmarkEntity);
         }
 
+        // ChangeUserBookmarkNameAsync tests
         [TestMethod]
         public async Task 
             ChangeUserBookmarkNameAsync_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
@@ -168,6 +173,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             await MockBookmarkRepository.Received(1).UpdateAsync(MockBookmarkEntity);
         }
 
+        // ChangeUserBookmarkUrlAsync tests
         [TestMethod]
         public async Task 
             ChangeUserBookmarkUrlAsync_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
@@ -195,6 +201,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             await MockBookmarkRepository.Received(1).UpdateAsync(MockBookmarkEntity);
         }
 
+        //MarkUserBookmarkAsFavoriteAsync tests
         [TestMethod]
         public async Task MarkUserBookmarkAsFavoriteAsync_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
         {
@@ -221,6 +228,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             await MockBookmarkRepository.Received(1).UpdateAsync(MockBookmarkEntity);
         }
 
+        // UnmarkUserBookmarkAsFavoriteAsync tests
         [TestMethod]
         public async Task UnmarkUserBookmarkAsFavoriteAsync_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
         {
@@ -247,6 +255,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             await MockBookmarkRepository.Received(1).UpdateAsync(MockBookmarkEntity);
         }
 
+        // MarkUserBookmarkAsVisitedAsync tests
         [TestMethod]
         public async Task MarkUserBookmarkAsVisitedAsync_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
         {
