@@ -153,6 +153,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             await MockfolderRepository.Received(1).UpdateAsync(MockFolderEntity);
         }
 
+        // UnmarkUserFolderAsFavoriteAsync tests
         [TestMethod]
         public async Task 
             UnmarkUserFolderAsFavoriteAsync_ThrowsFolderNotFoundException_WhenFolderDoesNotExist()
@@ -164,6 +165,20 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             //Act + Assert
             await Assert.ThrowsAsync<FolderNotFoundException>(
                 () => folderService.UnmarkUserFolderAsFavoriteAsync(MockUserId, MockFolderId));
+        }
+
+        [TestMethod]
+        public async Task UnmarkUserFolderAsFavoriteAsync_CallsUpdateAsyncFromFolderRepository()
+        {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns(MockFolderEntity);
+
+            //Act
+            await folderService.UnmarkUserFolderAsFavoriteAsync(MockUserId, MockFolderId);
+
+            //Assert
+            await MockfolderRepository.Received(1).UpdateAsync(MockFolderEntity);
         }
     }
 }
