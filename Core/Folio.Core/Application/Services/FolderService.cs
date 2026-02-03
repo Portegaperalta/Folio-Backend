@@ -52,7 +52,7 @@ namespace Folio.Core.Application.Services
             await _folderRepository.UpdateAsync(folder);
         }
 
-        public async Task MarkUserFolderAsFavoriteAync(Guid userId, Guid folderId)
+        public async Task MarkUserFolderAsFavoriteAsync(Guid userId, Guid folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
