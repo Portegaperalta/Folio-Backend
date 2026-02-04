@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Infrastructure\Identity\UnitTests\" />
+    <Folder Include="Infrastructure\Identity\" />
   </ItemGroup>
 
 </Project>
