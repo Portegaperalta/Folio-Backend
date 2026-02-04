@@ -6,7 +6,7 @@ namespace Folio_Backend_Tests.Core.Domain.Entities.UnitTests
     public class FolderTests
     {
         private readonly Guid MockUserId = Guid.NewGuid();
-        private string MockFolderName = "mock folder";
+        private readonly string MockFolderName = "mock folder";
         private Bookmark MockBookmark = null!;
         private Folder MockFolder = null!;
 
