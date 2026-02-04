@@ -38,7 +38,9 @@ namespace FolioWebAPI.Controllers
 
             var folders = await _folderService.GetAllUserFoldersAsync(currentUser.Id);
 
-            return Ok(folders);
+            var foldersDTOs = folders.Select(f => _folderMapper.ToDto(f));
+
+            return Ok(foldersDTOs);
         }
 
         [HttpGet("{folderId:guid}", Name = "GetUserFolder")]
