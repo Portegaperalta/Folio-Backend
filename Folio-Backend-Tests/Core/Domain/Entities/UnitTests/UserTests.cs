@@ -68,6 +68,31 @@ namespace Folio_Backend_Tests.Core.Domain.Entities.UnitTests
         }
 
         [TestMethod]
+        [DataRow(" ")]
+        [DataRow(null)]
+        public void ChangePassword_ThrowsArgumentException_WhenNewPasswordHashIsNullOrWhiteSpace(string? newPasswordHash)
+        {
+            //Arrange
+            string newUserPasswordHash = newPasswordHash!;
+
+            //Act + Assert
+            Assert.Throws<ArgumentException>(() => MockUser.ChangePassword(newUserPasswordHash));
+        }
+
+        [TestMethod]
+        public void ChangePassword_ShouldUpdatesPasswordHash()
+        {
+            //Arrange
+            string newPasswordHash = "e3d7cf509e5ffc03d30a20cdf3b513119e8f647c1afe49caadc5766fd13f3d18";
+
+            //Act
+            MockUser.ChangePassword(newPasswordHash);
+
+            //Assert
+            Assert.AreEqual(expected: newPasswordHash, actual: MockUser.PasswordHash);
+        }
+
+        [TestMethod]
         [DataRow("+18887778888")]
         [DataRow(null)]
         public void SetPhoneNumber_UpdatesPhoneNumber(string? PhoneNumber)
