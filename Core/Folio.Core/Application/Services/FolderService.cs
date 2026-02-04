@@ -19,6 +19,11 @@ namespace Folio.Core.Application.Services
             return folders;
         }
 
+        public async Task<int> CountUserFolders(Guid userId)
+        {
+            return await _folderRepository.CountByUserAsync(userId);
+        }
+
         public async Task<Folder?> GetUserFolderByIdAsync(Guid userId, Guid folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);

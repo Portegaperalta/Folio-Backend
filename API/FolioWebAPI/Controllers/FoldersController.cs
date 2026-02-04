@@ -63,6 +63,21 @@ namespace FolioWebAPI.Controllers
             return Ok(folderDTO);
         }
 
+        [HttpGet("count")]
+        public async Task<ActionResult<int>> Count()
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+
+            if (currentUser is null)
+            {
+                return Unauthorized("Authorization failed");
+            }
+
+            int folderCount = await _folderService.CountUserFolders(currentUser.Id);
+
+            return folderCount;
+        }
+
         // POST
         [HttpPost]
         public async Task<ActionResult> Create([FromForm] FolderCreationDTO folderCreationDTO)

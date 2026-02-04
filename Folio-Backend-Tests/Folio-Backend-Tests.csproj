@@ -23,4 +23,8 @@
     <ProjectReference Include="..\Infrastructure\Folio.Infrastructure\Folio.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Infrastructure\Identity\" />
+  </ItemGroup>
+
 </Project>
