@@ -5,7 +5,6 @@ namespace Folio.Core.Interfaces
     public interface IBookmarkRepository
     {
         Task<IEnumerable<Bookmark>> GetAllByUserIdAsync(Guid userId);
-
         Task<IEnumerable<Bookmark>> GetAllByUserAndFolderIdAsync(Guid userId, Guid folderId);
         Task<Bookmark?> GetByIdAsync(Guid userId, Guid folderId, Guid bookmarkId);
         Task<Bookmark?> GetByIdAsNoTrackingAsync(Guid userId, Guid folderId, Guid bookmarkId);
