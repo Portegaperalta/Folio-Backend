@@ -1,4 +1,5 @@
 ﻿using Folio.Core.Domain.Entities;
+using Folio.Core.Domain.Exceptions;
 
 namespace Folio_Backend_Tests.Core.Domain.Entities.UnitTests
 {
@@ -15,6 +16,16 @@ namespace Folio_Backend_Tests.Core.Domain.Entities.UnitTests
         {
             MockFolder = new Folder(MockFolderName, MockUserId);
             MockBookmark = new("mockBookmark", "https://fakeurl.com", MockFolder.Id, MockUserId);
+        }
+
+        [TestMethod]
+        [DataRow(null)]
+        [DataRow("")]
+        [DataRow(" ")]
+        public void ChangeName_ThrowsEmptyFolderNameException_WhenNewNameIsNullOrWhiteSpace(string? newName)
+        {
+            //Act + Assert
+            Assert.Throws<EmptyFolderNameException>(() => MockFolder.ChangeName(newName!));
         }
 
         [TestMethod]
