@@ -40,7 +40,7 @@ namespace FolioWebAPI.Controllers
             return Ok(bookmarksDTOs);
         }
 
-        [HttpGet("{bookmarkId:guid}")]
+        [HttpGet("{bookmarkId:guid}", Name = "GetUserBookmark")]
         public async Task<ActionResult<BookmarkDTO>> GetById([FromRoute] Guid folderId, [FromRoute] Guid bookmarkId)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -56,6 +56,24 @@ namespace FolioWebAPI.Controllers
             var bookmarkDTO = _bookmarkMapper.ToDto(bookmark);
 
             return Ok(bookmarkDTO);
+        }
+
+        // POST
+        [HttpPost]
+        public async Task<ActionResult> Create([FromForm] BookmarkCreationDTO bookmarkCreationDTO)
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+
+            if (currentUser is null)
+                return Unauthorized("Authorization failed");
+
+            var bookmarkEntity = _bookmarkMapper.ToEntity(currentUser.Id, bookmarkCreationDTO);
+
+            await _bookmarkService.CreateUserBookmarkAsync(bookmarkEntity);
+
+            var bookmarkDTO = _bookmarkMapper.ToDto(bookmarkEntity);
+
+            return CreatedAtRoute("GetUserBookmark", new { bookmarkId = bookmarkEntity.Id }, bookmarkDTO);
         }
     }
 }
