@@ -29,9 +29,7 @@ namespace Folio.Core.Application.Services
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
             if (folder is null)
-            {
                 return null;
-            }
 
             return folder;
         }
@@ -48,9 +46,7 @@ namespace Folio.Core.Application.Services
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
             if (folder is null)
-            {
                 throw new FolderNotFoundException(folderId);
-            }
 
             folder.ChangeName(newFolderName);
 
@@ -62,9 +58,7 @@ namespace Folio.Core.Application.Services
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
             if (folder is null)
-            {
                 throw new FolderNotFoundException(folderId);
-            }
 
             folder.MarkFavorite();
 
@@ -76,9 +70,7 @@ namespace Folio.Core.Application.Services
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
             if (folder is null)
-            {
                 throw new FolderNotFoundException(folderId);
-            }
 
             folder.UnmarkFavorite();
 
@@ -90,9 +82,7 @@ namespace Folio.Core.Application.Services
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
             if (folder is null)
-            {
                 throw new FolderNotFoundException(folderId);
-            }
 
             folder.Visit();
 
@@ -102,9 +92,7 @@ namespace Folio.Core.Application.Services
         public async Task DeleteUserFolderAsync(Guid userId, Folder folderEntity)
         {
             if (folderEntity is null)
-            {
                 ArgumentNullException.ThrowIfNull(folderEntity);
-            }
 
             await _folderRepository.DeleteAsync(folderEntity);
         }
