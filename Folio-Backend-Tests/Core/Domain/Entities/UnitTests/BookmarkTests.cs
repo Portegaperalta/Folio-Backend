@@ -43,13 +43,13 @@ namespace Folio_Backend_Tests.Core.Domain.Entities.UnitTests
         }
 
         [TestMethod]
-        public void ChangeUrl_ThrowsArgumentException_WhenNewBookmarkUrlIsNull()
+        [DataRow(null)]
+        [DataRow("")]
+        [DataRow(" ")]
+        public void ChangeUrl_ThrowsEmptyBookmarkUrlException_WhenNewUrlIsNullOrEmpty(string? newUrl)
         {
-            //Arrange
-            string newBookmarkUrl = null!;
-
             //Act + Assert
-            Assert.Throws<ArgumentException>(() => MockBookmark.ChangeUrl(newBookmarkUrl));
+            Assert.Throws<EmptyBookmarkUrlException>(() => MockBookmark.ChangeUrl(newUrl!));
         }
 
         [TestMethod]
