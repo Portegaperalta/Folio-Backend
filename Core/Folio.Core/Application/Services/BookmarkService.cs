@@ -13,9 +13,14 @@ namespace Folio.Core.Application.Services
             _bookmarkRepository = bookmarkRepository;
         }
 
-        public async Task<IEnumerable<Bookmark>> GetAllUserBookmarksAsync(Guid userId, Guid folderId)
+        public async Task<IEnumerable<Bookmark>> GetAllUserBookmarksAsync(Guid userId, Guid? folderId)
         {
-            return await _bookmarkRepository.GetAllAsync(userId,folderId);
+            if (folderId is null)
+            {
+                return await _bookmarkRepository.GetAllByUserIdAsync(userId);
+            }
+
+            return await _bookmarkRepository.GetAllByUserAndFolderIdAsync(userId, folderId.Value);
         }
 
         public async Task<Bookmark?> GetUserBookmarkByIdAsync(Guid userId, Guid folderId, Guid bookmarkId)
