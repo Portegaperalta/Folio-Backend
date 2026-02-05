@@ -1,6 +1,7 @@
 ﻿using Folio.Core.Application.Services;
 using Folio.Core.Interfaces;
 using FolioWebAPI.DTOs.Bookmark;
+using FolioWebAPI.DTOs.Folder;
 using FolioWebAPI.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -74,6 +75,46 @@ namespace FolioWebAPI.Controllers
             var bookmarkDTO = _bookmarkMapper.ToDto(bookmarkEntity);
 
             return CreatedAtRoute("GetUserBookmark", new { bookmarkId = bookmarkEntity.Id }, bookmarkDTO);
+        }
+
+        // PUT
+        [HttpPut]
+        public async Task<ActionResult> Update([FromRoute] Guid folderId, [FromForm] BookmarkUpdateDTO bookmarkUpdateDTO)
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+
+            if (currentUser is null)
+                return Unauthorized("Authorization failed");
+
+            var bookmark = await _bookmarkService.GetUserBookmarkByIdAsync(currentUser.Id, folderId, bookmarkUpdateDTO.Id);
+
+            if (bookmark is null)
+                return NotFound($"Bookmark with id: {bookmarkUpdateDTO.Id} not found");
+
+            if (bookmarkUpdateDTO.Name is not null)
+            {
+                await _bookmarkService.
+                    ChangeUserBookmarkNameAsync(currentUser.Id, folderId, bookmark.Id, bookmarkUpdateDTO.Name);
+            }
+
+            if (bookmarkUpdateDTO.Url is not null)
+            {
+                await _bookmarkService.
+                    ChangeUserBookmarkUrlAsync(currentUser.Id, folderId, bookmark.Id, bookmarkUpdateDTO.Url);
+            }
+
+            if (bookmarkUpdateDTO.IsMarkedFavorite.HasValue)
+            {
+                if (bookmarkUpdateDTO.IsMarkedFavorite is true)
+                {
+                    await _bookmarkService.MarkUserBookmarkAsFavoriteAsync(currentUser.Id, folderId, bookmark.Id);
+                } else
+                {
+                    await _bookmarkService.UnmarkUserBookmarkAsFavoriteAsync(currentUser.Id, folderId, bookmark.Id);
+                }
+            }
+
+            return NoContent();
         }
     }
 }
