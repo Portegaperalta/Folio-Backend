@@ -1,4 +1,6 @@
-﻿namespace Folio.Core.Domain.Entities
+﻿using Folio.Core.Domain.Exceptions;
+
+namespace Folio.Core.Domain.Entities
 {
     public class Folder
     {
@@ -18,7 +20,7 @@
         {
             if (string.IsNullOrWhiteSpace(name) is true)
             {
-                throw new ArgumentException("Name cannot be empty");
+                throw new EmptyFolderNameException();
             }
 
             this.Name = name;
@@ -32,9 +34,7 @@
         public void ChangeName(string newName)
         {
             if (string.IsNullOrWhiteSpace(newName) is true)
-            {
-                throw new ArgumentException("Name cannot be empty");
-            }
+                throw new EmptyFolderNameException();
 
             this.Name = newName;
         }
@@ -48,14 +48,10 @@
         public void AddBookmark(Bookmark newBookmark)
         {
             if (newBookmark is null)
-            {
                 ArgumentNullException.ThrowIfNull(newBookmark);
-            }
 
             if (newBookmark.FolderId != this.Id)
-            {
                 throw new ArgumentException("Bookmark doesn't belong to this folder");
-            }
 
             this._bookmarks.Add(newBookmark);
         }
@@ -65,9 +61,7 @@
             var bookmark = this._bookmarks.FirstOrDefault(b => b.Id == bookmarkId);
             
             if (bookmark is not null)
-            {
                 this._bookmarks.Remove(bookmark);
-            }
         }
     }
 }

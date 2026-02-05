@@ -32,7 +32,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         public async Task GetAllUserBookmarksAsync_ReturnsIEnumerableBookmark()
         {
             //Arrange
-            MockBookmarkRepository.GetAllAsync(MockUserId, MockFolderId)
+            MockBookmarkRepository.GetAllByUserAndFolderIdAsync(MockUserId, MockFolderId)
                                   .Returns(MockBookmarkList);
 
             //Act
@@ -50,7 +50,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             await bookmarkService.GetAllUserBookmarksAsync(MockUserId, MockFolderId);
 
             //Assert
-            await MockBookmarkRepository.Received(1).GetAllAsync(MockUserId, MockFolderId);
+            await MockBookmarkRepository.Received(1).GetAllByUserAndFolderIdAsync(MockUserId, MockFolderId);
         }
 
         // GetUserBookmarkByIdAsync tests
