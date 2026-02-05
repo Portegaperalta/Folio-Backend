@@ -124,7 +124,7 @@ namespace FolioWebAPI.Controllers
         }
 
         [HttpPut("{folderId:guid}/visit")]
-        public async Task<ActionResult> VisitFolder([FromRoute] Guid folderId)
+        public async Task<ActionResult> Visit([FromRoute] Guid folderId)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
 
