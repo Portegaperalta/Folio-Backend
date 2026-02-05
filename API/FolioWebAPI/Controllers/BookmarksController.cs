@@ -78,8 +78,9 @@ namespace FolioWebAPI.Controllers
         }
 
         // PUT
-        [HttpPut]
-        public async Task<ActionResult> Update([FromRoute] Guid folderId, [FromForm] BookmarkUpdateDTO bookmarkUpdateDTO)
+        [HttpPut("{bookmarkId:guid}")]
+        public async Task<ActionResult> Update
+            ([FromRoute] Guid bookmarkId,[FromRoute] Guid folderId, [FromForm] BookmarkUpdateDTO bookmarkUpdateDTO)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
 
