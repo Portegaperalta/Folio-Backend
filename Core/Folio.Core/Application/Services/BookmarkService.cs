@@ -16,9 +16,7 @@ namespace Folio.Core.Application.Services
         public async Task<IEnumerable<Bookmark>> GetAllUserBookmarksAsync(Guid userId, Guid? folderId)
         {
             if (folderId is null)
-            {
                 return await _bookmarkRepository.GetAllByUserIdAsync(userId);
-            }
 
             return await _bookmarkRepository.GetAllByUserAndFolderIdAsync(userId, folderId.Value);
         }
@@ -28,9 +26,7 @@ namespace Folio.Core.Application.Services
             var bookmark = await _bookmarkRepository.GetByIdAsync(userId,folderId,bookmarkId);
 
             if (bookmark is null)
-            {
                 return null;
-            }
 
             return bookmark;
         }
@@ -49,9 +45,7 @@ namespace Folio.Core.Application.Services
             bool bookmarkExists = await _bookmarkRepository.ExistsAsync(userId,bookmarkEntity!.Id);
 
             if (bookmarkExists is false)
-            {
                 throw new BookmarkNotFoundException(bookmarkEntity.Id);
-            }
 
             await _bookmarkRepository.UpdateAsync(bookmarkEntity);
         }
@@ -61,9 +55,7 @@ namespace Folio.Core.Application.Services
             var bookmark = await _bookmarkRepository.GetByIdAsync(userId,folderId,bookmarkId);
 
             if (bookmark is null)
-            {
                 throw new BookmarkNotFoundException(bookmarkId);
-            }
 
             await _bookmarkRepository.DeleteAsync(bookmark);
         }
@@ -74,9 +66,7 @@ namespace Folio.Core.Application.Services
             var bookmark = await _bookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId);
 
             if (bookmark is null)
-            {
                 throw new BookmarkNotFoundException(bookmarkId);
-            }
 
             bookmark.ChangeName(newBookmarkName);
 
@@ -89,9 +79,7 @@ namespace Folio.Core.Application.Services
             var bookmark = await _bookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId);
 
             if (bookmark is null)
-            {
                 throw new BookmarkNotFoundException(bookmarkId);
-            }
 
             bookmark.ChangeUrl(newBookmarkUrl);
 
@@ -103,9 +91,7 @@ namespace Folio.Core.Application.Services
             var bookmark = await _bookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId);
 
             if (bookmark is null)
-            {
                 throw new BookmarkNotFoundException(bookmarkId);
-            }
 
             bookmark.MarkFavorite();
 
@@ -117,9 +103,7 @@ namespace Folio.Core.Application.Services
             var bookmark = await _bookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId);
 
             if (bookmark is null)
-            {
                 throw new BookmarkNotFoundException(bookmarkId);
-            }
 
             bookmark.UnmarkFavorite();
 
@@ -131,9 +115,7 @@ namespace Folio.Core.Application.Services
             var bookmark = await _bookmarkRepository.GetByIdAsync(userId,folderId,bookmarkId);
 
             if (bookmark is null)
-            {
                 throw new BookmarkNotFoundException(bookmarkId);
-            }
 
             bookmark.Visit();
 
