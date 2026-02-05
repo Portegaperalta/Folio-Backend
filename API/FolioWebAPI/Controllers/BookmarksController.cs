@@ -130,5 +130,24 @@ namespace FolioWebAPI.Controllers
 
             return NoContent();
         }
+
+        // DELETE
+        [HttpDelete("{bookmarkId:guid}")]
+        public async Task<ActionResult> Delete([FromRoute] Guid bookmarkId, [FromRoute] Guid folderId)
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+
+            if (currentUser is null)
+                return Unauthorized("Authorization failed");
+
+            var bookmark = await _bookmarkService.GetUserBookmarkByIdAsync(currentUser.Id, folderId, bookmarkId);
+
+            if (bookmark is null)
+                return NotFound($"Bookmark with id: {bookmarkId} not found");
+
+            await _bookmarkService.DeleteUserBookmarkAsync(currentUser.Id, folderId, bookmarkId);
+
+            return NoContent();
+        }
     }
 }
