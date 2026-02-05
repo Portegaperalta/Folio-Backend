@@ -1,4 +1,5 @@
 ﻿using Folio.Core.Domain.Entities;
+using Folio.Core.Domain.Exceptions;
 
 namespace Folio_Backend_Tests.Core.Domain.Entities.UnitTests
 {
@@ -18,13 +19,14 @@ namespace Folio_Backend_Tests.Core.Domain.Entities.UnitTests
         }
 
         [TestMethod]
-        public void ChangeName_ThrowsArgumentException_WhenNewBookmarkNameIsNull()
+        [DataRow(null)]
+        [DataRow("")]
+        [DataRow(" ")]
+        public void 
+            ChangeName_ThrowsEmptyBookmarkNameException_WhenNewNameIsNullOrEmpty(string? newName)
         {
-            //Arrange
-            string newName = null!;
-
             //Act + Assert
-            Assert.Throws<ArgumentException>(() => MockBookmark.ChangeName(newName));
+            Assert.Throws<EmptyBookmarkNameException>(() => MockBookmark.ChangeName(newName!));
         }
 
         [TestMethod]
