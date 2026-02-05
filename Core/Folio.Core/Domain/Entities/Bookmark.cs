@@ -1,4 +1,6 @@
-﻿namespace Folio.Core.Domain.Entities
+﻿using Folio.Core.Domain.Exceptions;
+
+namespace Folio.Core.Domain.Entities
 {
     public class Bookmark
     {
@@ -18,7 +20,7 @@
         {
             if (string.IsNullOrWhiteSpace(name) is true)
             {
-                throw new ArgumentException("Bookmark name cannot be empty");
+                throw new EmptyBookmarkNameException();
             }
 
             if (string.IsNullOrWhiteSpace(url) is true)
@@ -40,7 +42,7 @@
         {
             if (string.IsNullOrWhiteSpace(newName) is true)
             {
-                throw new ArgumentException("Bookmark name cannot be empty");
+                throw new EmptyBookmarkNameException();
             }
 
             this.Name = newName;
