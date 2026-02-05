@@ -117,5 +117,18 @@ namespace FolioWebAPI.Controllers
 
             return NoContent();
         }
+
+        [HttpPut("{bookmarkId:guid}/visit")]
+        public async Task<ActionResult> Visit([FromRoute] Guid bookmarkId, [FromRoute] Guid folderId)
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+
+            if (currentUser is null)
+                return Unauthorized("Authorization failed");
+
+            await _bookmarkService.MarkUserBookmarkAsVisitedAsync(currentUser.Id, folderId, bookmarkId);
+
+            return NoContent();
+        }
     }
 }
