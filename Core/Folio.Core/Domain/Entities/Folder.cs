@@ -1,4 +1,6 @@
-﻿namespace Folio.Core.Domain.Entities
+﻿using Folio.Core.Domain.Exceptions;
+
+namespace Folio.Core.Domain.Entities
 {
     public class Folder
     {
@@ -18,7 +20,7 @@
         {
             if (string.IsNullOrWhiteSpace(name) is true)
             {
-                throw new ArgumentException("Name cannot be empty");
+                throw new EmptyFolderNameException();
             }
 
             this.Name = name;
@@ -32,9 +34,7 @@
         public void ChangeName(string newName)
         {
             if (string.IsNullOrWhiteSpace(newName) is true)
-            {
-                throw new ArgumentException("Name cannot be empty");
-            }
+                throw new EmptyFolderNameException();
 
             this.Name = newName;
         }
