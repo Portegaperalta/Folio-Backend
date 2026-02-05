@@ -11,8 +11,5 @@ namespace FolioWebAPI.DTOs.Bookmark
         [Required(ErrorMessage = "The field {0} is required")]
         [Url(ErrorMessage = "The field {0} must be a valid Url")]
         public required string Url { get; set; }
-
-        [Required(ErrorMessage = "The field {0} is required")]
-        public required Guid FolderId { get; set; }
     }
 }
