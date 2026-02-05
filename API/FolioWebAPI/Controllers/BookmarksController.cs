@@ -1,7 +1,6 @@
 ﻿using Folio.Core.Application.Services;
 using Folio.Core.Interfaces;
 using FolioWebAPI.DTOs.Bookmark;
-using FolioWebAPI.DTOs.Folder;
 using FolioWebAPI.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +16,8 @@ namespace FolioWebAPI.Controllers
         private readonly ICurrentUserService _currentUserService;
         private readonly BookmarkMapper _bookmarkMapper;
 
-        public BookmarksController(BookmarkService bookmarkService, ICurrentUserService currentUserService, BookmarkMapper bookmarkMapper)
+        public BookmarksController
+            (BookmarkService bookmarkService, ICurrentUserService currentUserService, BookmarkMapper bookmarkMapper)
         {
             _bookmarkService = bookmarkService;
             _currentUserService = currentUserService;
@@ -42,7 +42,8 @@ namespace FolioWebAPI.Controllers
         }
 
         [HttpGet("{bookmarkId:guid}", Name = "GetUserBookmark")]
-        public async Task<ActionResult<BookmarkDTO>> GetById([FromRoute] Guid folderId, [FromRoute] Guid bookmarkId)
+        public async Task<ActionResult<BookmarkDTO>> GetById
+            ([FromRoute] Guid folderId, [FromRoute] Guid bookmarkId)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
 
