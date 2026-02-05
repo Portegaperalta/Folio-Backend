@@ -25,7 +25,7 @@ namespace Folio.Core.Domain.Entities
 
             if (string.IsNullOrWhiteSpace(url) is true)
             {
-                throw new ArgumentException("Bookmark url cannot be empty");
+                throw new EmptyBookmarkUrlException();
             }
 
             this.Name = name;
@@ -52,7 +52,7 @@ namespace Folio.Core.Domain.Entities
         {
             if (string.IsNullOrWhiteSpace(newUrl) is true)
             {
-                throw new ArgumentException("Bookmark url cannot be empty");
+                throw new EmptyBookmarkUrlException();
             }
 
             this.Url = newUrl;
