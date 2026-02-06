@@ -31,12 +31,10 @@ namespace Folio.Infrastructure.Identity
 
             var result = await _userManager.CreateAsync(newApplicationUser, password);
 
-            if (result.Succeeded is not true)
+            if (result.Succeeded is false)
             {
-                foreach (var error in result.Errors)
-                {
-                    Console.WriteLine(error);
-                }
+                var errorMessages = string.Join(",", result.Errors.Select(e => e.Description));
+                throw new Exception($"Registration failed: {errorMessages}");
             }
 
             var applicationUser = await _userManager.FindByEmailAsync(email);
