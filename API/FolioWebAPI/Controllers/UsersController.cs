@@ -14,17 +14,20 @@ namespace FolioWebAPI.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IAuthenticationService _authenticationService;
         private readonly ITokenGenerator _tokenGenerator;
         private readonly ICurrentUserService _currentUserService;
 
         public UsersController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
+            IAuthenticationService authenticationService,
             ITokenGenerator tokenGenerator,
             ICurrentUserService currentUserService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _authenticationService = authenticationService;
             _tokenGenerator = tokenGenerator;
             _currentUserService = currentUserService;
         }
@@ -34,34 +37,13 @@ namespace FolioWebAPI.Controllers
         public async Task<ActionResult<AuthenticationResponseDTO>>
             Register([FromForm] RegisterCredentialsDTO registerCredentialsDTO)
         {
-            var user = new ApplicationUser
-            {
-                Name = registerCredentialsDTO.Name,
-                UserName = registerCredentialsDTO.Email,
-                Email = registerCredentialsDTO.Email,
-                CreationDate = DateTime.UtcNow.Date,
-                PhoneNumber = registerCredentialsDTO.PhoneNumber
-            };
 
-            var result = await _userManager.CreateAsync(user, registerCredentialsDTO.Password);
+            var authenticationResponse = await _authenticationService
+                                               .RegisterAsync(registerCredentialsDTO.Name,
+                                               registerCredentialsDTO.Email,
+                                               registerCredentialsDTO.Password);
 
-            if (result.Succeeded is not true)
-            {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-
-                return ValidationProblem();
-            }
-
-            var applicationUser = await _userManager.FindByEmailAsync(user.Email);
-
-            var userEntity = UserMapper.ToDomainEntity(applicationUser!);
-
-            var token = _tokenGenerator.GenerateJwt(userEntity);
-
-            return new AuthenticationResponseDTO { Token = token };
+            return authenticationResponse;
         }
 
         [HttpPost("login")]
