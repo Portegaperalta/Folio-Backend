@@ -49,6 +49,7 @@ namespace FolioWebAPI
                             .AddEntityFrameworkStores<ApplicationDbContext>()
                             .AddDefaultTokenProviders();
 
+            builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
             builder.Services.AddScoped<UserManager<ApplicationUser>>();
             builder.Services.AddScoped<SignInManager<ApplicationUser>>();
             builder.Services.AddHttpContextAccessor();
