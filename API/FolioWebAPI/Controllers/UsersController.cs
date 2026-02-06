@@ -12,21 +12,14 @@ namespace FolioWebAPI.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IAuthenticationService _authenticationService;
         private readonly ITokenGenerator _tokenGenerator;
         private readonly ICurrentUserService _currentUserService;
 
-        public UsersController(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            IAuthenticationService authenticationService,
+        public UsersController(IAuthenticationService authenticationService,
             ITokenGenerator tokenGenerator,
             ICurrentUserService currentUserService)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
             _authenticationService = authenticationService;
             _tokenGenerator = tokenGenerator;
             _currentUserService = currentUserService;
@@ -38,8 +31,8 @@ namespace FolioWebAPI.Controllers
             Register([FromForm] RegisterCredentialsDTO registerCredentialsDTO)
         {
 
-            var authenticationResponse = await _authenticationService
-                                               .RegisterAsync(registerCredentialsDTO.Name,
+            var authenticationResponse = await _authenticationService.RegisterAsync(
+                                               registerCredentialsDTO.Name,
                                                registerCredentialsDTO.Email,
                                                registerCredentialsDTO.Password);
 
@@ -49,25 +42,16 @@ namespace FolioWebAPI.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<AuthenticationResponseDTO>> Login([FromForm] LoginCredentialsDTO loginCredentialsDTO)
         {
-            var applicationUser = await _userManager.FindByNameAsync(loginCredentialsDTO.Email);
 
-            if (applicationUser is null)
+            var authenticationResponseDTO = await _authenticationService
+                                                 .LoginAsync(loginCredentialsDTO.Email, loginCredentialsDTO.Password);
+
+            if (authenticationResponseDTO is null)
             {
-                return BadRequest("Authentication failed");
+                return Unauthorized("Authentication failed");
             }
 
-            var result = await _signInManager.CheckPasswordSignInAsync(applicationUser, loginCredentialsDTO.Password, false);
-
-            if (result.Succeeded is not true)
-            {
-                return BadRequest("Authentication failed");
-            }
-
-            var userEntity = UserMapper.ToDomainEntity(applicationUser);
-
-            var token = _tokenGenerator.GenerateJwt(userEntity);
-
-            return new AuthenticationResponseDTO { Token = token };
+            return authenticationResponseDTO;
         }
 
         [HttpGet("renew-token")]
