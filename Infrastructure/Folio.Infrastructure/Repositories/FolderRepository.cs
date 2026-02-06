@@ -27,7 +27,8 @@ namespace Folio.Infrastructure.Repositories
             return await _dbContext.Folders
                                    .Where(f => f.Id == folderId)
                                    .Include(f => f.Bookmarks)
-                                   .FirstOrDefaultAsync();
+                                   .FirstOrDefaultAsync(f => 
+                                   f.UserId == userId);
         }
 
         public async Task AddAsync(Folder folderEntity)
