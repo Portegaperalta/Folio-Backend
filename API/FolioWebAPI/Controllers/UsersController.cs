@@ -13,15 +13,11 @@ namespace FolioWebAPI.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IAuthenticationService _authenticationService;
-        private readonly ITokenGenerator _tokenGenerator;
         private readonly ICurrentUserService _currentUserService;
 
-        public UsersController(IAuthenticationService authenticationService,
-            ITokenGenerator tokenGenerator,
-            ICurrentUserService currentUserService)
+        public UsersController(IAuthenticationService authenticationService, ICurrentUserService currentUserService)
         {
             _authenticationService = authenticationService;
-            _tokenGenerator = tokenGenerator;
             _currentUserService = currentUserService;
         }
 
@@ -63,9 +59,9 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authentication failed");
 
-            var token = _tokenGenerator.GenerateJwt(currentUser);
+            var authenticationResponseDTO = _authenticationService.RenewToken(currentUser);
 
-            return Ok(new AuthenticationResponseDTO { Token = token });
+            return Ok(authenticationResponseDTO);
         }
     }
 }
