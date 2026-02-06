@@ -23,11 +23,10 @@ namespace Folio.Infrastructure.Identity
             var newApplicationUser = new ApplicationUser
             {
                 Name = name,
-                Email = email,
                 UserName = email,
+                Email = email,
                 PhoneNumber = phoneNumber,
-                CreationDate = DateTime.UtcNow,
-                IsDeleted = false
+                CreationDate = DateTime.UtcNow
             };
 
             var result = await _userManager.CreateAsync(newApplicationUser, password);
