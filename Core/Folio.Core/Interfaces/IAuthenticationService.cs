@@ -1,5 +1,4 @@
 ﻿using Folio.Core.Application.DTOs.Auth;
-using Folio.Core.Domain.Entities;
 
 namespace Folio.Core.Interfaces
 {
