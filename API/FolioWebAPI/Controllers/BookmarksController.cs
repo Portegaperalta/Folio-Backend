@@ -90,6 +90,9 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
+            if (bookmarkId != bookmarkUpdateDTO.Id)
+                return BadRequest("Bookmark ids must match");
+
             var bookmark = await _bookmarkService.GetUserBookmarkByIdAsync(currentUser.Id, folderId, bookmarkUpdateDTO.Id);
 
             if (bookmark is null)
