@@ -86,5 +86,19 @@ namespace FolioWebAPI.Controllers
 
             return new AuthenticationResponseDTO { Token = token };
         }
+
+        [HttpGet("renew-token")]
+        [Authorize]
+        public async Task<ActionResult<AuthenticationResponseDTO>> RenewToken()
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+
+            if (currentUser is null)
+                return Unauthorized("Authentication failed");
+
+            var token = _tokenGenerator.GenerateJwt(currentUser);
+
+            return Ok(new AuthenticationResponseDTO { Token = token });
+        }
     }
 }
