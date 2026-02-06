@@ -1,9 +1,7 @@
 ﻿using Folio.Core.Application.DTOs.Auth;
-using Folio.Core.Domain.Entities;
 using Folio.Core.Interfaces;
 using Folio.Infrastructure.Identity.Mappers;
 using Microsoft.AspNetCore.Identity;
-using System.Xml.Linq;
 
 namespace Folio.Infrastructure.Identity
 {
@@ -48,7 +46,7 @@ namespace Folio.Infrastructure.Identity
             return new AuthenticationResponseDTO { Token = token};
         }
 
-        public async Task<User?> LoginAsync(string email, string password)
+        public async Task<AuthenticationResponseDTO?> LoginAsync(string email, string password)
         {
             var applicationUser = await _userManager.FindByEmailAsync(email);
 
@@ -62,7 +60,9 @@ namespace Folio.Infrastructure.Identity
 
             var userEntity = UserMapper.ToDomainEntity(applicationUser);
 
-            return userEntity;
+            var token = _tokenGenerator.GenerateJwt(userEntity);
+
+            return new AuthenticationResponseDTO { Token = token };
         }
     }
 }
