@@ -1,7 +1,7 @@
 ﻿using Folio.Core.Domain.Entities;
 using Folio.Core.Application.DTOs.Folder;
 
-namespace FolioWebAPI.Mappers
+namespace Folio.Core.Application.Mappers
 {
     public class FolderMapper
     {

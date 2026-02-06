@@ -1,7 +1,7 @@
 ﻿using Folio.Core.Application.DTOs.Bookmark;
 using Folio.Core.Domain.Entities;
 
-namespace FolioWebAPI.Mappers
+namespace Folio.Core.Application.Mappers
 {
     public class BookmarkMapper
     {
