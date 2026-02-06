@@ -1,5 +1,6 @@
 ﻿using Folio.Core.Domain.Entities;
 using Folio.Core.Interfaces;
+using Folio.Infrastructure.Identity.Mappers;
 using Microsoft.AspNetCore.Identity;
 
 namespace Folio.Infrastructure.Identity
