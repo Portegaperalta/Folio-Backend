@@ -96,7 +96,7 @@ namespace FolioWebAPI.Controllers
             var bookmark = await _bookmarkService.GetUserBookmarkByIdAsync(currentUser.Id, folderId, bookmarkId);
 
             if (bookmark is null)
-                return NotFound($"Bookmark with id: {bookmarkUpdateDTO.Id} not found");
+                return NotFound($"Bookmark with id: {bookmarkId} not found");
 
             if (bookmarkUpdateDTO.Name is not null)
             {
