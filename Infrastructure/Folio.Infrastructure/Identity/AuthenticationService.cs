@@ -28,9 +28,7 @@ namespace Folio.Infrastructure.Identity
             var result = _userManager.CreateAsync(applicationUser, password);
 
             if (result.IsCompletedSuccessfully is not true)
-            {
                 throw new InvalidOperationException(result.Exception!.Message);
-            }
 
             return UserMapper.ToDomainEntity(applicationUser);
         }
@@ -40,16 +38,12 @@ namespace Folio.Infrastructure.Identity
             var applicationUser = await _userManager.FindByEmailAsync(email);
 
             if (applicationUser is null)
-            {
                 throw new UnauthorizedAccessException("Invalid credentials");
-            }
 
             var validPassword = await _userManager.CheckPasswordAsync(applicationUser, password);
 
             if (validPassword is false)
-            {
                 throw new UnauthorizedAccessException("Invalid credentials");
-            }
 
             var userEntity = UserMapper.ToDomainEntity(applicationUser);
 
