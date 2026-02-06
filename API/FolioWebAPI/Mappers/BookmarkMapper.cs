@@ -1,5 +1,5 @@
-﻿using Folio.Core.Domain.Entities;
-using FolioWebAPI.DTOs.Bookmark;
+﻿using Folio.Core.Application.DTOs.Bookmark;
+using Folio.Core.Domain.Entities;
 
 namespace FolioWebAPI.Mappers
 {

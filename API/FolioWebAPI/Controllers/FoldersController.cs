@@ -1,6 +1,6 @@
-﻿using Folio.Core.Application.Services;
+﻿using Folio.Core.Application.DTOs.Folder;
+using Folio.Core.Application.Services;
 using Folio.Core.Interfaces;
-using FolioWebAPI.DTOs.Folder;
 using FolioWebAPI.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

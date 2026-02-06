@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FolioWebAPI.DTOs.Folder
+namespace Folio.Core.Application.DTOs.Folder
 {
     public class FolderCreationDTO
     {

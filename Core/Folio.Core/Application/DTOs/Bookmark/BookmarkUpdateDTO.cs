@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FolioWebAPI.DTOs.Bookmark
+namespace Folio.Core.Application.DTOs.Bookmark
 {
     public class BookmarkUpdateDTO
     {

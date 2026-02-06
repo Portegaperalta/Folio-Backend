@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FolioWebAPI.DTOs.Auth
+namespace Folio.Core.Application.DTOs.Auth
 {
     public class RegisterCredentialsDTO
     {

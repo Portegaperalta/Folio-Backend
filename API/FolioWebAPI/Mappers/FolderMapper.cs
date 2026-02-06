@@ -1,5 +1,5 @@
-﻿using FolioWebAPI.DTOs.Folder;
-using Folio.Core.Domain.Entities;
+﻿using Folio.Core.Domain.Entities;
+using Folio.Core.Application.DTOs.Folder;
 
 namespace FolioWebAPI.Mappers
 {
