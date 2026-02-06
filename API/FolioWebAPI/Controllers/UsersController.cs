@@ -1,9 +1,6 @@
 ﻿using Folio.Core.Application.DTOs.Auth;
 using Folio.Core.Interfaces;
-using Folio.Infrastructure.Identity;
-using Folio.Infrastructure.Identity.Mappers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FolioWebAPI.Controllers
