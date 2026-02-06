@@ -1,4 +1,5 @@
 ﻿using Folio.Core.Application.DTOs.Auth;
+using Folio.Core.Domain.Entities;
 using Folio.Core.Interfaces;
 using Folio.Infrastructure.Identity.Mappers;
 using Microsoft.AspNetCore.Identity;
@@ -59,6 +60,16 @@ namespace Folio.Infrastructure.Identity
                 throw new UnauthorizedAccessException("Invalid credentials");
 
             var userEntity = UserMapper.ToDomainEntity(applicationUser);
+
+            var token = _tokenGenerator.GenerateJwt(userEntity);
+
+            return new AuthenticationResponseDTO { Token = token };
+        }
+
+        public AuthenticationResponseDTO RenewToken(User userEntity)
+        {
+            if (userEntity is null)
+                throw new ArgumentException("User entity cannot be null");
 
             var token = _tokenGenerator.GenerateJwt(userEntity);
 
