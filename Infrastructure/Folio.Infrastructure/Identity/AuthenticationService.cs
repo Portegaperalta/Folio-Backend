@@ -17,13 +17,15 @@ namespace Folio.Infrastructure.Identity
             _tokenGenerator = tokenGenerator;
         }
 
-        public async Task<AuthenticationResponseDTO> RegisterAsync(string name, string email, string password)
+        public async Task<AuthenticationResponseDTO> 
+            RegisterAsync(string name, string email, string password, string? phoneNumber)
         {
             var newApplicationUser = new ApplicationUser
             {
                 Name = name,
                 Email = email,
                 UserName = email,
+                PhoneNumber = phoneNumber,
                 CreationDate = DateTime.UtcNow,
                 IsDeleted = false
             };
