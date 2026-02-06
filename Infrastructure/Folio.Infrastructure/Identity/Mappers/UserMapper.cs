@@ -1,7 +1,6 @@
 ﻿using Folio.Core.Domain.Entities;
-using Folio.Infrastructure.Identity;
 
-namespace FolioWebAPI.Mappers
+namespace Folio.Infrastructure.Identity.Mappers
 {
     public class UserMapper
     {

@@ -1,7 +1,7 @@
-﻿using Folio.Core.Application.Services;
+﻿using Folio.Core.Application.DTOs.Bookmark;
+using Folio.Core.Application.Mappers;
+using Folio.Core.Application.Services;
 using Folio.Core.Interfaces;
-using FolioWebAPI.DTOs.Bookmark;
-using FolioWebAPI.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -62,20 +62,22 @@ namespace FolioWebAPI.Controllers
 
         // POST
         [HttpPost]
-        public async Task<ActionResult> Create([FromForm] BookmarkCreationDTO bookmarkCreationDTO)
+        public async Task<ActionResult> 
+            Create([FromRoute] Guid folderId, [FromForm] BookmarkCreationDTO bookmarkCreationDTO)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
 
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var bookmarkEntity = _bookmarkMapper.ToEntity(currentUser.Id, bookmarkCreationDTO);
+            var bookmarkEntity = _bookmarkMapper.ToEntity(currentUser.Id, folderId, bookmarkCreationDTO);
 
             await _bookmarkService.CreateUserBookmarkAsync(bookmarkEntity);
 
             var bookmarkDTO = _bookmarkMapper.ToDto(bookmarkEntity);
 
-            return CreatedAtRoute("GetUserBookmark", new { bookmarkId = bookmarkEntity.Id }, bookmarkDTO);
+            return CreatedAtRoute("GetUserBookmark", 
+                new { folderId = folderId, bookmarkId = bookmarkEntity.Id }, bookmarkDTO);
         }
 
         // PUT
@@ -88,10 +90,13 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var bookmark = await _bookmarkService.GetUserBookmarkByIdAsync(currentUser.Id, folderId, bookmarkUpdateDTO.Id);
+            if (bookmarkId != bookmarkUpdateDTO.Id)
+                return BadRequest("Bookmark ids must match");
+
+            var bookmark = await _bookmarkService.GetUserBookmarkByIdAsync(currentUser.Id, folderId, bookmarkId);
 
             if (bookmark is null)
-                return NotFound($"Bookmark with id: {bookmarkUpdateDTO.Id} not found");
+                return NotFound($"Bookmark with id: {bookmarkId} not found");
 
             if (bookmarkUpdateDTO.Name is not null)
             {

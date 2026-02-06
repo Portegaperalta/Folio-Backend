@@ -1,4 +1,4 @@
-﻿namespace FolioWebAPI.DTOs.Folder
+﻿namespace Folio.Core.Application.DTOs.Folder
 {
     public class FolderDTO
     {

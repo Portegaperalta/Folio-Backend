@@ -1,6 +1,5 @@
 
 using Folio.Core.Application.Services;
-using FolioWebAPI.Mappers;
 using Folio.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -12,6 +11,7 @@ using Folio.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Folio.Infrastructure.Repositories;
 using FolioWebAPI.Middlewares;
+using Folio.Core.Application.Mappers;
 
 namespace FolioWebAPI
 {

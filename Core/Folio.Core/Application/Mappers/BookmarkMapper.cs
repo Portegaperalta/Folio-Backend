@@ -1,7 +1,7 @@
-﻿using Folio.Core.Domain.Entities;
-using FolioWebAPI.DTOs.Bookmark;
+﻿using Folio.Core.Application.DTOs.Bookmark;
+using Folio.Core.Domain.Entities;
 
-namespace FolioWebAPI.Mappers
+namespace Folio.Core.Application.Mappers
 {
     public class BookmarkMapper
     {
@@ -18,11 +18,11 @@ namespace FolioWebAPI.Mappers
             };
         }
 
-        public Bookmark ToEntity(Guid userId,BookmarkCreationDTO bookmarkCreationDTO)
+        public Bookmark ToEntity(Guid userId, Guid folderId, BookmarkCreationDTO bookmarkCreationDTO)
         {
             return new Bookmark(bookmarkCreationDTO.Name, 
                                 bookmarkCreationDTO.Url,
-                                bookmarkCreationDTO.FolderId,
+                                folderId,
                                 userId);
         }
     }

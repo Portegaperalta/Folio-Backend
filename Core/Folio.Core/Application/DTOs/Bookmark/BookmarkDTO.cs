@@ -1,4 +1,4 @@
-﻿namespace FolioWebAPI.DTOs.Bookmark
+﻿namespace Folio.Core.Application.DTOs.Bookmark
 {
     public class BookmarkDTO
     {

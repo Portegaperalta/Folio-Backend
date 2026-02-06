@@ -117,6 +117,9 @@ namespace Folio.Core.Application.Services
             if (bookmark is null)
                 throw new BookmarkNotFoundException(bookmarkId);
 
+            if (bookmark.UserId != userId)
+                throw new BookmarkNotFoundException(bookmarkId);
+
             bookmark.Visit();
 
             await _bookmarkRepository.UpdateAsync(bookmark);
