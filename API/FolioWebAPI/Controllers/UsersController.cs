@@ -27,7 +27,8 @@ namespace FolioWebAPI.Controllers
             var authenticationResponse = await _authenticationService.RegisterAsync(
                                                registerCredentialsDTO.Name,
                                                registerCredentialsDTO.Email,
-                                               registerCredentialsDTO.Password);
+                                               registerCredentialsDTO.Password,
+                                               registerCredentialsDTO.PhoneNumber);
 
             return authenticationResponse;
         }
