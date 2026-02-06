@@ -1,5 +1,4 @@
 ﻿using Folio.Core.Domain.Entities;
-using Folio.Infrastructure.Identity;
 
 namespace Folio.Infrastructure.Identity.Mappers
 {
