@@ -1,6 +1,7 @@
 ﻿using Folio.Core.Application.DTOs.Auth;
 using Folio.Core.Interfaces;
 using Folio.Infrastructure.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,13 +14,18 @@ namespace FolioWebAPI.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ITokenGenerator _tokenGenerator;
+        private readonly ICurrentUserService _currentUserService;
 
-        public UsersController(UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager, ITokenGenerator tokenGenerator)
+        public UsersController(
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            ITokenGenerator tokenGenerator,
+            ICurrentUserService currentUserService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenGenerator = tokenGenerator;
+            _currentUserService = currentUserService;
         }
 
         // POST: api/register
@@ -54,10 +60,7 @@ namespace FolioWebAPI.Controllers
 
             var token = _tokenGenerator.GenerateJwt(userEntity);
 
-            return new AuthenticationResponseDTO
-            {
-                Token = token,
-            };
+            return new AuthenticationResponseDTO { Token = token };
         }
 
         [HttpPost("login")]
@@ -81,10 +84,7 @@ namespace FolioWebAPI.Controllers
 
             var token = _tokenGenerator.GenerateJwt(userEntity);
 
-            return new AuthenticationResponseDTO
-            { 
-                Token = token
-            };
+            return new AuthenticationResponseDTO { Token = token };
         }
     }
 }
