@@ -3,6 +3,7 @@ using Folio.Core.Domain.Entities;
 using Folio.Core.Interfaces;
 using Folio.Infrastructure.Identity.Mappers;
 using Microsoft.AspNetCore.Identity;
+using System.Xml.Linq;
 
 namespace Folio.Infrastructure.Identity
 {
@@ -21,11 +22,11 @@ namespace Folio.Infrastructure.Identity
         {
             var newApplicationUser = new ApplicationUser
             {
-              Name = name,
-              Email = email,
-              UserName = email,
-              CreationDate = DateTime.UtcNow,
-              IsDeleted = false
+                Name = name,
+                Email = email,
+                UserName = email,
+                CreationDate = DateTime.UtcNow,
+                IsDeleted = false
             };
 
             var result = await _userManager.CreateAsync(newApplicationUser, password);
