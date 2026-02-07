@@ -14,14 +14,11 @@ namespace FolioWebAPI.Controllers
     {
         private readonly BookmarkService _bookmarkService;
         private readonly ICurrentUserService _currentUserService;
-        private readonly BookmarkMapper _bookmarkMapper;
 
-        public BookmarksController
-            (BookmarkService bookmarkService, ICurrentUserService currentUserService, BookmarkMapper bookmarkMapper)
+        public BookmarksController(BookmarkService bookmarkService, ICurrentUserService currentUserService)
         {
             _bookmarkService = bookmarkService;
             _currentUserService = currentUserService;
-            _bookmarkMapper = bookmarkMapper;
         }
 
         // GET
