@@ -1,5 +1,7 @@
-﻿using Folio.Core.Domain.Entities;
+﻿using Folio.Core.Application.DTOs.Auth;
+using Folio.Core.Domain.Entities;
 using Folio.Core.Interfaces;
+using Folio.Infrastructure.Identity.Mappers;
 using Microsoft.AspNetCore.Identity;
 
 namespace Folio.Infrastructure.Identity
@@ -7,53 +9,70 @@ namespace Folio.Infrastructure.Identity
     public class AuthenticationService : IAuthenticationService
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ITokenGenerator _tokenGenerator;
 
-        public AuthenticationService(
-            UserManager<ApplicationUser> userManager)
+        public AuthenticationService(UserManager<ApplicationUser> userManager, ITokenGenerator tokenGenerator)
         {
             _userManager = userManager;
+            _tokenGenerator = tokenGenerator;
         }
 
-        public async Task<User> RegisterAsync(string name, string email, string password)
+        public async Task<AuthenticationResponseDTO> 
+            RegisterAsync(string name, string email, string password, string? phoneNumber)
         {
-            var applicationUser = new ApplicationUser
+            var newApplicationUser = new ApplicationUser
             {
-              Name = name,
-              Email = email,
-              UserName = email,
-              CreationDate = DateTime.UtcNow,
-              IsDeleted = false
+                Name = name,
+                UserName = email,
+                Email = email,
+                PhoneNumber = phoneNumber,
+                CreationDate = DateTime.UtcNow
             };
 
-            var result = _userManager.CreateAsync(applicationUser, password);
+            var result = await _userManager.CreateAsync(newApplicationUser, password);
 
-            if (result.IsCompletedSuccessfully is not true)
+            if (result.Succeeded is false)
             {
-                throw new InvalidOperationException(result.Exception!.Message);
+                var errorMessages = string.Join(",", result.Errors.Select(e => e.Description));
+                throw new Exception($"Registration failed: {errorMessages}");
             }
 
-            return UserMapper.ToDomainEntity(applicationUser);
+            var applicationUser = await _userManager.FindByEmailAsync(email);
+
+            var userEntity = UserMapper.ToDomainEntity(applicationUser!);
+
+            var token = _tokenGenerator.GenerateJwt(userEntity);
+
+            return new AuthenticationResponseDTO { Token = token};
         }
 
-        public async Task<User?> LoginAsync(string email, string password)
+        public async Task<AuthenticationResponseDTO?> LoginAsync(string email, string password)
         {
             var applicationUser = await _userManager.FindByEmailAsync(email);
 
             if (applicationUser is null)
-            {
                 throw new UnauthorizedAccessException("Invalid credentials");
-            }
 
             var validPassword = await _userManager.CheckPasswordAsync(applicationUser, password);
 
             if (validPassword is false)
-            {
                 throw new UnauthorizedAccessException("Invalid credentials");
-            }
 
             var userEntity = UserMapper.ToDomainEntity(applicationUser);
 
-            return userEntity;
+            var token = _tokenGenerator.GenerateJwt(userEntity);
+
+            return new AuthenticationResponseDTO { Token = token };
+        }
+
+        public AuthenticationResponseDTO RenewToken(User userEntity)
+        {
+            if (userEntity is null)
+                throw new ArgumentException("User entity cannot be null");
+
+            var token = _tokenGenerator.GenerateJwt(userEntity);
+
+            return new AuthenticationResponseDTO { Token = token };
         }
     }
 }
