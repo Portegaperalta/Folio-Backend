@@ -78,7 +78,7 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var CreatedFolderDTO = await _folderService.CreateFolder(currentUser.Id, folderCreationDTO);
+            var CreatedFolderDTO = await _folderService.CreateFolderAsync(currentUser.Id, folderCreationDTO);
 
             if (CreatedFolderDTO is null)
             {
