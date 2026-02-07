@@ -52,11 +52,17 @@ namespace Folio.Core.Application.Services
             return await _bookmarkRepository.CountByFolderAsync(userId, folderId);
         }
 
-        public async Task CreateUserBookmarkAsync(Bookmark bookmarkEntity)
+        public async Task<BookmarkDTO> CreateUserBookmarkAsync(Guid userId, Guid folderId, BookmarkCreationDTO bookmarkCreationDTO)
         {
-            ArgumentNullException.ThrowIfNull(bookmarkEntity);
+            ArgumentNullException.ThrowIfNull(bookmarkCreationDTO);
 
-            await _bookmarkRepository.AddAsync(bookmarkEntity!);
+            var bookmarkEntity = _bookmarkMapper.ToEntity(userId, folderId, bookmarkCreationDTO);
+
+            await _bookmarkRepository.AddAsync(bookmarkEntity);
+
+            var bookmarkDTO = _bookmarkMapper.ToDto(bookmarkEntity);
+
+            return bookmarkDTO;
         }
 
         public async Task UpdateUserBookmarkAsync(Guid userId, Bookmark bookmarkEntity)

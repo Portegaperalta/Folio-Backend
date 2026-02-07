@@ -66,14 +66,16 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var bookmarkEntity = _bookmarkMapper.ToEntity(currentUser.Id, folderId, bookmarkCreationDTO);
+            var CreatedBookmarkDTO = await _bookmarkService.CreateUserBookmarkAsync(currentUser.Id, folderId, bookmarkCreationDTO);
 
-            await _bookmarkService.CreateUserBookmarkAsync(bookmarkEntity);
-
-            var bookmarkDTO = _bookmarkMapper.ToDto(bookmarkEntity);
+            if (CreatedBookmarkDTO is null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { Message = "Something went wrong while creating bookmark" });
+            }
 
             return CreatedAtRoute("GetUserBookmark", 
-                new { folderId = folderId, bookmarkId = bookmarkEntity.Id }, bookmarkDTO);
+                new { folderId = folderId, bookmarkId = CreatedBookmarkDTO.Id }, CreatedBookmarkDTO);
         }
 
         // PUT
