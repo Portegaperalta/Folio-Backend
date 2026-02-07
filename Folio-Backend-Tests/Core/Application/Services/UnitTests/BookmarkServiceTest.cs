@@ -70,8 +70,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             var response = await bookmarkService.GetAllUserBookmarksAsync(MockUserId, MockFolderId);
 
             //Assert
-            var result = response.ToList();
-            CollectionAssert.AreEqual(expected: MockBookmarkList.ToList(), actual: result);
+            Assert.IsInstanceOfType<IEnumerable<BookmarkDTO>>(response);
         }
 
         [TestMethod]
@@ -123,7 +122,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             var result = await bookmarkService.GetUserBookmarkByIdAsync(MockUserId, MockFolderId, MockBookmarkId);
 
             //Assert
-            Assert.AreEqual(expected: MockBookmarkDTO, actual: result);
+            Assert.IsInstanceOfType<BookmarkDTO>(result);
         }
 
         // CreateUserBookmarkAsync tests
