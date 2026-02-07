@@ -19,20 +19,13 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         private FolderDTO MockFolderDTO = null!;
         IFolderRepository MockfolderRepository = null!;
         private FolderMapper MockFolderMapper = null!;
-        IEnumerable<FolderDTO> MockFolderList = null!;
+        IEnumerable<Folder> MockFolderList = null!;
+        IEnumerable<FolderDTO> MockFolderDTOList = null!;
         private FolderService folderService = null!;
 
         [TestInitialize]
         public void Setup()
         {
-            MockFolderList = new List<FolderDTO> { 
-                new FolderDTO 
-                {   Id = MockFolderId,
-                    Name = "folderDTOMock",
-                    IsMarkedFavorite = false,
-                    CreationDate = DateTime.UtcNow
-                }};
-
             MockfolderRepository = Substitute.For<IFolderRepository>();
             MockFolderMapper = Substitute.For<FolderMapper>();
             MockFolderEntity = new Folder("folderMock", MockUserId);
@@ -42,6 +35,10 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
                 Name = "folderDTOMock", 
                 IsMarkedFavorite = false,
                 CreationDate = DateTime.UtcNow};
+
+            MockFolderList = new List<Folder> { MockFolderEntity };
+
+            MockFolderDTOList = new List<FolderDTO> { MockFolderDTO };
 
             folderService = new FolderService(MockfolderRepository, MockFolderMapper);
         }
