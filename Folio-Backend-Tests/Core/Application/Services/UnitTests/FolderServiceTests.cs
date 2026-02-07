@@ -27,7 +27,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         public void Setup()
         {
             MockfolderRepository = Substitute.For<IFolderRepository>();
-            MockFolderMapper = Substitute.For<FolderMapper>();
+            MockFolderMapper = new FolderMapper();
             MockFolderEntity = new Folder("folderMock", MockUserId);
 
             MockFolderDTO = new FolderDTO { 

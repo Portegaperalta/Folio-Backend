@@ -40,7 +40,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             MockBookmarkRepository = Substitute.For<IBookmarkRepository>();
             MockBookmarkList = new List<Bookmark> { MockBookmarkEntity };
             MockBookmarkDTOList = new List<BookmarkDTO> { MockBookmarkDTO };
-            MockBookmarkMapper = Substitute.For<BookmarkMapper>();
+            MockBookmarkMapper = new BookmarkMapper();
             bookmarkService = new(MockBookmarkRepository, MockBookmarkMapper);
         }
 
