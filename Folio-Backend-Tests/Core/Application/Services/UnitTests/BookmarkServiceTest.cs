@@ -151,15 +151,31 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         // DeleteUserBookmarkAsync tests
         [TestMethod]
         public async Task 
-            DeleteUserBookmarkAsync_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
+            DeleteUserBookmarkAsync_ReturnsFalse_WhenBookmarkDoesNotExist()
         {
             //Arrange
             MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
                                   .Returns((Bookmark?)null);
 
-            //Act + Assert
-            await Assert.ThrowsAsync<BookmarkNotFoundException>(() =>
-            bookmarkService.DeleteUserBookmarkAsync(MockUserId, MockFolderId, MockBookmarkId));
+            //Act
+            var result = await bookmarkService.DeleteUserBookmarkAsync(MockUserId, MockFolderId, MockBookmarkId);
+
+            //Assert
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public async Task DeleteUserBookmarkAsync_ReturnsTrue_WhenBookmarkIsDelete()
+        {
+            //Arrange
+            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+                                  .Returns(MockBookmarkEntity);
+
+            //Act 
+            var result = await bookmarkService.DeleteUserBookmarkAsync(MockUserId, MockFolderId, MockBookmarkId);
+
+            //Assert
+            Assert.IsTrue(result);
         }
 
         [TestMethod]
@@ -173,7 +189,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             await bookmarkService.DeleteUserBookmarkAsync(MockUserId, MockFolderId, MockBookmarkId);
 
             //Assert
-            await MockBookmarkRepository.Received(1).DeleteAsync(MockBookmarkEntity);
+            await MockBookmarkRepository.Received(1).DeleteAsync(Arg.Any<Bookmark>());
         }
 
         // ChangeUserBookmarkNameAsync tests
