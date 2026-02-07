@@ -1,5 +1,4 @@
 ﻿using Folio.Core.Application.DTOs.Bookmark;
-using Folio.Core.Application.Mappers;
 using Folio.Core.Application.Services;
 using Folio.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
