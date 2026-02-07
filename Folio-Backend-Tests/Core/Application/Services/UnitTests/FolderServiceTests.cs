@@ -97,6 +97,30 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             Assert.IsInstanceOfType<FolderDTO>(result);
         }
 
+        // CountFoldersAsync tests
+        [TestMethod]
+        public async Task CountFoldersAsync_ReturnsInteger()
+        {
+            //Arrange
+            MockfolderRepository.CountByUserAsync(MockUserId).Returns(1);
+
+            //Act
+            var result = await folderService.CountFoldersAsync(MockUserId);
+
+            //Assert
+            Assert.IsInstanceOfType<int>(result);
+        }
+
+        [TestMethod]
+        public async Task CountFolderAsync_CallsCountByUserAsyncFromFolderRepository()
+        {
+            //Act 
+            await folderService.CountFoldersAsync(MockUserId);
+
+            //Assert
+            await MockfolderRepository.Received(1).CountByUserAsync(MockUserId);
+        }
+
         // CreateFolder tests
         [TestMethod]
         public async Task CreateFolder_ThrowsArgumentNullException_WhenFolderEntityIsNull()
