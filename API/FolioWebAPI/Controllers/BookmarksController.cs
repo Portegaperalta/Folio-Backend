@@ -48,12 +48,10 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var bookmark = await _bookmarkService.GetUserBookmarkByIdAsync(currentUser.Id, folderId, bookmarkId);
+            var bookmarkDTO = await _bookmarkService.GetUserBookmarkByIdAsync(currentUser.Id, folderId, bookmarkId);
 
-            if (bookmark is null)
+            if (bookmarkDTO is null)
                 return NotFound($"Bookmark with id: {bookmarkId} not found");
-
-            var bookmarkDTO = _bookmarkMapper.ToDto(bookmark);
 
             return Ok(bookmarkDTO);
         }
