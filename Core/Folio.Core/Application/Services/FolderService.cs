@@ -1,4 +1,6 @@
-﻿using Folio.Core.Domain.Entities;
+﻿using Folio.Core.Application.DTOs.Folder;
+using Folio.Core.Application.Mappers;
+using Folio.Core.Domain.Entities;
 using Folio.Core.Domain.Exceptions;
 using Folio.Core.Interfaces;
 
@@ -7,16 +9,21 @@ namespace Folio.Core.Application.Services
     public class FolderService
     {
         private readonly IFolderRepository _folderRepository;
+        private readonly FolderMapper _folderMapper;
 
-        public FolderService(IFolderRepository folderRepository)
+        public FolderService(IFolderRepository folderRepository, FolderMapper folderMapper)
         {
             _folderRepository = folderRepository;
+            _folderMapper = folderMapper;
         }
 
-        public async Task<IEnumerable<Folder>> GetAllUserFoldersAsync(Guid userId)
+        public async Task<IEnumerable<FolderDTO>> GetAllUserFoldersAsync(Guid userId)
         {
             var folders = await _folderRepository.GetAllAsync(userId);
-            return folders;
+
+            var foldersDTOs = folders.Select(f => _folderMapper.ToDto(f));
+
+            return foldersDTOs;
         }
 
         public async Task<int> CountUserFolders(Guid userId)
