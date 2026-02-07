@@ -35,14 +35,16 @@ namespace Folio.Core.Application.Services
             return bookmarksDTO;
         }
 
-        public async Task<Bookmark?> GetUserBookmarkByIdAsync(Guid userId, Guid folderId, Guid bookmarkId)
+        public async Task<BookmarkDTO?> GetUserBookmarkByIdAsync(Guid userId, Guid folderId, Guid bookmarkId)
         {
             var bookmark = await _bookmarkRepository.GetByIdAsync(userId,folderId,bookmarkId);
 
             if (bookmark is null)
                 return null;
 
-            return bookmark;
+            var bookmarkDTO = _bookmarkMapper.ToDto(bookmark);
+
+            return bookmarkDTO;
         }
 
         public async Task<int> CountBookmarksByFolderIdAsync(Guid userId, Guid folderId)
