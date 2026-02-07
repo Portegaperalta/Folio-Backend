@@ -1,6 +1,5 @@
 ﻿using Folio.Core.Application.DTOs.Folder;
 using Folio.Core.Application.Mappers;
-using Folio.Core.Domain.Entities;
 using Folio.Core.Domain.Exceptions;
 using Folio.Core.Interfaces;
 
@@ -106,7 +105,7 @@ namespace Folio.Core.Application.Services
 
         public async Task<bool> DeleteFolderAsync(Guid userId, Guid folderId)
         {
-            var folderEntity = await GetFolderEntityByIdAsync(userId, folderId);
+            var folderEntity = await _folderRepository.GetByIdAsync(userId, folderId);
 
             if (folderEntity is null)
             {
@@ -116,18 +115,6 @@ namespace Folio.Core.Application.Services
             await _folderRepository.DeleteAsync(folderEntity);
 
             return true;
-        }
-
-        private async Task<Folder?> GetFolderEntityByIdAsync(Guid userId, Guid folderId)
-        {
-            var folder = await _folderRepository.GetByIdAsync(userId, folderId);
-
-            if (folder is null)
-            {
-                return null;
-            }
-
-            return folder;
         }
     }
 }
