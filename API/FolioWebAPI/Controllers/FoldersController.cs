@@ -95,24 +95,24 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var folder = await _folderService.GetUserFolderByIdAsync(currentUser.Id, folderId);
+            var folder = await _folderService.GetFolderByIdAsync(currentUser.Id, folderId);
 
             if (folder is null)
                 return NotFound($"Folder with id {folderId} not found");
 
             if (folderUpdateDTO.Name is not null)
             {
-               await _folderService.ChangeUserFolderNameAsync(currentUser.Id, folderId, folderUpdateDTO.Name);
+               await _folderService.ChangeFolderNameAsync(currentUser.Id, folderId, folderUpdateDTO.Name);
             }
 
             if (folderUpdateDTO.IsMarkedFavorite.HasValue)
             {
                 if (folderUpdateDTO.IsMarkedFavorite is true)
                 {
-                    await _folderService.MarkUserFolderAsFavoriteAsync(currentUser.Id, folderId);
+                    await _folderService.MarkFolderAsFavoriteAsync(currentUser.Id, folderId);
                 } else
                 {
-                    await _folderService.UnmarkUserFolderAsFavoriteAsync(currentUser.Id, folderId);
+                    await _folderService.UnmarkFolderAsFavoriteAsync(currentUser.Id, folderId);
                 }
             }
 
@@ -127,7 +127,7 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            await _folderService.MarkUserFolderAsVisitedAsync(currentUser.Id, folderId);
+            await _folderService.MarkFolderAsVisitedAsync(currentUser.Id, folderId);
 
             return NoContent();
         }
@@ -141,12 +141,12 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var folder = await _folderService.GetUserFolderByIdAsync(currentUser.Id, folderId);
+            var folder = await _folderService.GetFolderByIdAsync(currentUser.Id, folderId);
 
             if (folder is null)
                 return NotFound($"Folder with id {folderId} not found");
 
-            await _folderService.DeleteUserFolderAsync(currentUser.Id, folder);
+            await _folderService.DeleteFolderAsync(currentUser.Id, folder);
 
             return NoContent();
         }
