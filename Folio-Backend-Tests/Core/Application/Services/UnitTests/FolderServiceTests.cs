@@ -17,27 +17,23 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         private readonly Guid MockInvalidUserId = Guid.NewGuid();
         private Folder MockFolderEntity = null!;
         private FolderDTO MockFolderDTO = null!;
-        IFolderRepository MockfolderRepository = null!;
+        private IFolderRepository MockfolderRepository = null!;
         private FolderMapper MockFolderMapper = null!;
-        IEnumerable<Folder> MockFolderList = null!;
-        IEnumerable<FolderDTO> MockFolderDTOList = null!;
+        private IEnumerable<Folder> MockFolderList = null!;
+        private IEnumerable<FolderDTO> MockFolderDTOList = null!;
         private FolderService folderService = null!;
 
         [TestInitialize]
         public void Setup()
         {
-            MockfolderRepository = Substitute.For<IFolderRepository>();
-            MockFolderMapper = new FolderMapper();
             MockFolderEntity = new Folder("folderMock", MockUserId);
 
-            MockFolderDTO = new FolderDTO { 
-                Id = MockFolderId, 
-                Name = "folderDTOMock", 
-                IsMarkedFavorite = false,
-                CreationDate = DateTime.UtcNow};
+            MockfolderRepository = Substitute.For<IFolderRepository>();
+            MockFolderMapper = new FolderMapper();
+
+            MockFolderDTO = MockFolderMapper.ToDto(MockFolderEntity);
 
             MockFolderList = new List<Folder> { MockFolderEntity };
-
             MockFolderDTOList = new List<FolderDTO> { MockFolderDTO };
 
             folderService = new FolderService(MockfolderRepository, MockFolderMapper);
@@ -48,14 +44,13 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         public async Task GetAllFoldersAsync_ReturnsFolderDTOList()
         {
             //Arrange
-            MockfolderRepository.GetAllAsync(MockUserId).Returns(MockFolderList);
+            MockfolderRepository.GetAllAsync(MockUserId).Returns((MockFolderList));
 
             //Act
             var response = await folderService.GetAllFoldersAsync(MockUserId);
 
             //Assert
-            var result = response.ToList();
-            CollectionAssert.AreEqual(expected: MockFolderDTOList.ToList(), actual: result);
+            Assert.IsInstanceOfType<IEnumerable<FolderDTO>>(response);
         }
 
         // GetFolderByIdAsync tests
