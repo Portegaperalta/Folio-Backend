@@ -259,24 +259,45 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             await MockfolderRepository.Received(1).UpdateAsync(MockFolderEntity);
         }
 
-        // DeleteUserFolderAsync tests
+        // DeleteFolderAsync tests
         [TestMethod]
         public async Task 
-            DeleteFolderAsync_ThrowsArgumentNullException_WhenFolderEntityIsNull()
+            DeleteFolderAsync_ReturnsFalse_WhenFolderDoesNotExists()
         {
             //Arrange
-            FolderDTO nullFolderEntity = null!;
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns((Folder?)null);
 
-            //Act + Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(
-                () => folderService.DeleteFolderAsync(MockUserId, nullFolderEntity));
+            //Act
+            var response = await folderService.DeleteFolderAsync(MockUserId, MockFolderId);
+
+            //Assert
+            Assert.IsFalse(response);
+        }
+
+        [TestMethod]
+        public async Task DeleteFolderAsync_ReturnsTrue_WhenFolderIsDeleted()
+        {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns(MockFolderEntity);
+
+            //Act
+            var result = await folderService.DeleteFolderAsync(MockUserId, MockFolderId);
+
+            //Assert
+            Assert.IsTrue(result);
         }
 
         [TestMethod]
         public async Task DeleteFolderAsync_CallsDeleteAsyncFromFolderRepository()
         {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns(MockFolderEntity);
+
             //Act
-            await folderService.DeleteFolderAsync(MockUserId, MockFolderDTO);
+            await folderService.DeleteFolderAsync(MockUserId, MockFolderId);
 
             //Assert
             await MockfolderRepository.Received(1)
