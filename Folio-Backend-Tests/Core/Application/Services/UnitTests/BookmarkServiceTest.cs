@@ -15,18 +15,24 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         private readonly Guid MockBookmarkId = Guid.NewGuid();
         private readonly Guid MockFolderId = Guid.NewGuid();
         private readonly string FakeUrl = "https://fakeurl.com";
+
         private Bookmark MockBookmarkEntity = null!;
         private BookmarkDTO MockBookmarkDTO = null!;
+        private BookmarkCreationDTO MockBookmarkCreationDTO = null!;
+
         IBookmarkRepository MockBookmarkRepository = null!;
         private BookmarkMapper MockBookmarkMapper = null!;
+
         IEnumerable<Bookmark> MockBookmarkList = null!;
         private IEnumerable<BookmarkDTO> MockBookmarkDTOList = null!;
+
         private BookmarkService bookmarkService = null!;
 
         [TestInitialize]
         public void Setup()
         {
             MockBookmarkEntity = new("mockBookmark", FakeUrl, MockFolderId, MockUserId);
+
             MockBookmarkDTO = new BookmarkDTO
             {
                 Id = MockBookmarkId,
@@ -37,10 +43,18 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
                 LastVisitedTime = null
             };
 
+            MockBookmarkCreationDTO = new BookmarkCreationDTO 
+            {
+                Name = "mockBookmark",
+                Url = FakeUrl 
+            };
+
             MockBookmarkRepository = Substitute.For<IBookmarkRepository>();
+            MockBookmarkMapper = new BookmarkMapper();
+
             MockBookmarkList = new List<Bookmark> { MockBookmarkEntity };
             MockBookmarkDTOList = new List<BookmarkDTO> { MockBookmarkDTO };
-            MockBookmarkMapper = new BookmarkMapper();
+
             bookmarkService = new(MockBookmarkRepository, MockBookmarkMapper);
         }
 
@@ -114,24 +128,25 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
         // CreateUserBookmarkAsync tests
         [TestMethod]
-        public async Task CreateUserBookmarkAsync_ThrowsArgumentNullException_WhenBookmarkEntityIsNull()
+        public async Task 
+            CreateUserBookmarkAsync_ThrowsArgumentNullException_WhenBookmarkCreationDTOIsNull()
         {
             //Arrange
-            Bookmark nullBookmarkEntity = null!;
+            BookmarkCreationDTO nullBookmarkDTO = null!;
 
             //Act + Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => 
-            bookmarkService.CreateUserBookmarkAsync(nullBookmarkEntity));
+            bookmarkService.CreateUserBookmarkAsync(MockUserId, MockFolderId, nullBookmarkDTO));
         }
 
         [TestMethod]
         public async Task CreateUserBookmarkAsync_CallsAddAsyncFromBookmarkRepository()
         {
             //Act
-            await bookmarkService.CreateUserBookmarkAsync(MockBookmarkEntity);
+            await bookmarkService.CreateUserBookmarkAsync(MockUserId, MockFolderId, MockBookmarkCreationDTO);
 
             //Assert
-            await MockBookmarkRepository.Received(1).AddAsync(MockBookmarkEntity);
+            await MockBookmarkRepository.Received(1).AddAsync(Arg.Any<Bookmark>());
         }
 
         // DeleteUserBookmarkAsync tests
