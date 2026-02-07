@@ -246,7 +246,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             DeleteFolderAsync_ThrowsArgumentNullException_WhenFolderEntityIsNull()
         {
             //Arrange
-            Folder nullFolderEntity = null!;
+            FolderDTO nullFolderEntity = null!;
 
             //Act + Assert
             await Assert.ThrowsAsync<ArgumentNullException>(
@@ -257,7 +257,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         public async Task DeleteFolderAsync_CallsDeleteAsyncFromFolderRepository()
         {
             //Act
-            await folderService.DeleteFolderAsync(MockUserId, MockFolderEntity);
+            await folderService.DeleteFolderAsync(MockUserId, MockFolderDTO);
 
             //Assert
             await MockfolderRepository.Received(1).DeleteAsync(MockFolderEntity);
