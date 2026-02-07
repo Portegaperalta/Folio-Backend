@@ -1,4 +1,5 @@
-﻿using Folio.Core.Application.Services;
+﻿using Folio.Core.Application.Mappers;
+using Folio.Core.Application.Services;
 using Folio.Core.Domain.Entities;
 using Folio.Core.Domain.Exceptions;
 using Folio.Core.Interfaces;
@@ -15,6 +16,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         private readonly string FakeUrl = "https://fakeurl.com";
         private Bookmark MockBookmarkEntity = null!;
         IBookmarkRepository MockBookmarkRepository = null!;
+        private BookmarkMapper MockBookmarkMapper = null!;
         IEnumerable<Bookmark> MockBookmarkList = null!;
         private BookmarkService bookmarkService = null!;
 
@@ -24,7 +26,8 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             MockBookmarkEntity = new("mockBookmark", FakeUrl, MockFolderId, MockUserId);
             MockBookmarkRepository = Substitute.For<IBookmarkRepository>();
             MockBookmarkList = new List<Bookmark> { MockBookmarkEntity };
-            bookmarkService = new(MockBookmarkRepository);
+            MockBookmarkMapper = Substitute.For<BookmarkMapper>();
+            bookmarkService = new(MockBookmarkRepository, MockBookmarkMapper);
         }
 
         // GetAllUserBookmarksAsync tests
