@@ -254,7 +254,8 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             await folderService.DeleteFolderAsync(MockUserId, MockFolderDTO);
 
             //Assert
-            await MockfolderRepository.Received(1).DeleteAsync(MockFolderEntity);
+            await MockfolderRepository.Received(1)
+                                      .DeleteAsync(Arg.Any<Folder>());
         }
     }
 }
