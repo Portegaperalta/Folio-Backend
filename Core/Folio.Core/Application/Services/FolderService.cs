@@ -113,5 +113,17 @@ namespace Folio.Core.Application.Services
 
             await _folderRepository.DeleteAsync(folderEntity);
         }
+
+        private async Task<Folder?> GetFolderEntityByIdAsync(Guid userId, Guid folderId)
+        {
+            var folder = await _folderRepository.GetByIdAsync(userId, folderId);
+
+            if (folder is null)
+            {
+                return null;
+            }
+
+            return folder;
+        }
     }
 }
