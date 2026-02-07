@@ -144,12 +144,12 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var bookmark = await _bookmarkService.GetUserBookmarkByIdAsync(currentUser.Id, folderId, bookmarkId);
+            var isDeleted = await _bookmarkService.DeleteUserBookmarkAsync(currentUser.Id, folderId, bookmarkId);
 
-            if (bookmark is null)
+            if (isDeleted is not true)
+            {
                 return NotFound($"Bookmark with id: {bookmarkId} not found");
-
-            await _bookmarkService.DeleteUserBookmarkAsync(currentUser.Id, folderId, bookmarkId);
+            }
 
             return NoContent();
         }
