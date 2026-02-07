@@ -15,15 +15,11 @@ namespace FolioWebAPI.Controllers
     {
         private readonly FolderService _folderService;
         private readonly ICurrentUserService _currentUserService;
-        private readonly FolderMapper _folderMapper;
 
-        public FoldersController(FolderService folderService,
-            ICurrentUserService currentUserService, 
-            FolderMapper folderMapper)
+        public FoldersController(FolderService folderService, ICurrentUserService currentUserService)
         {
             _folderService = folderService;
             _currentUserService = currentUserService;
-            _folderMapper = folderMapper;
         }
 
         //GET
