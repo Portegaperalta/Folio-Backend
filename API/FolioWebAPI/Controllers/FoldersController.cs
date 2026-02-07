@@ -47,12 +47,10 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var folder = await _folderService.GetUserFolderByIdAsync(currentUser.Id, folderId);
+            var folderDTO = await _folderService.GetUserFolderByIdAsync(currentUser.Id, folderId);
 
-            if (folder is null)
+            if (folderDTO is null)
                 return NotFound($"Folder with Id:{folderId} not found");
-
-            var folderDTO = _folderMapper.ToDto(folder);
 
             return Ok(folderDTO);
         }
