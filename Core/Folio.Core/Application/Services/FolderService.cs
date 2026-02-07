@@ -26,19 +26,21 @@ namespace Folio.Core.Application.Services
             return foldersDTOs;
         }
 
-        public async Task<int> CountUserFolders(Guid userId)
-        {
-            return await _folderRepository.CountByUserAsync(userId);
-        }
-
-        public async Task<Folder?> GetUserFolderByIdAsync(Guid userId, Guid folderId)
+        public async Task<FolderDTO?> GetUserFolderByIdAsync(Guid userId, Guid folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
             if (folder is null)
                 return null;
 
-            return folder;
+            var folderDTO = _folderMapper.ToDto(folder);
+
+            return folderDTO;
+        }
+
+        public async Task<int> CountUserFolders(Guid userId)
+        {
+            return await _folderRepository.CountByUserAsync(userId);
         }
 
         public async Task CreateUserFolder(Folder folderEntity)
