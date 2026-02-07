@@ -17,7 +17,7 @@ namespace Folio.Core.Application.Services
             _bookmarkMapper = bookmarkMapper;
         }
 
-        public async Task<IEnumerable<BookmarkDTO>> GetAllUserBookmarksAsync(Guid userId, Guid? folderId)
+        public async Task<IEnumerable<BookmarkDTO>> GetAllBookmarksAsync(Guid userId, Guid? folderId)
         {
             if (folderId is null)
             {
@@ -35,7 +35,7 @@ namespace Folio.Core.Application.Services
             return bookmarksDTO;
         }
 
-        public async Task<BookmarkDTO?> GetUserBookmarkByIdAsync(Guid userId, Guid folderId, Guid bookmarkId)
+        public async Task<BookmarkDTO?> GetBookmarkByIdAsync(Guid userId, Guid folderId, Guid bookmarkId)
         {
             var bookmark = await _bookmarkRepository.GetByIdAsync(userId,folderId,bookmarkId);
 
@@ -52,7 +52,7 @@ namespace Folio.Core.Application.Services
             return await _bookmarkRepository.CountByFolderAsync(userId, folderId);
         }
 
-        public async Task<BookmarkDTO> CreateUserBookmarkAsync(Guid userId, Guid folderId, BookmarkCreationDTO bookmarkCreationDTO)
+        public async Task<BookmarkDTO> CreateBookmarkAsync(Guid userId, Guid folderId, BookmarkCreationDTO bookmarkCreationDTO)
         {
             ArgumentNullException.ThrowIfNull(bookmarkCreationDTO);
 
@@ -65,7 +65,7 @@ namespace Folio.Core.Application.Services
             return bookmarkDTO;
         }
 
-        public async Task UpdateUserBookmarkAsync(Guid userId, Bookmark bookmarkEntity)
+        public async Task UpdateBookmarkAsync(Guid userId, Bookmark bookmarkEntity)
         {
             ArgumentNullException.ThrowIfNull(bookmarkEntity);
 
@@ -77,7 +77,7 @@ namespace Folio.Core.Application.Services
             await _bookmarkRepository.UpdateAsync(bookmarkEntity);
         }
 
-        public async Task<bool> DeleteUserBookmarkAsync(Guid userId, Guid folderId, Guid bookmarkId)
+        public async Task<bool> DeleteBookmarkAsync(Guid userId, Guid folderId, Guid bookmarkId)
         {
             var bookmarkEntity = await _bookmarkRepository.GetByIdAsync(userId,folderId,bookmarkId);
 
@@ -91,7 +91,7 @@ namespace Folio.Core.Application.Services
             return true;
         }
 
-        public async Task ChangeUserBookmarkNameAsync
+        public async Task ChangeBookmarkNameAsync
             (Guid userId, Guid folderId, Guid bookmarkId, string newBookmarkName)
         {
             var bookmark = await _bookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId);
@@ -104,7 +104,7 @@ namespace Folio.Core.Application.Services
             await _bookmarkRepository.UpdateAsync(bookmark);
         }
 
-        public async Task ChangeUserBookmarkUrlAsync
+        public async Task ChangeBookmarkUrlAsync
             (Guid userId, Guid folderId, Guid bookmarkId, string newBookmarkUrl)
         {
             var bookmark = await _bookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId);
@@ -117,7 +117,7 @@ namespace Folio.Core.Application.Services
             await _bookmarkRepository.UpdateAsync(bookmark);
         }
 
-        public async Task MarkUserBookmarkAsFavoriteAsync(Guid userId, Guid folderId, Guid bookmarkId)
+        public async Task MarkBookmarkAsFavoriteAsync(Guid userId, Guid folderId, Guid bookmarkId)
         {
             var bookmark = await _bookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId);
 
@@ -129,7 +129,7 @@ namespace Folio.Core.Application.Services
             await _bookmarkRepository.UpdateAsync(bookmark);
         }
 
-        public async Task UnmarkUserBookmarkAsFavoriteAsync(Guid userId, Guid folderId, Guid bookmarkId)
+        public async Task UnmarkBookmarkAsFavoriteAsync(Guid userId, Guid folderId, Guid bookmarkId)
         {
             var bookmark = await _bookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId);
 
@@ -141,7 +141,7 @@ namespace Folio.Core.Application.Services
             await _bookmarkRepository.UpdateAsync(bookmark);
         }
 
-        public async Task MarkUserBookmarkAsVisitedAsync(Guid userId, Guid folderId, Guid bookmarkId)
+        public async Task MarkBookmarkAsVisitedAsync(Guid userId, Guid folderId, Guid bookmarkId)
         {
             var bookmark = await _bookmarkRepository.GetByIdAsync(userId,folderId,bookmarkId);
 

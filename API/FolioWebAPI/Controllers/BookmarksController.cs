@@ -34,7 +34,7 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var bookmarksDTOs = await _bookmarkService.GetAllUserBookmarksAsync(currentUser.Id, folderId);
+            var bookmarksDTOs = await _bookmarkService.GetAllBookmarksAsync(currentUser.Id, folderId);
 
             return Ok(bookmarksDTOs);
         }
@@ -48,7 +48,7 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var bookmarkDTO = await _bookmarkService.GetUserBookmarkByIdAsync(currentUser.Id, folderId, bookmarkId);
+            var bookmarkDTO = await _bookmarkService.GetBookmarkByIdAsync(currentUser.Id, folderId, bookmarkId);
 
             if (bookmarkDTO is null)
                 return NotFound($"Bookmark with id: {bookmarkId} not found");
@@ -66,7 +66,7 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var CreatedBookmarkDTO = await _bookmarkService.CreateUserBookmarkAsync(currentUser.Id, folderId, bookmarkCreationDTO);
+            var CreatedBookmarkDTO = await _bookmarkService.CreateBookmarkAsync(currentUser.Id, folderId, bookmarkCreationDTO);
 
             if (CreatedBookmarkDTO is null)
             {
@@ -91,7 +91,7 @@ namespace FolioWebAPI.Controllers
             if (bookmarkId != bookmarkUpdateDTO.Id)
                 return BadRequest("Bookmark ids must match");
 
-            var bookmark = await _bookmarkService.GetUserBookmarkByIdAsync(currentUser.Id, folderId, bookmarkId);
+            var bookmark = await _bookmarkService.GetBookmarkByIdAsync(currentUser.Id, folderId, bookmarkId);
 
             if (bookmark is null)
                 return NotFound($"Bookmark with id: {bookmarkId} not found");
@@ -99,23 +99,23 @@ namespace FolioWebAPI.Controllers
             if (bookmarkUpdateDTO.Name is not null)
             {
                 await _bookmarkService.
-                    ChangeUserBookmarkNameAsync(currentUser.Id, folderId, bookmark.Id, bookmarkUpdateDTO.Name);
+                    ChangeBookmarkNameAsync(currentUser.Id, folderId, bookmark.Id, bookmarkUpdateDTO.Name);
             }
 
             if (bookmarkUpdateDTO.Url is not null)
             {
                 await _bookmarkService.
-                    ChangeUserBookmarkUrlAsync(currentUser.Id, folderId, bookmark.Id, bookmarkUpdateDTO.Url);
+                    ChangeBookmarkUrlAsync(currentUser.Id, folderId, bookmark.Id, bookmarkUpdateDTO.Url);
             }
 
             if (bookmarkUpdateDTO.IsMarkedFavorite.HasValue)
             {
                 if (bookmarkUpdateDTO.IsMarkedFavorite is true)
                 {
-                    await _bookmarkService.MarkUserBookmarkAsFavoriteAsync(currentUser.Id, folderId, bookmark.Id);
+                    await _bookmarkService.MarkBookmarkAsFavoriteAsync(currentUser.Id, folderId, bookmark.Id);
                 } else
                 {
-                    await _bookmarkService.UnmarkUserBookmarkAsFavoriteAsync(currentUser.Id, folderId, bookmark.Id);
+                    await _bookmarkService.UnmarkBookmarkAsFavoriteAsync(currentUser.Id, folderId, bookmark.Id);
                 }
             }
 
@@ -130,7 +130,7 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            await _bookmarkService.MarkUserBookmarkAsVisitedAsync(currentUser.Id, folderId, bookmarkId);
+            await _bookmarkService.MarkBookmarkAsVisitedAsync(currentUser.Id, folderId, bookmarkId);
 
             return NoContent();
         }
@@ -144,7 +144,7 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var isDeleted = await _bookmarkService.DeleteUserBookmarkAsync(currentUser.Id, folderId, bookmarkId);
+            var isDeleted = await _bookmarkService.DeleteBookmarkAsync(currentUser.Id, folderId, bookmarkId);
 
             if (isDeleted is not true)
             {
