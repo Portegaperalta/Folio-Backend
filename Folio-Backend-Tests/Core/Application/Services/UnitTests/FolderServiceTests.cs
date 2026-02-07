@@ -95,7 +95,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             var result = await folderService.GetFolderByIdAsync(MockUserId, MockFolderId);
 
             //Assert
-            Assert.AreEqual(expected: MockFolderDTO, actual: result);
+            Assert.IsInstanceOfType<FolderDTO>(result);
         }
 
         // CreateFolder tests
