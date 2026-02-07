@@ -47,7 +47,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             MockfolderRepository.GetAllAsync(MockUserId).Returns((MockFolderList));
 
             //Act
-            var response = await folderService.GetAllFoldersAsync(MockUserId);
+            var response = await folderService.GetAllFoldersDTOsAsync(MockUserId);
 
             //Assert
             Assert.IsInstanceOfType<IEnumerable<FolderDTO>>(response);
