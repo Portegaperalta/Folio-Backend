@@ -31,6 +31,11 @@ namespace Folio.Core.Application.Services
             return bookmark;
         }
 
+        public async Task<int> CountBookmarksByFolderIdAsync(Guid userId, Guid folderId)
+        {
+            return await _bookmarkRepository.CountByFolderAsync(userId, folderId);
+        }
+
         public async Task CreateUserBookmarkAsync(Bookmark bookmarkEntity)
         {
             ArgumentNullException.ThrowIfNull(bookmarkEntity);
