@@ -1,4 +1,5 @@
-﻿using Folio.Core.Application.Mappers;
+﻿using Folio.Core.Application.DTOs.Bookmark;
+using Folio.Core.Application.Mappers;
 using Folio.Core.Application.Services;
 using Folio.Core.Domain.Entities;
 using Folio.Core.Domain.Exceptions;
@@ -15,17 +16,30 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         private readonly Guid MockFolderId = Guid.NewGuid();
         private readonly string FakeUrl = "https://fakeurl.com";
         private Bookmark MockBookmarkEntity = null!;
+        private BookmarkDTO MockBookmarkDTO = null!;
         IBookmarkRepository MockBookmarkRepository = null!;
         private BookmarkMapper MockBookmarkMapper = null!;
         IEnumerable<Bookmark> MockBookmarkList = null!;
+        private IEnumerable<BookmarkDTO> MockBookmarkDTOList = null!;
         private BookmarkService bookmarkService = null!;
 
         [TestInitialize]
         public void Setup()
         {
             MockBookmarkEntity = new("mockBookmark", FakeUrl, MockFolderId, MockUserId);
+            MockBookmarkDTO = new BookmarkDTO
+            {
+                Id = MockBookmarkId,
+                Name = "mockBookmark",
+                Url = FakeUrl,
+                IsMarkedFavorite = false,
+                CreationDate = DateTime.UtcNow,
+                LastVisitedTime = null
+            };
+
             MockBookmarkRepository = Substitute.For<IBookmarkRepository>();
             MockBookmarkList = new List<Bookmark> { MockBookmarkEntity };
+            MockBookmarkDTOList = new List<BookmarkDTO> { MockBookmarkDTO };
             MockBookmarkMapper = Substitute.For<BookmarkMapper>();
             bookmarkService = new(MockBookmarkRepository, MockBookmarkMapper);
         }
