@@ -77,14 +77,18 @@ namespace Folio.Core.Application.Services
             await _bookmarkRepository.UpdateAsync(bookmarkEntity);
         }
 
-        public async Task DeleteUserBookmarkAsync(Guid userId, Guid folderId, Guid bookmarkId)
+        public async Task<bool> DeleteUserBookmarkAsync(Guid userId, Guid folderId, Guid bookmarkId)
         {
-            var bookmark = await _bookmarkRepository.GetByIdAsync(userId,folderId,bookmarkId);
+            var bookmarkEntity = await _bookmarkRepository.GetByIdAsync(userId,folderId,bookmarkId);
 
-            if (bookmark is null)
-                throw new BookmarkNotFoundException(bookmarkId);
+            if (bookmarkEntity is null)
+            {
+                return false;
+            }
 
-            await _bookmarkRepository.DeleteAsync(bookmark);
+            await _bookmarkRepository.DeleteAsync(bookmarkEntity);
+
+            return true;
         }
 
         public async Task ChangeUserBookmarkNameAsync
