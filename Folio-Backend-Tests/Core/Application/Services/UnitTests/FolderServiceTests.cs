@@ -45,7 +45,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
         // GetAllFoldersAsync tests
         [TestMethod]
-        public async Task GetAllFoldersAsync_ReturnsIEnumerableFolder()
+        public async Task GetAllFoldersAsync_ReturnsFolderDTOList()
         {
             //Arrange
             MockfolderRepository.GetAllAsync(MockUserId).Returns(MockFolderList);
@@ -55,7 +55,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
             //Assert
             var result = response.ToList();
-            CollectionAssert.AreEqual(expected: MockFolderList.ToList(), actual: result);
+            CollectionAssert.AreEqual(expected: MockFolderDTOList.ToList(), actual: result);
         }
 
         // GetFolderByIdAsync tests
