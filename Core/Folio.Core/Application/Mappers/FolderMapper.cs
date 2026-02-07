@@ -21,5 +21,10 @@ namespace Folio.Core.Application.Mappers
         {
             return new Folder(folderCreationDTO.Name, userId);
         }
+
+        public Folder ToEntity(Guid userId, FolderDTO folderDTO)
+        {
+            return new Folder(folderDTO.Name, userId);
+        }
     }
 }
