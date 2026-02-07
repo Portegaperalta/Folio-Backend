@@ -98,7 +98,7 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var folder = await _folderService.GetFolderByIdAsync(currentUser.Id, folderId);
+            var folder = await _folderService.GetFolderDTOByIdAsync(currentUser.Id, folderId);
 
             if (folder is null)
                 return NotFound($"Folder with id {folderId} not found");

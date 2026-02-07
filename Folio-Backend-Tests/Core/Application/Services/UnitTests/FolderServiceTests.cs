@@ -63,7 +63,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
                                 .Returns((Folder?)null);
 
             //Act
-            var response = await folderService.GetFolderByIdAsync(MockUserId, MockFolderId);
+            var response = await folderService.GetFolderDTOByIdAsync(MockUserId, MockFolderId);
 
             //Assert
             Assert.IsNull(response);
@@ -71,28 +71,28 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
         [TestMethod]
         public async Task 
-            GetFolderByIdAsync_ReturnsNull_WhenFolderDoesNotBelongToUser()
+            GetFolderDTOByIdAsync_ReturnsNull_WhenFolderDoesNotBelongToUser()
         {
             //Arrange
             MockfolderRepository.GetByIdAsync(MockInvalidUserId, MockFolderId)
                                 .Returns((Folder?)null);
 
             //Act
-            var response = await folderService.GetFolderByIdAsync(MockInvalidUserId, MockFolderId);
+            var response = await folderService.GetFolderDTOByIdAsync(MockInvalidUserId, MockFolderId);
 
             //Assert
             Assert.IsNull(response);
         }
 
         [TestMethod]
-        public async Task GetFolderByIdAsync_ReturnsFolderDTO()
+        public async Task GetFolderDTOByIdAsync_ReturnsFolderDTO()
         {
             //Arrange
             MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
                                 .Returns(MockFolderEntity);
 
             //Act
-            var result = await folderService.GetFolderByIdAsync(MockUserId, MockFolderId);
+            var result = await folderService.GetFolderDTOByIdAsync(MockUserId, MockFolderId);
 
             //Assert
             Assert.IsInstanceOfType<FolderDTO>(result);
