@@ -17,6 +17,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         private readonly Guid MockInvalidUserId = Guid.NewGuid();
         private Folder MockFolderEntity = null!;
         private FolderDTO MockFolderDTO = null!;
+        private FolderCreationDTO MockFolderCreationDTO = null!;
         private IFolderRepository MockfolderRepository = null!;
         private FolderMapper MockFolderMapper = null!;
         private IEnumerable<Folder> MockFolderList = null!;
@@ -31,7 +32,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             MockFolderMapper = new FolderMapper();
 
             MockFolderDTO = MockFolderMapper.ToDto(MockFolderEntity);
-
+            MockFolderCreationDTO = new FolderCreationDTO { Name = "folderMock" };
 
             MockFolderList = new List<Folder> { MockFolderEntity };
 
@@ -123,24 +124,24 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
         // CreateFolder tests
         [TestMethod]
-        public async Task CreateFolder_ThrowsArgumentNullException_WhenFolderEntityIsNull()
+        public async Task CreateFolderAsync_ThrowsArgumentNullException_WhenFolderEntityIsNull()
         {
             //Arrange
-            Folder nullFolderEntity = null!;
+            FolderCreationDTO nullFolderEntity = null!;
 
             //Act + Assert
             var result = await Assert.ThrowsAsync <ArgumentNullException> (
-                () => folderService.CreateFolder(nullFolderEntity));
+                () => folderService.CreateFolderAsync(MockUserId ,nullFolderEntity));
         }
 
         [TestMethod]
-        public async Task CreateFolder_CallsAddAsyncFromFolderRepository()
+        public async Task CreateFolderAsync_CallsAddAsyncFromFolderRepository()
         {
             //Act
-            await folderService.CreateFolder(MockFolderEntity);
+            await folderService.CreateFolderAsync(MockUserId, MockFolderCreationDTO);
 
             //Assert
-            await MockfolderRepository.Received(1).AddAsync(MockFolderEntity);
+            await MockfolderRepository.Received(1).AddAsync(Arg.Any<Folder>());
         }
 
         // ChangeFolderNameAsync tests
