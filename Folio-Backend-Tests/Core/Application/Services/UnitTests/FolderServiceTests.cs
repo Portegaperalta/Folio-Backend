@@ -1,4 +1,5 @@
-﻿using Folio.Core.Application.Mappers;
+﻿using Folio.Core.Application.DTOs.Folder;
+using Folio.Core.Application.Mappers;
 using Folio.Core.Application.Services;
 using Folio.Core.Domain.Entities;
 using Folio.Core.Domain.Exceptions;
@@ -15,18 +16,33 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         private readonly Guid MockFolderId = Guid.NewGuid();
         private readonly Guid MockInvalidUserId = Guid.NewGuid();
         private Folder MockFolderEntity = null!;
+        private FolderDTO MockFolderDTO = null!;
         IFolderRepository MockfolderRepository = null!;
         private FolderMapper MockFolderMapper = null!;
-        IEnumerable<Folder> MockFolderList = null!;
+        IEnumerable<FolderDTO> MockFolderList = null!;
         private FolderService folderService = null!;
 
         [TestInitialize]
         public void Setup()
         {
-            MockFolderList = new List<Folder> { new Folder("folderMock", MockUserId) };
+            MockFolderList = new List<FolderDTO> { 
+                new FolderDTO 
+                {   Id = MockFolderId,
+                    Name = "folderDTOMock",
+                    IsMarkedFavorite = false,
+                    CreationDate = DateTime.UtcNow
+                }};
+
             MockfolderRepository = Substitute.For<IFolderRepository>();
             MockFolderMapper = Substitute.For<FolderMapper>();
             MockFolderEntity = new Folder("folderMock", MockUserId);
+
+            MockFolderDTO = new FolderDTO { 
+                Id = MockFolderId, 
+                Name = "folderDTOMock", 
+                IsMarkedFavorite = false,
+                CreationDate = DateTime.UtcNow};
+
             folderService = new FolderService(MockfolderRepository, MockFolderMapper);
         }
 
@@ -77,7 +93,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         }
 
         [TestMethod]
-        public async Task GetFolderByIdAsync_ReturnsFolderEntity()
+        public async Task GetFolderByIdAsync_ReturnsFolderDTO()
         {
             //Arrange
             MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
@@ -87,7 +103,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             var result = await folderService.GetFolderByIdAsync(MockUserId, MockFolderId);
 
             //Assert
-            Assert.AreEqual(expected: MockFolderEntity, actual: result);
+            Assert.AreEqual(expected: MockFolderDTO, actual: result);
         }
 
         // CreateFolder tests
@@ -198,7 +214,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             await MockfolderRepository.Received(1).UpdateAsync(MockFolderEntity);
         }
 
-        // MarkFolderAsVisitedAsync tests
+        // MarkUserFolderAsVisitedAsync tests
         [TestMethod]
         public async Task 
             MarkFolderAsVisitedAsync_ThrowsFolderNotFoundException_WhenFolderDoesNotExist()
@@ -227,7 +243,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             await MockfolderRepository.Received(1).UpdateAsync(MockFolderEntity);
         }
 
-        // DeleteFolderAsync tests
+        // DeleteUserFolderAsync tests
         [TestMethod]
         public async Task 
             DeleteFolderAsync_ThrowsArgumentNullException_WhenFolderEntityIsNull()
