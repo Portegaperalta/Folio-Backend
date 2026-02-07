@@ -26,7 +26,7 @@ namespace Folio.Core.Application.Services
             return foldersDTOs;
         }
 
-        public async Task<FolderDTO?> GetFolderByIdAsync(Guid userId, Guid folderId)
+        public async Task<FolderDTO?> GetFolderDTOByIdAsync(Guid userId, Guid folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
