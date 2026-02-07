@@ -43,7 +43,7 @@ namespace Folio.Core.Application.Services
             return await _folderRepository.CountByUserAsync(userId);
         }
 
-        public async Task CreateUserFolder(Folder folderEntity)
+        public async Task CreateFolder(Folder folderEntity)
         {
             ArgumentNullException.ThrowIfNull(folderEntity);
 
