@@ -20,7 +20,6 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         private IFolderRepository MockfolderRepository = null!;
         private FolderMapper MockFolderMapper = null!;
         private IEnumerable<Folder> MockFolderList = null!;
-        private IEnumerable<FolderDTO> MockFolderDTOList = null!;
         private FolderService folderService = null!;
 
         [TestInitialize]
@@ -33,8 +32,8 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
             MockFolderDTO = MockFolderMapper.ToDto(MockFolderEntity);
 
+
             MockFolderList = new List<Folder> { MockFolderEntity };
-            MockFolderDTOList = new List<FolderDTO> { MockFolderDTO };
 
             folderService = new FolderService(MockfolderRepository, MockFolderMapper);
         }
