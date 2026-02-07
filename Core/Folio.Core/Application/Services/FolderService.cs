@@ -104,14 +104,18 @@ namespace Folio.Core.Application.Services
             await _folderRepository.UpdateAsync(folder);
         }
 
-        public async Task DeleteFolderAsync(Guid userId, FolderDTO folderDTO)
+        public async Task<bool> DeleteFolderAsync(Guid userId, Guid folderId)
         {
-            if (folderDTO is null)
-                ArgumentNullException.ThrowIfNull(folderDTO);
+            var folderEntity = await GetFolderEntityByIdAsync(userId, folderId);
 
-            var folderEntity = _folderMapper.ToEntity(userId, folderDTO);
+            if (folderEntity is null)
+            {
+                return false;
+            }    
 
             await _folderRepository.DeleteAsync(folderEntity);
+
+            return true;
         }
 
         private async Task<Folder?> GetFolderEntityByIdAsync(Guid userId, Guid folderId)
