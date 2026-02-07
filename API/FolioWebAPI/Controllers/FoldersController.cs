@@ -34,7 +34,7 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var foldersDTOs = await _folderService.GetAllUserFoldersAsync(currentUser.Id);
+            var foldersDTOs = await _folderService.GetAllFoldersAsync(currentUser.Id);
 
             return Ok(foldersDTOs);
         }
@@ -47,7 +47,7 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var folderDTO = await _folderService.GetUserFolderByIdAsync(currentUser.Id, folderId);
+            var folderDTO = await _folderService.GetFolderByIdAsync(currentUser.Id, folderId);
 
             if (folderDTO is null)
                 return NotFound($"Folder with Id:{folderId} not found");
@@ -63,7 +63,7 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            int folderCount = await _folderService.CountUserFolders(currentUser.Id);
+            int folderCount = await _folderService.CountFolders(currentUser.Id);
 
             return folderCount;
         }
@@ -79,7 +79,7 @@ namespace FolioWebAPI.Controllers
 
             var folderEntity = _folderMapper.ToEntity(currentUser.Id, folderCreationDTO);
 
-            await _folderService.CreateUserFolder(folderEntity);
+            await _folderService.CreateFolder(folderEntity);
 
             var folderDTO = _folderMapper.ToDto(folderEntity);
 
