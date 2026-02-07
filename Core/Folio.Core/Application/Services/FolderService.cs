@@ -43,11 +43,17 @@ namespace Folio.Core.Application.Services
             return await _folderRepository.CountByUserAsync(userId);
         }
 
-        public async Task CreateFolder(Folder folderEntity)
+        public async Task<FolderDTO> CreateFolder(Guid userId, FolderCreationDTO folderCreationDTO)
         {
-            ArgumentNullException.ThrowIfNull(folderEntity);
+            ArgumentNullException.ThrowIfNull(folderCreationDTO);
+
+            var folderEntity = _folderMapper.ToEntity(userId, folderCreationDTO);
 
             await _folderRepository.AddAsync(folderEntity);
+
+            var folderDTO = _folderMapper.ToDto(folderEntity);
+
+            return folderDTO;
         }
 
         public async Task ChangeFolderNameAsync(Guid userId, Guid folderId, string newFolderName)

@@ -3,6 +3,7 @@ using Folio.Core.Application.Mappers;
 using Folio.Core.Application.Services;
 using Folio.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FolioWebAPI.Controllers
@@ -70,20 +71,22 @@ namespace FolioWebAPI.Controllers
 
         // POST
         [HttpPost]
-        public async Task<ActionResult> Create([FromForm] FolderCreationDTO folderCreationDTO)
+        public async Task<ActionResult<FolderDTO>> Create([FromForm] FolderCreationDTO folderCreationDTO)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
 
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var folderEntity = _folderMapper.ToEntity(currentUser.Id, folderCreationDTO);
+            var CreatedFolderDTO = await _folderService.CreateFolder(currentUser.Id, folderCreationDTO);
 
-            await _folderService.CreateFolder(folderEntity);
+            if (CreatedFolderDTO is null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    new { Message = "Something went wrong while creating folder"} );
+            }
 
-            var folderDTO = _folderMapper.ToDto(folderEntity);
-
-            return CreatedAtRoute("GetUserFolder", new {folderId = folderDTO.Id}, folderDTO);
+            return CreatedAtRoute("GetUserFolder", new {folderId = CreatedFolderDTO.Id }, CreatedFolderDTO);
         }
 
         // PUT
