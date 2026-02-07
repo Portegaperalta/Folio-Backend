@@ -99,7 +99,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         }
 
         [TestMethod]
-        public async Task GetUserBookmarkByIdAsync_ReturnsBookmarkEntity()
+        public async Task GetUserBookmarkByIdAsync_ReturnsBookmarkDTO()
         {
             //Arrange
             MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
@@ -109,7 +109,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             var result = await bookmarkService.GetUserBookmarkByIdAsync(MockUserId, MockFolderId, MockBookmarkId);
 
             //Assert
-            Assert.AreEqual(expected: MockBookmarkEntity, actual: result);
+            Assert.AreEqual(expected: MockBookmarkDTO, actual: result);
         }
 
         // CreateUserBookmarkAsync tests
