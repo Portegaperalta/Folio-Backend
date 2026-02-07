@@ -17,7 +17,7 @@ namespace Folio.Core.Application.Services
             _folderMapper = folderMapper;
         }
 
-        public async Task<IEnumerable<FolderDTO>> GetAllFoldersAsync(Guid userId)
+        public async Task<IEnumerable<FolderDTO>> GetAllFoldersDTOsAsync(Guid userId)
         {
             var folders = await _folderRepository.GetAllAsync(userId);
 
