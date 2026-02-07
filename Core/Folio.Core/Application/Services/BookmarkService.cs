@@ -1,4 +1,6 @@
-﻿using Folio.Core.Domain.Entities;
+﻿using Folio.Core.Application.DTOs.Bookmark;
+using Folio.Core.Application.Mappers;
+using Folio.Core.Domain.Entities;
 using Folio.Core.Domain.Exceptions;
 using Folio.Core.Interfaces;
 
@@ -7,18 +9,30 @@ namespace Folio.Core.Application.Services
     public class BookmarkService
     {
         private readonly IBookmarkRepository _bookmarkRepository;
+        private readonly BookmarkMapper _bookmarkMapper;
 
-        public BookmarkService(IBookmarkRepository bookmarkRepository)
+        public BookmarkService(IBookmarkRepository bookmarkRepository, BookmarkMapper bookmarkMapper)
         {
             _bookmarkRepository = bookmarkRepository;
+            _bookmarkMapper = bookmarkMapper;
         }
 
-        public async Task<IEnumerable<Bookmark>> GetAllUserBookmarksAsync(Guid userId, Guid? folderId)
+        public async Task<IEnumerable<BookmarkDTO>> GetAllUserBookmarksAsync(Guid userId, Guid? folderId)
         {
             if (folderId is null)
-                return await _bookmarkRepository.GetAllByUserIdAsync(userId);
+            {
+                var bookmarksByUserId = await _bookmarkRepository.GetAllByUserIdAsync(userId);
 
-            return await _bookmarkRepository.GetAllByUserAndFolderIdAsync(userId, folderId.Value);
+                var bookmarksByUserIdDTOs = bookmarksByUserId.Select(b => _bookmarkMapper.ToDto(b));
+
+                return bookmarksByUserIdDTOs;
+            }
+
+            var bookmarks = await _bookmarkRepository.GetAllByUserAndFolderIdAsync(userId, folderId.Value);
+
+            var bookmarksDTO = bookmarks.Select(b => _bookmarkMapper.ToDto(b));
+
+            return bookmarksDTO;
         }
 
         public async Task<Bookmark?> GetUserBookmarkByIdAsync(Guid userId, Guid folderId, Guid bookmarkId)
