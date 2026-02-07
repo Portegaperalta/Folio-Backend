@@ -63,7 +63,7 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            int folderCount = await _folderService.CountFolders(currentUser.Id);
+            int folderCount = await _folderService.CountFoldersAsync(currentUser.Id);
 
             return folderCount;
         }

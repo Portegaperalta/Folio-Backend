@@ -38,7 +38,7 @@ namespace Folio.Core.Application.Services
             return folderDTO;
         }
 
-        public async Task<int> CountFolders(Guid userId)
+        public async Task<int> CountFoldersAsync(Guid userId)
         {
             return await _folderRepository.CountByUserAsync(userId);
         }
