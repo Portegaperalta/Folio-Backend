@@ -55,40 +55,32 @@ namespace Folio.Core.Application.Services
             return folderDTO;
         }
 
-        public async Task ChangeFolderNameAsync(Guid userId, Guid folderId, string newFolderName)
+        public async Task UpdateFolderAsync(Guid folderId, Guid userId, FolderUpdateDTO folderUpdateDTO)
         {
-            var folder = await _folderRepository.GetByIdAsync(userId, folderId);
+            var folderEntity = await _folderRepository.GetByIdAsync(userId, folderId);
 
-            if (folder is null)
+            if (folderEntity is null)
+            {
                 throw new FolderNotFoundException(folderId);
+            }
 
-            folder.ChangeName(newFolderName);
+            if (folderUpdateDTO.Name is not null)
+            {
+                folderEntity.ChangeName(folderUpdateDTO.Name);
+            }
 
-            await _folderRepository.UpdateAsync(folder);
-        }
+            if (folderUpdateDTO.IsMarkedFavorite.HasValue)
+            {
+                if (folderUpdateDTO.IsMarkedFavorite is true)
+                {
+                    folderEntity.MarkFavorite();
+                } else
+                {
+                    folderEntity.UnmarkFavorite();
+                }
+            }
 
-        public async Task MarkFolderAsFavoriteAsync(Guid userId, Guid folderId)
-        {
-            var folder = await _folderRepository.GetByIdAsync(userId, folderId);
-
-            if (folder is null)
-                throw new FolderNotFoundException(folderId);
-
-            folder.MarkFavorite();
-
-            await _folderRepository.UpdateAsync(folder);
-        }
-
-        public async Task UnmarkFolderAsFavoriteAsync(Guid userId, Guid folderId)
-        {
-            var folder = await _folderRepository.GetByIdAsync(userId, folderId);
-
-            if (folder is null)
-                throw new FolderNotFoundException(folderId);
-
-            folder.UnmarkFavorite();
-
-            await _folderRepository.UpdateAsync(folder);
+            await _folderRepository.UpdateAsync(folderEntity);
         }
 
         public async Task MarkFolderAsVisitedAsync(Guid userId, Guid folderId)

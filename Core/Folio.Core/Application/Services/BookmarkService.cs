@@ -65,14 +65,37 @@ namespace Folio.Core.Application.Services
             return bookmarkDTO;
         }
 
-        public async Task UpdateBookmarkAsync(Guid userId, Bookmark bookmarkEntity)
+        public async Task 
+            UpdateBookmarkAsync(Guid userId, Guid folderId, BookmarkUpdateDTO bookmarkUpdateDTO)
         {
-            ArgumentNullException.ThrowIfNull(bookmarkEntity);
+            ArgumentNullException.ThrowIfNull(bookmarkUpdateDTO);
 
-            bool bookmarkExists = await _bookmarkRepository.ExistsAsync(userId,bookmarkEntity!.Id);
+            var bookmarkEntity = await _bookmarkRepository.GetByIdAsync(userId, folderId, bookmarkUpdateDTO.Id);
 
-            if (bookmarkExists is false)
-                throw new BookmarkNotFoundException(bookmarkEntity.Id);
+            if (bookmarkEntity is null)
+                throw new BookmarkNotFoundException(bookmarkUpdateDTO.Id);
+
+            if (bookmarkUpdateDTO.Name is not null)
+            {
+                bookmarkEntity.ChangeName(bookmarkUpdateDTO.Name);
+            }
+
+            if (bookmarkUpdateDTO.Url is not null)
+            {
+                bookmarkEntity.ChangeUrl(bookmarkUpdateDTO.Url);
+            }
+
+            if (bookmarkUpdateDTO.IsMarkedFavorite.HasValue)
+            {
+                if (bookmarkUpdateDTO.IsMarkedFavorite is true)
+                {
+                    bookmarkEntity.MarkFavorite();
+                }
+                else
+                {
+                    bookmarkEntity.UnmarkFavorite();
+                }
+            }
 
             await _bookmarkRepository.UpdateAsync(bookmarkEntity);
         }
@@ -89,56 +112,6 @@ namespace Folio.Core.Application.Services
             await _bookmarkRepository.DeleteAsync(bookmarkEntity);
 
             return true;
-        }
-
-        public async Task ChangeBookmarkNameAsync
-            (Guid userId, Guid folderId, Guid bookmarkId, string newBookmarkName)
-        {
-            var bookmark = await _bookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId);
-
-            if (bookmark is null)
-                throw new BookmarkNotFoundException(bookmarkId);
-
-            bookmark.ChangeName(newBookmarkName);
-
-            await _bookmarkRepository.UpdateAsync(bookmark);
-        }
-
-        public async Task ChangeBookmarkUrlAsync
-            (Guid userId, Guid folderId, Guid bookmarkId, string newBookmarkUrl)
-        {
-            var bookmark = await _bookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId);
-
-            if (bookmark is null)
-                throw new BookmarkNotFoundException(bookmarkId);
-
-            bookmark.ChangeUrl(newBookmarkUrl);
-
-            await _bookmarkRepository.UpdateAsync(bookmark);
-        }
-
-        public async Task MarkBookmarkAsFavoriteAsync(Guid userId, Guid folderId, Guid bookmarkId)
-        {
-            var bookmark = await _bookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId);
-
-            if (bookmark is null)
-                throw new BookmarkNotFoundException(bookmarkId);
-
-            bookmark.MarkFavorite();
-
-            await _bookmarkRepository.UpdateAsync(bookmark);
-        }
-
-        public async Task UnmarkBookmarkAsFavoriteAsync(Guid userId, Guid folderId, Guid bookmarkId)
-        {
-            var bookmark = await _bookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId);
-
-            if (bookmark is null)
-                throw new BookmarkNotFoundException(bookmarkId);
-
-            bookmark.UnmarkFavorite();
-
-            await _bookmarkRepository.UpdateAsync(bookmark);
         }
 
         public async Task MarkBookmarkAsVisitedAsync(Guid userId, Guid folderId, Guid bookmarkId)

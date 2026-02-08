@@ -92,26 +92,7 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var folder = await _folderService.GetFolderDTOByIdAsync(currentUser.Id, folderId);
-
-            if (folder is null)
-                return NotFound($"Folder with id {folderId} not found");
-
-            if (folderUpdateDTO.Name is not null)
-            {
-               await _folderService.ChangeFolderNameAsync(currentUser.Id, folderId, folderUpdateDTO.Name);
-            }
-
-            if (folderUpdateDTO.IsMarkedFavorite.HasValue)
-            {
-                if (folderUpdateDTO.IsMarkedFavorite is true)
-                {
-                    await _folderService.MarkFolderAsFavoriteAsync(currentUser.Id, folderId);
-                } else
-                {
-                    await _folderService.UnmarkFolderAsFavoriteAsync(currentUser.Id, folderId);
-                }
-            }
+            await _folderService.UpdateFolderAsync(folderId, currentUser.Id, folderUpdateDTO);
 
             return NoContent();
         }

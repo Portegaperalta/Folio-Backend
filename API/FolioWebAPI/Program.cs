@@ -26,7 +26,7 @@ namespace FolioWebAPI
             builder.Services.AddDataProtection();
 
             // controllers services
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddNewtonsoftJson();
             
             // services, repositories and mapper services
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
