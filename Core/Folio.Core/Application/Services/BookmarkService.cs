@@ -114,56 +114,6 @@ namespace Folio.Core.Application.Services
             return true;
         }
 
-        public async Task ChangeBookmarkNameAsync
-            (Guid userId, Guid folderId, Guid bookmarkId, string newBookmarkName)
-        {
-            var bookmark = await _bookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId);
-
-            if (bookmark is null)
-                throw new BookmarkNotFoundException(bookmarkId);
-
-            bookmark.ChangeName(newBookmarkName);
-
-            await _bookmarkRepository.UpdateAsync(bookmark);
-        }
-
-        public async Task ChangeBookmarkUrlAsync
-            (Guid userId, Guid folderId, Guid bookmarkId, string newBookmarkUrl)
-        {
-            var bookmark = await _bookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId);
-
-            if (bookmark is null)
-                throw new BookmarkNotFoundException(bookmarkId);
-
-            bookmark.ChangeUrl(newBookmarkUrl);
-
-            await _bookmarkRepository.UpdateAsync(bookmark);
-        }
-
-        public async Task MarkBookmarkAsFavoriteAsync(Guid userId, Guid folderId, Guid bookmarkId)
-        {
-            var bookmark = await _bookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId);
-
-            if (bookmark is null)
-                throw new BookmarkNotFoundException(bookmarkId);
-
-            bookmark.MarkFavorite();
-
-            await _bookmarkRepository.UpdateAsync(bookmark);
-        }
-
-        public async Task UnmarkBookmarkAsFavoriteAsync(Guid userId, Guid folderId, Guid bookmarkId)
-        {
-            var bookmark = await _bookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId);
-
-            if (bookmark is null)
-                throw new BookmarkNotFoundException(bookmarkId);
-
-            bookmark.UnmarkFavorite();
-
-            await _bookmarkRepository.UpdateAsync(bookmark);
-        }
-
         public async Task MarkBookmarkAsVisitedAsync(Guid userId, Guid folderId, Guid bookmarkId)
         {
             var bookmark = await _bookmarkRepository.GetByIdAsync(userId,folderId,bookmarkId);
