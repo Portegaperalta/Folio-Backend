@@ -87,33 +87,7 @@ namespace FolioWebAPI.Controllers
             if (bookmarkId != bookmarkUpdateDTO.Id)
                 return BadRequest("Bookmark ids must match");
 
-            var bookmark = await _bookmarkService.GetBookmarkByIdAsync(currentUser.Id, folderId, bookmarkId);
-
-            if (bookmark is null)
-                return NotFound($"Bookmark with id: {bookmarkId} not found");
-
-            if (bookmarkUpdateDTO.Name is not null)
-            {
-                await _bookmarkService.
-                    ChangeBookmarkNameAsync(currentUser.Id, folderId, bookmark.Id, bookmarkUpdateDTO.Name);
-            }
-
-            if (bookmarkUpdateDTO.Url is not null)
-            {
-                await _bookmarkService.
-                    ChangeBookmarkUrlAsync(currentUser.Id, folderId, bookmark.Id, bookmarkUpdateDTO.Url);
-            }
-
-            if (bookmarkUpdateDTO.IsMarkedFavorite.HasValue)
-            {
-                if (bookmarkUpdateDTO.IsMarkedFavorite is true)
-                {
-                    await _bookmarkService.MarkBookmarkAsFavoriteAsync(currentUser.Id, folderId, bookmark.Id);
-                } else
-                {
-                    await _bookmarkService.UnmarkBookmarkAsFavoriteAsync(currentUser.Id, folderId, bookmark.Id);
-                }
-            }
+            await _bookmarkService.UpdateBookmarkAsync(currentUser.Id, folderId, bookmarkUpdateDTO);
 
             return NoContent();
         }
