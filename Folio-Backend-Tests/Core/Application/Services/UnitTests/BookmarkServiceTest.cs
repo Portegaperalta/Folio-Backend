@@ -25,7 +25,6 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         private BookmarkMapper MockBookmarkMapper = null!;
 
         IEnumerable<Bookmark> MockBookmarkList = null!;
-        private IEnumerable<BookmarkDTO> MockBookmarkDTOList = null!;
 
         private BookmarkService bookmarkService = null!;
 
@@ -55,7 +54,6 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             MockBookmarkMapper = new BookmarkMapper();
 
             MockBookmarkList = new List<Bookmark> { MockBookmarkEntity };
-            MockBookmarkDTOList = new List<BookmarkDTO> { MockBookmarkDTO };
 
             bookmarkService = new(MockBookmarkRepository, MockBookmarkMapper);
         }
