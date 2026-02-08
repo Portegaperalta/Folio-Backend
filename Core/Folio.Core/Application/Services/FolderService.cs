@@ -83,42 +83,6 @@ namespace Folio.Core.Application.Services
             await _folderRepository.UpdateAsync(folderEntity);
         }
 
-        public async Task ChangeFolderNameAsync(Guid userId, Guid folderId, string newFolderName)
-        {
-            var folder = await _folderRepository.GetByIdAsync(userId, folderId);
-
-            if (folder is null)
-                throw new FolderNotFoundException(folderId);
-
-            folder.ChangeName(newFolderName);
-
-            await _folderRepository.UpdateAsync(folder);
-        }
-
-        public async Task MarkFolderAsFavoriteAsync(Guid userId, Guid folderId)
-        {
-            var folder = await _folderRepository.GetByIdAsync(userId, folderId);
-
-            if (folder is null)
-                throw new FolderNotFoundException(folderId);
-
-            folder.MarkFavorite();
-
-            await _folderRepository.UpdateAsync(folder);
-        }
-
-        public async Task UnmarkFolderAsFavoriteAsync(Guid userId, Guid folderId)
-        {
-            var folder = await _folderRepository.GetByIdAsync(userId, folderId);
-
-            if (folder is null)
-                throw new FolderNotFoundException(folderId);
-
-            folder.UnmarkFavorite();
-
-            await _folderRepository.UpdateAsync(folder);
-        }
-
         public async Task MarkFolderAsVisitedAsync(Guid userId, Guid folderId)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
