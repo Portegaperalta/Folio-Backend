@@ -6,6 +6,7 @@ using Folio.Core.Domain.Exceptions;
 using Folio.Core.Interfaces;
 using NSubstitute;
 using NSubstitute.ReceivedExtensions;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 {
@@ -15,12 +16,16 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         private readonly Guid MockUserId = Guid.NewGuid();
         private readonly Guid MockFolderId = Guid.NewGuid();
         private readonly Guid MockInvalidUserId = Guid.NewGuid();
+
         private Folder MockFolderEntity = null!;
         private FolderDTO MockFolderDTO = null!;
         private FolderCreationDTO MockFolderCreationDTO = null!;
+        private FolderUpdateDTO MockFolderUpdateDTO = null!;
+
         private IFolderRepository MockfolderRepository = null!;
         private FolderMapper MockFolderMapper = null!;
         private IEnumerable<Folder> MockFolderList = null!;
+
         private FolderService folderService = null!;
 
         [TestInitialize]
@@ -33,6 +38,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
             MockFolderDTO = MockFolderMapper.ToDto(MockFolderEntity);
             MockFolderCreationDTO = new FolderCreationDTO { Name = "folderMock" };
+            MockFolderUpdateDTO = new FolderUpdateDTO { Name = "folderMock" };
 
             MockFolderList = new List<Folder> { MockFolderEntity };
 
@@ -142,6 +148,34 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
 
             //Assert
             await MockfolderRepository.Received(1).AddAsync(Arg.Any<Folder>());
+        }
+
+        // UpdateFolderAsync tests
+        [TestMethod]
+        public async Task 
+            UpdateFolderAsync_ThrowsFolderNotFoundException_WhenFolderDoesNotExist()
+        {
+            //Arrange 
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns((Folder?)null);
+
+            //Act + Assert
+            await Assert.ThrowsAsync<FolderNotFoundException>(() =>
+            folderService.UpdateFolderAsync(MockFolderId, MockUserId, MockFolderUpdateDTO));
+        }
+
+        [TestMethod]
+        public async Task UpdateFolderAsync_CallsUpdateAsyncFromFolderRepository()
+        {
+            //Arrange
+            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
+                                .Returns(MockFolderEntity);
+
+            //Act
+            await folderService.UpdateFolderAsync(MockFolderId, MockUserId, MockFolderUpdateDTO);
+
+            //Assert
+            await MockfolderRepository.Received(1).UpdateAsync(Arg.Any<Folder>());
         }
 
         // MarkUserFolderAsVisitedAsync tests
