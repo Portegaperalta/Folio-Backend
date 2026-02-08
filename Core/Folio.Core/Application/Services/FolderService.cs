@@ -55,6 +55,34 @@ namespace Folio.Core.Application.Services
             return folderDTO;
         }
 
+        public async Task UpdateFolderAsync(Guid folderId, Guid userId, FolderUpdateDTO folderUpdateDTO)
+        {
+            var folderEntity = await _folderRepository.GetByIdAsync(userId, folderId);
+
+            if (folderEntity is null)
+            {
+                throw new FolderNotFoundException(folderId);
+            }
+
+            if (folderUpdateDTO.Name is not null)
+            {
+                folderEntity.ChangeName(folderUpdateDTO.Name);
+            }
+
+            if (folderUpdateDTO.IsMarkedFavorite.HasValue)
+            {
+                if (folderUpdateDTO.IsMarkedFavorite is true)
+                {
+                    folderEntity.MarkFavorite();
+                } else
+                {
+                    folderEntity.UnmarkFavorite();
+                }
+            }
+
+            await _folderRepository.UpdateAsync(folderEntity);
+        }
+
         public async Task ChangeFolderNameAsync(Guid userId, Guid folderId, string newFolderName)
         {
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
