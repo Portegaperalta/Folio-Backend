@@ -52,6 +52,19 @@ namespace FolioWebAPI.Controllers
             return Ok(bookmarkDTO);
         }
 
+        [HttpGet("count")]
+        public async Task<ActionResult<int>> Count([FromRoute] Guid folderId)
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+
+            if (currentUser is null)
+                return Unauthorized("Authorization failed");
+
+            var bookmarkCount = await _bookmarkService.CountBookmarksByFolderIdAsync(currentUser.Id, folderId);
+
+            return Ok(bookmarkCount);
+        }
+
         // POST
         [HttpPost]
         public async Task<ActionResult> 
