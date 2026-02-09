@@ -1,4 +1,6 @@
-﻿namespace FolioWebAPI.Middlewares
+﻿using Folio.Core.Domain.Exceptions;
+
+namespace FolioWebAPI.Middlewares
 {
     public class ExceptionHandlingMiddleware
     {
@@ -17,13 +19,42 @@
             {
                 await _next(context);
             }
-            catch (UnauthorizedAccessException exception)
+            catch (Exception exception)
             {
-                _logger.LogWarning(exception, "Unauthorized access attempt at {Path}", context.Request.Path);
-
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                await context.Response.WriteAsync("Unauthorized");
+                await HandleExceptionAsync(context, exception);
             }
+        }
+
+        private Task HandleExceptionAsync(HttpContext context, Exception exception)
+        {
+            var (statusCode, message) = exception switch
+            {
+                UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized Access"),
+                FolderNotFoundException => (StatusCodes.Status404NotFound, "Folder not found"),
+                BookmarkNotFoundException => (StatusCodes.Status404NotFound, "Bookmark not found"),
+                EmptyFolderNameException => (StatusCodes.Status400BadRequest, "Folder name cannot be empty"),
+                EmptyBookmarkNameException => (StatusCodes.Status400BadRequest, "Bookmark name cannot be empty"),
+                EmptyBookmarkUrlException => (StatusCodes.Status400BadRequest, "Bookmark url cannot be empty"),
+                ForbiddenAccessException => (StatusCodes.Status403Forbidden, "Forbidden Access"),
+                _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred")
+            };
+
+            if (statusCode >= 500)
+            {
+                _logger.LogError(exception, "Unhandled Exception at {Path}", context.Request.Path);
+            } else
+            {
+                _logger.LogWarning("Client error ({StatusCode}) at {Path}: {Message}", statusCode, context.Request.Path, message);
+            }
+
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = statusCode;
+
+            return context.Response.WriteAsJsonAsync(new
+            {
+                error = message,
+                status = statusCode
+            });
         }
     }
 }
