@@ -105,6 +105,7 @@ namespace FolioWebAPI
             }
 
             app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
 
