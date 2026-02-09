@@ -125,6 +125,35 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
             Assert.IsInstanceOfType<BookmarkDTO>(result);
         }
 
+        // CountBookmarksByFolderIdAsync tests
+        [TestMethod]
+        public async Task CountBookmarksByFolderIdAsync_CallsCountByFolderAsyncFromBookmarkRepository()
+        {
+            //Arrange
+            MockBookmarkRepository.CountByFolderAsync(MockUserId, MockFolderId)
+                                  .Returns(1);
+
+            //Act
+            await bookmarkService.CountBookmarksByFolderIdAsync(MockUserId, MockFolderId);
+
+            //Assert
+            await MockBookmarkRepository.Received(1).CountByFolderAsync(MockUserId, MockFolderId);
+        }
+
+        [TestMethod]
+        public async Task CountBookmarksByFolderIdAsync_ReturnsInteger()
+        {
+            //Arrange
+            MockBookmarkRepository.CountByFolderAsync(MockUserId, MockFolderId)
+                                  .Returns(1);
+
+            //Act
+            var result = await bookmarkService.CountBookmarksByFolderIdAsync(MockUserId, MockFolderId);
+
+            //Assert
+            Assert.IsInstanceOfType<int>(result);
+        }
+
         // CreateUserBookmarkAsync tests
         [TestMethod]
         public async Task 
