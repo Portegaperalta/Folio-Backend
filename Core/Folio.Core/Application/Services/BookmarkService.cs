@@ -55,6 +55,11 @@ namespace Folio.Core.Application.Services
         public async Task<BookmarkDTO> CreateBookmarkAsync(Guid userId, Guid folderId, BookmarkCreationDTO bookmarkCreationDTO)
         {
             ArgumentNullException.ThrowIfNull(bookmarkCreationDTO);
+
+            var userFolder = await _bookmarkRepository.GetFolderByUserAndFolderIdAsync(folderId, userId);
+
+            if (userFolder is null)
+                throw new FolderNotFoundException(folderId);
             
             var bookmarkEntity = _bookmarkMapper.ToEntity(userId, folderId, bookmarkCreationDTO);
             
