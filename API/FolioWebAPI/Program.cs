@@ -26,6 +26,10 @@ namespace FolioWebAPI
             builder.Services.AddOutputCache(options =>
             {
                 options.DefaultExpirationTimeSpan = TimeSpan.FromMinutes(5);
+
+                options.AddBasePolicy(builder =>
+                builder.Expire(TimeSpan.FromMinutes(5))
+                       .SetVaryByHeader("Authorization");
             });
 
             builder.Services.AddDataProtection();
