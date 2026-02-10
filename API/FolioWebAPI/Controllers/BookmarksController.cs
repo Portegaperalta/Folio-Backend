@@ -4,12 +4,14 @@ using Folio.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace FolioWebAPI.Controllers
 {
     [ApiController]
     [Route("api/{folderId:guid}/bookmarks")]
     [Authorize]
+    [EnableRateLimiting("Authenticated")]
     public class BookmarksController : ControllerBase
     {
         private readonly BookmarkService _bookmarkService;
