@@ -14,11 +14,14 @@ namespace FolioWebAPI.Controllers
     {
         private readonly BookmarkService _bookmarkService;
         private readonly ICurrentUserService _currentUserService;
+        private readonly IOutputCacheStore _outputCacheStore;
 
-        public BookmarksController(BookmarkService bookmarkService, ICurrentUserService currentUserService)
+        public BookmarksController(BookmarkService bookmarkService, 
+            ICurrentUserService currentUserService, IOutputCacheStore outputCacheStore)
         {
             _bookmarkService = bookmarkService;
             _currentUserService = currentUserService;
+            _outputCacheStore = outputCacheStore;
         }
 
         // GET

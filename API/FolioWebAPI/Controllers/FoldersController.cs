@@ -14,11 +14,14 @@ namespace FolioWebAPI.Controllers
     {
         private readonly FolderService _folderService;
         private readonly ICurrentUserService _currentUserService;
+        private readonly IOutputCacheStore _outputCacheStore;
 
-        public FoldersController(FolderService folderService, ICurrentUserService currentUserService)
+        public FoldersController(FolderService folderService, 
+            ICurrentUserService currentUserService, IOutputCacheStore outputCacheStore)
         {
             _folderService = folderService;
             _currentUserService = currentUserService;
+            _outputCacheStore = outputCacheStore;
         }
 
         //GET
