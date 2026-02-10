@@ -80,6 +80,8 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
+            await _outputCacheStore.EvictByTagAsync(cacheKey, default);
+
             var CreatedFolderDTO = await _folderService.CreateFolderAsync(currentUser.Id, folderCreationDTO);
 
             if (CreatedFolderDTO is null)
@@ -99,6 +101,8 @@ namespace FolioWebAPI.Controllers
 
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
+
+            await _outputCacheStore.EvictByTagAsync(cacheKey, default);
 
             await _folderService.UpdateFolderAsync(folderId, currentUser.Id, folderUpdateDTO);
 
@@ -126,6 +130,8 @@ namespace FolioWebAPI.Controllers
 
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
+
+            await _outputCacheStore.EvictByTagAsync(cacheKey, default);
 
             var isDeleted = await _folderService.DeleteFolderAsync(currentUser.Id, folderId);
 
