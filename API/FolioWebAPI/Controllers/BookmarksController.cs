@@ -3,6 +3,7 @@ using Folio.Core.Application.Services;
 using Folio.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace FolioWebAPI.Controllers
 {
@@ -23,6 +24,7 @@ namespace FolioWebAPI.Controllers
         // GET
         [HttpGet]
         [HttpGet("~/api/bookmarks")]
+        [OutputCache]
         public async Task<ActionResult<IEnumerable<BookmarkDTO>>> GetAll([FromRoute] Guid? folderId)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -53,6 +55,7 @@ namespace FolioWebAPI.Controllers
         }
 
         [HttpGet("count")]
+        [OutputCache]
         public async Task<ActionResult<int>> Count([FromRoute] Guid folderId)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();

@@ -3,6 +3,7 @@ using Folio.Core.Application.Services;
 using Folio.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace FolioWebAPI.Controllers
 {
@@ -22,6 +23,7 @@ namespace FolioWebAPI.Controllers
 
         //GET
         [HttpGet(Name = "GetAllUserFolders")]
+        [OutputCache]
         public async Task<ActionResult<IEnumerable<FolderDTO>>> GetAll()
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -35,6 +37,7 @@ namespace FolioWebAPI.Controllers
         }
 
         [HttpGet("{folderId:guid}", Name = "GetUserFolder")]
+        [OutputCache]
         public async Task<ActionResult<FolderDTO?>> GetById([FromRoute] Guid folderId)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -51,6 +54,7 @@ namespace FolioWebAPI.Controllers
         }
 
         [HttpGet("count")]
+        [OutputCache]
         public async Task<ActionResult<int>> Count()
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
