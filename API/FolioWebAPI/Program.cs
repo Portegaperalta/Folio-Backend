@@ -86,7 +86,16 @@ namespace FolioWebAPI
                     Type = SecuritySchemeType.ApiKey,
                     Scheme = "Bearer",
                     BearerFormat = "JWT",
-                    In = ParameterLocation.Header
+                    In = ParameterLocation.Header,
+                    Description = "Enter your JWT token"
+                });
+
+                options.AddSecurityRequirement(doc => new OpenApiSecurityRequirement
+                {
+                    {
+                      new OpenApiSecuritySchemeReference("Bearer"),
+                      new List<string>()
+                    }
                 });
             });
 
