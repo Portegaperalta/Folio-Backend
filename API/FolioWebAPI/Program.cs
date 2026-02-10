@@ -23,6 +23,11 @@ namespace FolioWebAPI
 
             // SERVICES AREA
 
+            builder.Services.AddOutputCache(options =>
+            {
+                options.DefaultExpirationTimeSpan = TimeSpan.FromMinutes(5);
+            });
+
             builder.Services.AddDataProtection();
 
             // controllers services
@@ -112,6 +117,8 @@ namespace FolioWebAPI
             app.UseAuthorization();
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+            app.UseOutputCache();
 
             app.MapControllers();
 
