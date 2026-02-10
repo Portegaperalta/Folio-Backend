@@ -3,6 +3,7 @@ using Folio.Core.Application.Services;
 using Folio.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace FolioWebAPI.Controllers
 {
@@ -13,16 +14,21 @@ namespace FolioWebAPI.Controllers
     {
         private readonly BookmarkService _bookmarkService;
         private readonly ICurrentUserService _currentUserService;
+        private readonly IOutputCacheStore _outputCacheStore;
+        private const string cacheKey = "get-bookmark";
 
-        public BookmarksController(BookmarkService bookmarkService, ICurrentUserService currentUserService)
+        public BookmarksController(BookmarkService bookmarkService, 
+            ICurrentUserService currentUserService, IOutputCacheStore outputCacheStore)
         {
             _bookmarkService = bookmarkService;
             _currentUserService = currentUserService;
+            _outputCacheStore = outputCacheStore;
         }
 
         // GET
         [HttpGet]
         [HttpGet("~/api/bookmarks")]
+        [OutputCache(Tags = [cacheKey])]
         public async Task<ActionResult<IEnumerable<BookmarkDTO>>> GetAll([FromRoute] Guid? folderId)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -36,6 +42,7 @@ namespace FolioWebAPI.Controllers
         }
 
         [HttpGet("{bookmarkId:guid}", Name = "GetUserBookmark")]
+        [OutputCache(Tags = [cacheKey])]
         public async Task<ActionResult<BookmarkDTO>> GetById
             ([FromRoute] Guid folderId, [FromRoute] Guid bookmarkId)
         {
@@ -53,6 +60,7 @@ namespace FolioWebAPI.Controllers
         }
 
         [HttpGet("count")]
+        [OutputCache(Tags = [cacheKey])]
         public async Task<ActionResult<int>> Count([FromRoute] Guid folderId)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -74,6 +82,8 @@ namespace FolioWebAPI.Controllers
 
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
+
+            await _outputCacheStore.EvictByTagAsync(cacheKey, default);
 
             var CreatedBookmarkDTO = await _bookmarkService.CreateBookmarkAsync(currentUser.Id, folderId, bookmarkCreationDTO);
 
@@ -99,6 +109,8 @@ namespace FolioWebAPI.Controllers
 
             if (bookmarkId != bookmarkUpdateDTO.Id)
                 return BadRequest("Bookmark ids must match");
+
+            await _outputCacheStore.EvictByTagAsync(cacheKey, default);
 
             await _bookmarkService.UpdateBookmarkAsync(currentUser.Id, folderId, bookmarkUpdateDTO);
 
@@ -126,6 +138,8 @@ namespace FolioWebAPI.Controllers
 
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
+
+            await _outputCacheStore.EvictByTagAsync(cacheKey, default);
 
             var isDeleted = await _bookmarkService.DeleteBookmarkAsync(currentUser.Id, folderId, bookmarkId);
 

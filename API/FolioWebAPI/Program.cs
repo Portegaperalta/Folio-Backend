@@ -23,6 +23,14 @@ namespace FolioWebAPI
 
             // SERVICES AREA
 
+            builder.Services.AddOutputCache(options =>
+            {
+                options.DefaultExpirationTimeSpan = TimeSpan.FromMinutes(5);
+
+                options.AddBasePolicy(builder =>
+                builder.SetVaryByHeader("Authorization"));
+            });
+
             builder.Services.AddDataProtection();
 
             // controllers services
@@ -81,7 +89,16 @@ namespace FolioWebAPI
                     Type = SecuritySchemeType.ApiKey,
                     Scheme = "Bearer",
                     BearerFormat = "JWT",
-                    In = ParameterLocation.Header
+                    In = ParameterLocation.Header,
+                    Description = "Enter your JWT token"
+                });
+
+                options.AddSecurityRequirement(doc => new OpenApiSecurityRequirement
+                {
+                    {
+                      new OpenApiSecuritySchemeReference("Bearer"),
+                      new List<string>()
+                    }
                 });
             });
 
@@ -109,9 +126,12 @@ namespace FolioWebAPI
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+            app.UseOutputCache();
 
             app.MapControllers();
 

@@ -17,6 +17,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         private readonly string FakeUrl = "https://fakeurl.com";
 
         private Bookmark MockBookmarkEntity = null!;
+        private Folder MockFolderEntity = null!;
         private BookmarkDTO MockBookmarkDTO = null!;
         private BookmarkCreationDTO MockBookmarkCreationDTO = null!;
         private BookmarkUpdateDTO MockBookmarkUpdateDTO = null!;
@@ -32,6 +33,7 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         public void Setup()
         {
             MockBookmarkEntity = new("mockBookmark", FakeUrl, MockFolderId, MockUserId);
+            MockFolderEntity = new("mockFolder", MockUserId);
 
             MockBookmarkDTO = new BookmarkDTO
             {
@@ -170,6 +172,10 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         [TestMethod]
         public async Task CreateBookmarkAsync_CallsAddAsyncFromBookmarkRepository()
         {
+            //Arrange
+            MockBookmarkRepository.GetFolderByIdAsync(MockFolderId, MockUserId)
+                                  .Returns(MockFolderEntity);
+
             //Act
             await bookmarkService.CreateBookmarkAsync(MockUserId, MockFolderId, MockBookmarkCreationDTO);
 
