@@ -28,8 +28,7 @@ namespace FolioWebAPI
                 options.DefaultExpirationTimeSpan = TimeSpan.FromMinutes(5);
 
                 options.AddBasePolicy(builder =>
-                builder.Expire(TimeSpan.FromMinutes(5))
-                       .SetVaryByHeader("Authorization"));
+                builder.SetVaryByHeader("Authorization"));
             });
 
             builder.Services.AddDataProtection();
