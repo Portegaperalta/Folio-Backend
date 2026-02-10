@@ -56,7 +56,7 @@ namespace Folio.Core.Application.Services
         {
             ArgumentNullException.ThrowIfNull(bookmarkCreationDTO);
 
-            var userFolder = await _bookmarkRepository.GetFolderByUserAndFolderIdAsync(folderId, userId);
+            var userFolder = await _bookmarkRepository.GetFolderByIdAsync(folderId, userId);
 
             if (userFolder is null)
                 throw new FolderNotFoundException(folderId);
