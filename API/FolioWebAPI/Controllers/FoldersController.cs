@@ -15,6 +15,7 @@ namespace FolioWebAPI.Controllers
         private readonly FolderService _folderService;
         private readonly ICurrentUserService _currentUserService;
         private readonly IOutputCacheStore _outputCacheStore;
+        private const string cacheKey = "get-folder";
 
         public FoldersController(FolderService folderService, 
             ICurrentUserService currentUserService, IOutputCacheStore outputCacheStore)
@@ -26,7 +27,7 @@ namespace FolioWebAPI.Controllers
 
         //GET
         [HttpGet(Name = "GetAllUserFolders")]
-        [OutputCache]
+        [OutputCache(Tags = [cacheKey])]
         public async Task<ActionResult<IEnumerable<FolderDTO>>> GetAll()
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -40,7 +41,7 @@ namespace FolioWebAPI.Controllers
         }
 
         [HttpGet("{folderId:guid}", Name = "GetUserFolder")]
-        [OutputCache]
+        [OutputCache(Tags = [cacheKey])]
         public async Task<ActionResult<FolderDTO?>> GetById([FromRoute] Guid folderId)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -57,7 +58,7 @@ namespace FolioWebAPI.Controllers
         }
 
         [HttpGet("count")]
-        [OutputCache]
+        [OutputCache(Tags = [cacheKey])]
         public async Task<ActionResult<int>> Count()
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();

@@ -15,6 +15,7 @@ namespace FolioWebAPI.Controllers
         private readonly BookmarkService _bookmarkService;
         private readonly ICurrentUserService _currentUserService;
         private readonly IOutputCacheStore _outputCacheStore;
+        private const string cacheKey = "get-bookmark";
 
         public BookmarksController(BookmarkService bookmarkService, 
             ICurrentUserService currentUserService, IOutputCacheStore outputCacheStore)
@@ -27,7 +28,7 @@ namespace FolioWebAPI.Controllers
         // GET
         [HttpGet]
         [HttpGet("~/api/bookmarks")]
-        [OutputCache]
+        [OutputCache(Tags = [cacheKey])]
         public async Task<ActionResult<IEnumerable<BookmarkDTO>>> GetAll([FromRoute] Guid? folderId)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -41,6 +42,7 @@ namespace FolioWebAPI.Controllers
         }
 
         [HttpGet("{bookmarkId:guid}", Name = "GetUserBookmark")]
+        [OutputCache(Tags = [cacheKey])]
         public async Task<ActionResult<BookmarkDTO>> GetById
             ([FromRoute] Guid folderId, [FromRoute] Guid bookmarkId)
         {
@@ -58,7 +60,7 @@ namespace FolioWebAPI.Controllers
         }
 
         [HttpGet("count")]
-        [OutputCache]
+        [OutputCache(Tags = [cacheKey])]
         public async Task<ActionResult<int>> Count([FromRoute] Guid folderId)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
