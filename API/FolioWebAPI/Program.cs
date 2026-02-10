@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Folio.Infrastructure.Repositories;
 using FolioWebAPI.Middlewares;
 using Folio.Core.Application.Mappers;
+using System.Threading.RateLimiting;
 
 namespace FolioWebAPI
 {
@@ -22,6 +23,39 @@ namespace FolioWebAPI
             var builder = WebApplication.CreateBuilder(args);
 
             // SERVICES AREA
+
+            // Rate Limiting services
+
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+                options.AddPolicy("Authenticated", httpContext =>
+                {
+                    var userId = httpContext.User.Identity?.Name;
+
+                    return RateLimitPartition.GetSlidingWindowLimiter(
+                        partitionKey: userId,
+                        factory: _ => new SlidingWindowRateLimiterOptions
+                        {
+                            PermitLimit = 20,
+                            Window = TimeSpan.FromMinutes(1),
+                            SegmentsPerWindow = 2
+                        });
+                });
+
+                options.AddPolicy("Unauthenticated", httpContext =>
+                {
+                    return RateLimitPartition.GetSlidingWindowLimiter(
+                        partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown",
+                        factory: _ => new SlidingWindowRateLimiterOptions
+                        {
+                            PermitLimit = 6,
+                            Window = TimeSpan.FromMinutes(1),
+                            SegmentsPerWindow = 2
+                        });
+                });
+            });
 
             builder.Services.AddOutputCache(options =>
             {
@@ -35,7 +69,7 @@ namespace FolioWebAPI
 
             // controllers services
             builder.Services.AddControllers().AddNewtonsoftJson();
-            
+
             // services, repositories and mapper services
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
             builder.Services.AddScoped<FolderMapper>();
@@ -128,6 +162,8 @@ namespace FolioWebAPI
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseRateLimiter();
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
