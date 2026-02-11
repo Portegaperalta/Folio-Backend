@@ -2,17 +2,18 @@
 using Folio.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace FolioWebAPI.Controllers
 {
-    [Route("api/users")]
+    [Route("api")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly IAuthenticationService _authenticationService;
         private readonly ICurrentUserService _currentUserService;
 
-        public UsersController(IAuthenticationService authenticationService, ICurrentUserService currentUserService)
+        public AuthController(IAuthenticationService authenticationService, ICurrentUserService currentUserService)
         {
             _authenticationService = authenticationService;
             _currentUserService = currentUserService;
@@ -20,6 +21,7 @@ namespace FolioWebAPI.Controllers
 
         // POST: api/register
         [HttpPost("register")]
+        [EnableRateLimiting("Unauthenticated")]
         public async Task<ActionResult<AuthenticationResponseDTO>>
             Register([FromForm] RegisterCredentialsDTO registerCredentialsDTO)
         {
@@ -34,6 +36,7 @@ namespace FolioWebAPI.Controllers
         }
 
         [HttpPost("login")]
+        [EnableRateLimiting("Unauthenticated")]
         public async Task<ActionResult<AuthenticationResponseDTO>> Login([FromForm] LoginCredentialsDTO loginCredentialsDTO)
         {
 
@@ -49,6 +52,7 @@ namespace FolioWebAPI.Controllers
         }
 
         [HttpGet("renew-token")]
+        [EnableRateLimiting("Authenticated")]
         [Authorize]
         public async Task<ActionResult<AuthenticationResponseDTO>> RenewToken()
         {

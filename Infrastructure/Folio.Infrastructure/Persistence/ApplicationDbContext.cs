@@ -33,6 +33,8 @@ namespace Folio.Infrastructure.Persistence
 
             modelBuilder.Entity<ApplicationUser>().ToTable("Users");
             modelBuilder.Entity<IdentityRole<Guid>>().ToTable("Roles");
+
+            modelBuilder.Entity<ApplicationUser>().HasQueryFilter(u => !u.IsDeleted);
         }
 
         public DbSet<Folder> Folders { get; set; }

@@ -1,6 +1,6 @@
 ﻿using Folio.Core.Application.DTOs.Folder;
 using Folio.Core.Application.Mappers;
-using Folio.Core.Domain.Exceptions;
+using Folio.Core.Domain.Exceptions.Folder;
 using Folio.Core.Interfaces;
 
 namespace Folio.Core.Application.Services

@@ -1,4 +1,6 @@
 ﻿using Folio.Core.Domain.Exceptions;
+using Folio.Core.Domain.Exceptions.Bookmark;
+using Folio.Core.Domain.Exceptions.Folder;
 
 namespace FolioWebAPI.Middlewares
 {

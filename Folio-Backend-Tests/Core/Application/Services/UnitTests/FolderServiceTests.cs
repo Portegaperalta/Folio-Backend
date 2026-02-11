@@ -2,7 +2,7 @@
 using Folio.Core.Application.Mappers;
 using Folio.Core.Application.Services;
 using Folio.Core.Domain.Entities;
-using Folio.Core.Domain.Exceptions;
+using Folio.Core.Domain.Exceptions.Folder;
 using Folio.Core.Interfaces;
 using NSubstitute;
 using NSubstitute.ReceivedExtensions;
