@@ -1,4 +1,6 @@
-﻿namespace Folio.Core.Domain.Entities
+﻿using Folio.Core.Domain.Exceptions.User;
+
+namespace Folio.Core.Domain.Entities
 {
     public class User
     {
@@ -48,7 +50,7 @@
         {
             if (string.IsNullOrWhiteSpace(newName) is true)
             {
-                throw new ArgumentException("User name cannot be empty");
+                throw new EmptyUsernameException();
             }
 
             this.Name = newName;
@@ -58,7 +60,7 @@
         {
             if (string.IsNullOrWhiteSpace(newEmail) is true)
             {
-                throw new ArgumentException("User email cannot be empty");
+                throw new EmptyUserEmailException();
             }
 
             this.Email = newEmail;
@@ -68,7 +70,7 @@
         {
             if (string.IsNullOrWhiteSpace(newPasswordHash) is true)
             {
-                throw new ArgumentException("User password cannot be empty");
+                throw new EmptyUserPasswordHashException();
             }
 
             this.PasswordHash = newPasswordHash;
