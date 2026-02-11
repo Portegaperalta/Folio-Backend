@@ -1,4 +1,5 @@
 ﻿using Folio.Core.Domain.Entities;
+using Folio.Core.Domain.Exceptions.User;
 
 namespace Folio_Backend_Tests.Core.Domain.Entities.UnitTests
 {
@@ -20,13 +21,14 @@ namespace Folio_Backend_Tests.Core.Domain.Entities.UnitTests
         [TestMethod]
         [DataRow(" ")]
         [DataRow(null)]
-        public void ChangeName_ThrowsArgumentException_WhenNewNameIsNullOrWhiteSpace(string? newName)
+        public void 
+            ChangeName_ThrowsEmptyUsernameException_WhenNewNameIsNullOrWhiteSpace(string? newName)
         {
             //Arrange
             string newUserName = newName!;
 
             //Act + Assert
-            Assert.Throws<ArgumentException>(() => MockUser.ChangeName(newUserName));
+            Assert.Throws<EmptyUsernameException>(() => MockUser.ChangeName(newUserName));
         }
 
         [TestMethod]
@@ -45,13 +47,14 @@ namespace Folio_Backend_Tests.Core.Domain.Entities.UnitTests
         [TestMethod]
         [DataRow(" ")]
         [DataRow(null)]
-        public void ChangeEmail_ThrowsArgumentException_WhenNewEmaileIsNullOrWhiteSpace(string? newEmail)
+        public void 
+            ChangeEmail_ThrowsEmptyUserEmailException_WhenNewEmaileIsNullOrWhiteSpace(string? newEmail)
         {
             //Arrange
             string newUserEmail = newEmail!;
 
             //Act + Assert
-            Assert.Throws<ArgumentException>(() => MockUser.ChangeEmail(newUserEmail));
+            Assert.Throws<EmptyUserEmailException>(() => MockUser.ChangeEmail(newUserEmail));
         }
 
         [TestMethod]
@@ -70,13 +73,14 @@ namespace Folio_Backend_Tests.Core.Domain.Entities.UnitTests
         [TestMethod]
         [DataRow(" ")]
         [DataRow(null)]
-        public void ChangePassword_ThrowsArgumentException_WhenNewPasswordHashIsNullOrWhiteSpace(string? newPasswordHash)
+        public void 
+            ChangePassword_ThrowsEmptyUserPasswordHashException_WhenNewPasswordHashIsNullOrWhiteSpace(string? newPasswordHash)
         {
             //Arrange
             string newUserPasswordHash = newPasswordHash!;
 
             //Act + Assert
-            Assert.Throws<ArgumentException>(() => MockUser.ChangePassword(newUserPasswordHash));
+            Assert.Throws<EmptyUserPasswordHashException>(() => MockUser.ChangePassword(newUserPasswordHash));
         }
 
         [TestMethod]
