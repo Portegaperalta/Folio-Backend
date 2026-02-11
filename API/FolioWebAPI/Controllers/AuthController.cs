@@ -8,12 +8,12 @@ namespace FolioWebAPI.Controllers
 {
     [Route("api")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly IAuthenticationService _authenticationService;
         private readonly ICurrentUserService _currentUserService;
 
-        public UsersController(IAuthenticationService authenticationService, ICurrentUserService currentUserService)
+        public AuthController(IAuthenticationService authenticationService, ICurrentUserService currentUserService)
         {
             _authenticationService = authenticationService;
             _currentUserService = currentUserService;
