@@ -1,4 +1,4 @@
-﻿namespace Folio.Core.Domain.Exceptions
+﻿namespace Folio.Core.Domain.Exceptions.Folder
 {
     public class FolderNotFoundException : Exception
     {

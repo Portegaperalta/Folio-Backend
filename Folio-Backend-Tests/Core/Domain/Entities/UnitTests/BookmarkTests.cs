@@ -1,5 +1,5 @@
 ﻿using Folio.Core.Domain.Entities;
-using Folio.Core.Domain.Exceptions;
+using Folio.Core.Domain.Exceptions.Bookmark;
 
 namespace Folio_Backend_Tests.Core.Domain.Entities.UnitTests
 {

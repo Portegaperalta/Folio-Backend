@@ -1,4 +1,4 @@
-﻿namespace Folio.Core.Domain.Exceptions
+﻿namespace Folio.Core.Domain.Exceptions.User
 {
     public class EmptyUserEmailException : Exception
     {
