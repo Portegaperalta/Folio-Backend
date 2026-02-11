@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace FolioWebAPI.Controllers
 {
-    [Route("api/users")]
+    [Route("api")]
     [ApiController]
     public class UsersController : ControllerBase
     {
