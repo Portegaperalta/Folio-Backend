@@ -1,4 +1,4 @@
-﻿using Folio.Core.Domain.Exceptions;
+﻿using Folio.Core.Domain.Exceptions.Folder;
 
 namespace Folio.Core.Domain.Entities
 {
