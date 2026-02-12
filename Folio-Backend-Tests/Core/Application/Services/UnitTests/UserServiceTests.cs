@@ -70,11 +70,11 @@ namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
         public async Task UpdateUserAsync_CallsUpdateUserAsyncFromUserRepository()
         {
             //Arrange
-            MockUserRepository.GetUserByIdAsync(MockUser.Id)
+            MockUserRepository.GetUserByIdAsync(MockUserId)
                               .Returns(MockUser);
 
             //Act
-            await userService.UpdateUserAsync(MockUser.Id, MockUserUpdateDTO);
+            await userService.UpdateUserAsync(MockUserId, MockUserUpdateDTO);
 
             //Assert
             await MockUserRepository.Received(1).UpdateUserAsync(Arg.Any<User>());
