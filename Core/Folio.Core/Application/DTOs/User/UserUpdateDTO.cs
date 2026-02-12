@@ -10,7 +10,6 @@ namespace Folio.Core.Application.DTOs.User
         [MinLength(1, ErrorMessage = "The field {0} must have {0} or more")]
         public string? Name { get; set; }
 
-        [Required(ErrorMessage = "The field {0} is required")]
         [EmailAddress(ErrorMessage = "The field {0} must be a valid email address")]
         public string? Email { get; set; }
 
