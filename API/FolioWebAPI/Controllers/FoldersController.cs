@@ -29,7 +29,7 @@ namespace FolioWebAPI.Controllers
         //GET
         [HttpGet(Name = "GetAllUserFolders")]
         [OutputCache(Tags = [cacheKey])]
-        public async Task<ActionResult<IEnumerable<FolderDTO>>> GetAll()
+        public async Task<ActionResult<IEnumerable<FolderDTO>>> GetAll([FromQuery] FolderPaginationDTO folderPaginationDTO)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
 
