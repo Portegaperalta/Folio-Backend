@@ -32,6 +32,13 @@ namespace Folio.Infrastructure.Identity.Mappers
             };
         }
 
+        public static void ToExistingApplicationUser(User userEntity, ApplicationUser applicationUser)
+        {
+            applicationUser.Name = userEntity.Name;
+            applicationUser.Email = userEntity.Email;
+            applicationUser.PhoneNumber = userEntity.PhoneNumber;
+        }
+
         public static void UpdateFromDomain(ApplicationUser applicationUser, User domainUser)
         {
             applicationUser.Name = domainUser.Name;

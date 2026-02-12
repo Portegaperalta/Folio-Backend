@@ -28,9 +28,10 @@ namespace Folio.Infrastructure.Repositories
 
         public async Task UpdateUserAsync(User userEntity)
         {
-            var applicationUser = UserMapper.ToApplicationUser(userEntity);
+            var existingApplicationUser = await _dbContext.Users.FindAsync(userEntity.Id);
 
-            _dbContext.Users.Update(applicationUser);
+            UserMapper.ToExistingApplicationUser(userEntity, existingApplicationUser!);
+
             await _dbContext.SaveChangesAsync();
         }
 
