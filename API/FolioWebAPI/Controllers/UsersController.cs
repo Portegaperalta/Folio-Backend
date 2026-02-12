@@ -1,5 +1,5 @@
 ﻿using Folio.Core.Application.DTOs.User;
-using Folio.Core.Application.Services;
+using Folio.Core.Interfaces;
 using FolioWebAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +13,10 @@ namespace FolioWebAPI.Controllers
     [EnableRateLimiting("Authenticated")]
     public class UsersController : ControllerBase
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
         private readonly CurrentUserService _currentUserService;
 
-        public UsersController(UserService userService, CurrentUserService currentUserService)
+        public UsersController(IUserService userService, CurrentUserService currentUserService)
         {
             _userService = userService;
             _currentUserService = currentUserService;

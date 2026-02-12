@@ -1,5 +1,4 @@
 ﻿using Folio.Core.Application.DTOs.Bookmark;
-using Folio.Core.Application.Services;
 using Folio.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,12 +13,12 @@ namespace FolioWebAPI.Controllers
     [EnableRateLimiting("Authenticated")]
     public class BookmarksController : ControllerBase
     {
-        private readonly BookmarkService _bookmarkService;
+        private readonly IBookmarkService _bookmarkService;
         private readonly ICurrentUserService _currentUserService;
         private readonly IOutputCacheStore _outputCacheStore;
         private const string cacheKey = "get-bookmark";
 
-        public BookmarksController(BookmarkService bookmarkService, 
+        public BookmarksController(IBookmarkService bookmarkService, 
             ICurrentUserService currentUserService, IOutputCacheStore outputCacheStore)
         {
             _bookmarkService = bookmarkService;
