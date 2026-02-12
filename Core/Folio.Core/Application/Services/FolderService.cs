@@ -5,7 +5,7 @@ using Folio.Core.Interfaces;
 
 namespace Folio.Core.Application.Services
 {
-    public class FolderService
+    public class FolderService : IFolderService
     {
         private readonly IFolderRepository _folderRepository;
         private readonly FolderMapper _folderMapper;
