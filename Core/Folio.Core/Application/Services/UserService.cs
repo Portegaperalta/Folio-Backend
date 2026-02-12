@@ -20,7 +20,7 @@ namespace Folio.Core.Application.Services
             if (userEntity is null)
                 throw new UserNotFoundException(userId);
 
-            if (userId != userEntity.Id)
+            if (userId != userUpdateDTO.UserId)
                 throw new ArgumentException("User id's must match");
 
             if (userUpdateDTO.Name is not null)
