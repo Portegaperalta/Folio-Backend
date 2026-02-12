@@ -4,7 +4,7 @@ using Folio.Core.Interfaces;
 
 namespace Folio.Core.Application.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
 
