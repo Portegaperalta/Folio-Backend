@@ -14,9 +14,9 @@ namespace FolioWebAPI.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly CurrentUserService _currentUserService;
+        private readonly ICurrentUserService _currentUserService;
 
-        public UsersController(IUserService userService, CurrentUserService currentUserService)
+        public UsersController(IUserService userService, ICurrentUserService currentUserService)
         {
             _userService = userService;
             _currentUserService = currentUserService;
