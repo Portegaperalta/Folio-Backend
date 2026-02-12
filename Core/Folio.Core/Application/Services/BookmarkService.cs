@@ -6,7 +6,7 @@ using Folio.Core.Interfaces;
 
 namespace Folio.Core.Application.Services
 {
-    public class BookmarkService
+    public class BookmarkService : IBookmarkService
     {
         private readonly IBookmarkRepository _bookmarkRepository;
         private readonly BookmarkMapper _bookmarkMapper;

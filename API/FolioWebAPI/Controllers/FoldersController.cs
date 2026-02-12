@@ -1,5 +1,4 @@
 ﻿using Folio.Core.Application.DTOs.Folder;
-using Folio.Core.Application.Services;
 using Folio.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,12 +13,12 @@ namespace FolioWebAPI.Controllers
     [EnableRateLimiting("Authenticated")]
     public class FoldersController : ControllerBase
     {
-        private readonly FolderService _folderService;
+        private readonly IFolderService _folderService;
         private readonly ICurrentUserService _currentUserService;
         private readonly IOutputCacheStore _outputCacheStore;
         private const string cacheKey = "get-folder";
 
-        public FoldersController(FolderService folderService, 
+        public FoldersController(IFolderService folderService, 
             ICurrentUserService currentUserService, IOutputCacheStore outputCacheStore)
         {
             _folderService = folderService;

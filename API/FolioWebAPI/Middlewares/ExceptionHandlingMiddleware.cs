@@ -1,6 +1,7 @@
 ﻿using Folio.Core.Domain.Exceptions;
 using Folio.Core.Domain.Exceptions.Bookmark;
 using Folio.Core.Domain.Exceptions.Folder;
+using Folio.Core.Domain.Exceptions.User;
 
 namespace FolioWebAPI.Middlewares
 {
@@ -32,8 +33,12 @@ namespace FolioWebAPI.Middlewares
             var (statusCode, message) = exception switch
             {
                 UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized Access"),
+                UserNotFoundException => (StatusCodes.Status404NotFound, "User not found"),
                 FolderNotFoundException => (StatusCodes.Status404NotFound, "Folder not found"),
                 BookmarkNotFoundException => (StatusCodes.Status404NotFound, "Bookmark not found"),
+                EmptyUsernameException => (StatusCodes.Status400BadRequest, "User name cannot be empty"),
+                EmptyUserEmailException => (StatusCodes.Status400BadRequest, "User email cannot be empty"),
+                EmptyUserPasswordHashException => (StatusCodes.Status400BadRequest, "User password hash cannot be empty"),
                 EmptyFolderNameException => (StatusCodes.Status400BadRequest, "Folder name cannot be empty"),
                 EmptyBookmarkNameException => (StatusCodes.Status400BadRequest, "Bookmark name cannot be empty"),
                 EmptyBookmarkUrlException => (StatusCodes.Status400BadRequest, "Bookmark url cannot be empty"),

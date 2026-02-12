@@ -71,11 +71,13 @@ namespace FolioWebAPI
             builder.Services.AddControllers().AddNewtonsoftJson();
 
             // services, repositories and mapper services
+            builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
             builder.Services.AddScoped<FolderMapper>();
             builder.Services.AddScoped<BookmarkMapper>();
-            builder.Services.AddScoped<FolderService>();
-            builder.Services.AddScoped<BookmarkService>();
+            builder.Services.AddScoped<IFolderService,FolderService>();
+            builder.Services.AddScoped<IBookmarkService,BookmarkService>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IFolderRepository, FolderRepository>();
             builder.Services.AddScoped<IBookmarkRepository, BookmarkRepository>();
             builder.Services.AddTransient<ITokenGenerator, TokenGenerator>();
