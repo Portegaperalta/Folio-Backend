@@ -1,6 +1,6 @@
-﻿namespace Folio.Core.Application.DTOs.Pagination
+﻿namespace Folio.Core.Application.DTOs.Folder
 {
-    public record PaginationDTO (int Page = 1, int RecordsPerPage = 20)
+    public record FolderPaginationDTO(int Page = 1, int RecordsPerPage = 20)
     {
         private const int MaxRecordsPerPage = 50;
 
