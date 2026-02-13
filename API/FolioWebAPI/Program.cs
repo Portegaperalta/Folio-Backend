@@ -16,7 +16,7 @@ using System.Threading.RateLimiting;
 
 namespace FolioWebAPI
 {
-    public class Program
+    public partial class Program
     {
         public static void Main(string[] args)
         {
