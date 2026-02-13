@@ -22,7 +22,7 @@ namespace FolioWebAPI.Controllers
             _currentUserService = currentUserService;
         }
 
-        [HttpPut("update-profile")]
+        [HttpPut("update")]
         public async Task<ActionResult> Update([FromForm] UserUpdateDTO userUpdateDTO)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -35,7 +35,7 @@ namespace FolioWebAPI.Controllers
             return NoContent();
         }
 
-        [HttpDelete("delete-account")]
+        [HttpDelete("delete")]
         public async Task<ActionResult> Delete()
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
