@@ -48,7 +48,7 @@ namespace FolioWebAPI.Controllers
                 return Unauthorized("Authentication failed");
             }
 
-            return authenticationResponseDTO;
+            return Ok(authenticationResponseDTO);
         }
 
         [HttpGet("renew-token")]
