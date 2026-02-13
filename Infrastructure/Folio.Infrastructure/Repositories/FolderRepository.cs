@@ -16,11 +16,9 @@ namespace Folio.Infrastructure.Repositories
 
         public async Task<IEnumerable<Folder>> GetAllAsync(Guid userId)
         {
-            return await _dbContext.Folders
-                                   .AsQueryable()
-                                   .Where(f => f.UserId == userId)
-                                   .Include(f => f.Bookmarks)
-                                   .ToListAsync();
+            return await _dbContext.Folders.Where(f => f.UserId == userId)
+                                           .Include(f => f.Bookmarks)
+                                           .ToListAsync();
         }
 
         public async Task<Folder?> GetByIdAsync(Guid userId, Guid folderId)
