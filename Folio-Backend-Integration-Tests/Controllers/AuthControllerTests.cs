@@ -10,7 +10,9 @@ namespace Folio_Backend_Integration_Tests.Controllers
     [TestClass]
     public class AuthControllerTests : TestsBase
     {
-        private static readonly string Url = "/api/auth/register";
+        private static readonly string registerUrl = "/api/auth/register";
+        private static readonly string loginUrl = "/api/auth/login";
+        private static readonly string renewTokenUrl = "/api/auth/renew-token";
         private readonly string dbName = Guid.NewGuid().ToString();
         private readonly JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions
         {
@@ -32,7 +34,7 @@ namespace Folio_Backend_Integration_Tests.Controllers
             };
 
             //Act
-            var response = await client.PostAsJsonAsync(Url, invalidRegistrationCredentials);
+            var response = await client.PostAsJsonAsync(registerUrl, invalidRegistrationCredentials);
 
             //Assert
             var statusCode = response.StatusCode;
@@ -61,7 +63,7 @@ namespace Folio_Backend_Integration_Tests.Controllers
                 ];
 
             //Act
-            var response = await client.PostAsJsonAsync(Url, invalidRegistrationCredentials, jsonSerializerOptions);
+            var response = await client.PostAsJsonAsync(registerUrl, invalidRegistrationCredentials, jsonSerializerOptions);
 
             //Assert
             var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
