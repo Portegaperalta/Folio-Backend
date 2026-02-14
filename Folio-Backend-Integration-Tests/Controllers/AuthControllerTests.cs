@@ -134,7 +134,6 @@ namespace Folio_Backend_Integration_Tests.Controllers
 
             //Assert
             Assert.AreEqual(expected: HttpStatusCode.OK, actual: response.StatusCode);
-            Assert.AreEqual(expected:"asdr", actual: response.Content.Headers.)
         }
     }
 }
