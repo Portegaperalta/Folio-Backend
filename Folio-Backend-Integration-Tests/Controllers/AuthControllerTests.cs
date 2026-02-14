@@ -1,7 +1,8 @@
 ﻿using Folio.Core.Application.DTOs.Auth;
+using Folio.Infrastructure.Identity;
 using Folio_Backend_Integration_Tests.Utils;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -14,7 +15,9 @@ namespace Folio_Backend_Integration_Tests.Controllers
         private static readonly string registerUrl = "/api/auth/register";
         private static readonly string loginUrl = "/api/auth/login";
         private static readonly string renewTokenUrl = "/api/auth/renew-token";
+
         private readonly string dbName = Guid.NewGuid().ToString();
+
         private readonly JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -92,6 +95,46 @@ namespace Folio_Backend_Integration_Tests.Controllers
             //Assert
             var statusCode = response.StatusCode;
             Assert.AreEqual(expected: HttpStatusCode.Unauthorized, actual: statusCode);
+        }
+
+        [TestMethod]
+        public async Task Login_ReturnsStatusCode200_WhenCredentialsAreValid()
+        {
+            //Arrage
+            var factory = BuildWebApplicationFactory(dbName);
+            var client = factory.CreateClient();
+
+            using (var context = BuildContext(dbName))
+            {
+                var passwordHasher = new PasswordHasher<ApplicationUser>();
+                var user = new ApplicationUser
+                {
+                    Name = "fakeUser",
+                    Email = "fakeUser@test.com",
+                    UserName = "fakeUser@test.com",
+                    NormalizedEmail = "FAKEUSER@TEST.COM",
+                    NormalizedUserName = "FAKEUSER@TEST.COM",
+                    SecurityStamp = Guid.NewGuid().ToString() 
+                };
+
+                user.PasswordHash = passwordHasher.HashPassword(user, "#fakeUserpassword123");
+
+                context.Users.Add(user);
+                await context.SaveChangesAsync();
+            }
+
+            var validLoginCredentials = new LoginCredentialsDTO
+            {
+                Email = "fakeUser@test.com",
+                Password = "#fakeUserpassword123"!,
+            };
+
+            //Act
+            var response = await client.PostAsJsonAsync(loginUrl, validLoginCredentials, jsonSerializerOptions);
+
+            //Assert
+            Assert.AreEqual(expected: HttpStatusCode.OK, actual: response.StatusCode);
+            Assert.AreEqual(expected:"asdr", actual: response.Content.Headers.)
         }
     }
 }
