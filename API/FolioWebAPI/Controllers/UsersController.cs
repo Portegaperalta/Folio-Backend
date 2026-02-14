@@ -23,7 +23,7 @@ namespace FolioWebAPI.Controllers
         }
 
         [HttpPut("update")]
-        public async Task<ActionResult> Update([FromForm] UserUpdateDTO userUpdateDTO)
+        public async Task<ActionResult> Update([FromBody] UserUpdateDTO userUpdateDTO)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
 
