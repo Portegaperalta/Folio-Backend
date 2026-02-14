@@ -74,7 +74,7 @@ namespace FolioWebAPI.Controllers
 
         // POST
         [HttpPost]
-        public async Task<ActionResult<FolderDTO>> Create([FromForm] FolderCreationDTO folderCreationDTO)
+        public async Task<ActionResult<FolderDTO>> Create([FromBody] FolderCreationDTO folderCreationDTO)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
 
@@ -96,7 +96,7 @@ namespace FolioWebAPI.Controllers
 
         // PUT
         [HttpPut("{folderId:guid}")]
-        public async Task<ActionResult> Update([FromRoute] Guid folderId, [FromForm] FolderUpdateDTO folderUpdateDTO)
+        public async Task<ActionResult> Update([FromRoute] Guid folderId, [FromBody] FolderUpdateDTO folderUpdateDTO)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
 
