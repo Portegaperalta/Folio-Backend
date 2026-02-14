@@ -23,7 +23,7 @@ namespace FolioWebAPI.Controllers
         [HttpPost("register")]
         [EnableRateLimiting("Unauthenticated")]
         public async Task<ActionResult<AuthenticationResponseDTO>>
-            Register([FromForm] RegisterCredentialsDTO registerCredentialsDTO)
+            Register([FromBody] RegisterCredentialsDTO registerCredentialsDTO)
         {
 
             var authenticationResponseDTO = await _authenticationService.RegisterAsync(
@@ -37,7 +37,7 @@ namespace FolioWebAPI.Controllers
 
         [HttpPost("login")]
         [EnableRateLimiting("Unauthenticated")]
-        public async Task<ActionResult<AuthenticationResponseDTO>> Login([FromForm] LoginCredentialsDTO loginCredentialsDTO)
+        public async Task<ActionResult<AuthenticationResponseDTO>> Login([FromBody] LoginCredentialsDTO loginCredentialsDTO)
         {
 
             var authenticationResponseDTO = await _authenticationService
