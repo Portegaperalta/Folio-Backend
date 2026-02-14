@@ -12,8 +12,12 @@ namespace Folio_Backend_Integration_Tests.Controllers
     {
         private static readonly string Url = "/api/auth/register";
         private readonly string dbName = Guid.NewGuid().ToString();
+        private readonly JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
 
-        [TestMethod]
+    [TestMethod]
         public async Task Register_ReturnsStatusCode400_WhenRegistrationFieldsAreInvalid()
         {
             //Arrange
@@ -56,13 +60,8 @@ namespace Folio_Backend_Integration_Tests.Controllers
                 "Password must contain at least one special character"
                 ];
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
             //Act
-            var response = await client.PostAsJsonAsync(Url, invalidRegistrationCredentials, options);
+            var response = await client.PostAsJsonAsync(Url, invalidRegistrationCredentials, jsonSerializerOptions);
 
             //Assert
             var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
