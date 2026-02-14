@@ -1,6 +1,7 @@
 ﻿using Folio.Core.Application.DTOs.Auth;
 using Folio_Backend_Integration_Tests.Utils;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -70,6 +71,27 @@ namespace Folio_Backend_Integration_Tests.Controllers
             var errorMessages = problemDetails!.Errors.Values.SelectMany(x => x).ToList();
 
             CollectionAssert.AreEquivalent(expectedErrors, errorMessages);
+        }
+
+        [TestMethod]
+        public async Task Login_ReturnsStatusCode401_WhenLoginCredentialsAreInvalid()
+        {
+            //Arrange
+            var factory = BuildWebApplicationFactory(dbName);
+            var client = factory.CreateClient();
+
+            var invalidLoginCredentials = new LoginCredentialsDTO
+            {
+                Email = "testUser@test.com",
+                Password = "@InvalidPassword123"
+            };
+
+            //Act
+            var response = await client.PostAsJsonAsync(loginUrl, invalidLoginCredentials, jsonSerializerOptions);
+
+            //Assert
+            var statusCode = response.StatusCode;
+            Assert.AreEqual(expected: HttpStatusCode.Unauthorized, actual: statusCode);
         }
     }
 }
