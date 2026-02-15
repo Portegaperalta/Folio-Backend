@@ -178,7 +178,7 @@ namespace Folio_Backend_Integration_Tests.Controllers
 
             var tokenParts = authResponse.Token.Split('.');
 
-            Assert.AreEqual(expected: 3, actual: tokenParts.Length);
+            Assert.HasCount(expected: 3, tokenParts);
         }
     }
 }
