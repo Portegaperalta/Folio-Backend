@@ -6,7 +6,7 @@ an URL saving and management app. Built with .NET 10, EF CORE, PostgreSQL.
 
 ```text
 Folio-Backend/
-├── FolioWebAPI/           # User Interface (API)
+├── FolioWebAPI/           # Presentation Layer (API)
 │   ├── Controllers/       # REST Endpoints
 │   ├── Extensions/        # Extensions
 │   └── Middlewares/       # Global Error Handling and custom request pipelines.
