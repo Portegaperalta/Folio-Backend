@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Net.Http.Headers;
 
 namespace Folio_Backend_Integration_Tests.Controllers
 {
@@ -213,6 +214,67 @@ namespace Folio_Backend_Integration_Tests.Controllers
             var tokenParts = authResponse.Token.Split('.');
 
             Assert.HasCount(expected: 3, tokenParts);
+        }
+
+        [TestMethod]
+        public async Task RenewToken_ReturnsNewValidToken()
+        {
+            var factory = BuildWebApplicationFactory(dbName);
+            var client = factory.CreateClient();
+
+            using (var context = BuildContext(dbName))
+            {
+                var passwordHasher = new PasswordHasher<ApplicationUser>();
+                var user = new ApplicationUser
+                {
+                    Name = "fakeUser",
+                    Email = "fakeUser@test.com",
+                    UserName = "fakeUser@test.com",
+                    NormalizedEmail = "FAKEUSER@TEST.COM",
+                    NormalizedUserName = "FAKEUSER@TEST.COM",
+                    SecurityStamp = Guid.NewGuid().ToString()
+                };
+
+                user.PasswordHash = passwordHasher.HashPassword(user, "#fakeUserpassword123");
+
+                context.Users.Add(user);
+                await context.SaveChangesAsync();
+            }
+
+            var validLoginCredentials = new LoginCredentialsDTO
+            {
+                Email = "fakeUser@test.com",
+                Password = "#fakeUserpassword123"!,
+            };
+
+            //Act
+
+            var loginResponse = await client.PostAsJsonAsync(loginUrl, validLoginCredentials, jsonSerializerOptions);
+            loginResponse.EnsureSuccessStatusCode();
+
+             // extracts token from login response
+            var loginContent = await loginResponse.Content.ReadFromJsonAsync<AuthenticationResponseDTO>();
+            var oldToken = loginContent?.Token;
+
+            // waits for the clock to tick to the next second
+            await Task.Delay(1001);
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", oldToken);
+            var tokenRenewResponse = await client.GetAsync(renewTokenUrl);
+
+            //Assert
+            tokenRenewResponse.EnsureSuccessStatusCode();
+
+             // extracts new token from renew-token response
+            var renewContent = await tokenRenewResponse.Content.ReadFromJsonAsync<AuthenticationResponseDTO>();
+            var newToken = renewContent?.Token;
+
+            Assert.IsNotNull(newToken);
+
+            var newTokenParts = newToken.Split('.');
+
+            Assert.HasCount(expected: 3, newTokenParts);
+            Assert.AreNotEqual(oldToken, newToken);
         }
     }
 }
