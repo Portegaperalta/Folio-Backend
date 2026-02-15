@@ -135,5 +135,50 @@ namespace Folio_Backend_Integration_Tests.Controllers
             //Assert
             Assert.AreEqual(expected: HttpStatusCode.OK, actual: response.StatusCode);
         }
+
+        [TestMethod]
+        public async Task Login_ReturnsValidJWT_WhenCredentialsAreValid()
+        {
+            //Arrange
+            var factory = BuildWebApplicationFactory(dbName);
+            var client = factory.CreateClient();
+
+            using (var context = BuildContext(dbName))
+            {
+                var passwordHasher = new PasswordHasher<ApplicationUser>();
+                var user = new ApplicationUser
+                {
+                    Name = "fakeUser",
+                    Email = "fakeUser@test.com",
+                    UserName = "fakeUser@test.com",
+                    NormalizedEmail = "FAKEUSER@TEST.COM",
+                    NormalizedUserName = "FAKEUSER@TEST.COM",
+                    SecurityStamp = Guid.NewGuid().ToString() 
+                };
+
+                user.PasswordHash = passwordHasher.HashPassword(user, "#fakeUserpassword123");
+
+                context.Users.Add(user);
+                await context.SaveChangesAsync();
+            }
+
+            var validLoginCredentials = new LoginCredentialsDTO
+            {
+                Email = "fakeUser@test.com",
+                Password = "#fakeUserpassword123"!,
+            };
+
+            //Act
+            var response = await client.PostAsJsonAsync(loginUrl, validLoginCredentials, jsonSerializerOptions);
+
+            //Assert
+            var authResponse = await response.Content.ReadFromJsonAsync<AuthenticationResponseDTO>();
+
+            Assert.IsFalse(string.IsNullOrEmpty(authResponse!.Token));
+
+            var tokenParts = authResponse.Token.Split('.');
+
+            Assert.AreEqual(expected: 3, actual: tokenParts.Length);
+        }
     }
 }
