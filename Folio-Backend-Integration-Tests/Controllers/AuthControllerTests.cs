@@ -1,8 +1,11 @@
 ﻿using Folio.Core.Application.DTOs.Auth;
 using Folio.Infrastructure.Identity;
+using Folio.Infrastructure.Persistence;
 using Folio_Backend_Integration_Tests.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -74,6 +77,37 @@ namespace Folio_Backend_Integration_Tests.Controllers
             var errorMessages = problemDetails!.Errors.Values.SelectMany(x => x).ToList();
 
             CollectionAssert.AreEquivalent(expectedErrors, errorMessages);
+        }
+
+        [TestMethod]
+        public async Task Register_PeristsDataInDatabase()
+        {
+            //Arrage
+            var factory = BuildWebApplicationFactory(dbName);
+            var client = factory.CreateClient();
+
+            var registrationCredentials = new RegisterCredentialsDTO
+            {
+                Name = "fakeUser",
+                Email = "fakeUser@test.com",
+                Password = "#fakeUserpassword123"
+            };
+
+            //Act
+            var response = await client.PostAsJsonAsync(registerUrl, registrationCredentials, jsonSerializerOptions);
+
+            //Assert
+            response.EnsureSuccessStatusCode();
+
+            using var scope = factory.Services.CreateScope();
+
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+            var userInDb = await dbContext.Users
+                .FirstOrDefaultAsync(u => u.Email == registrationCredentials.Email);
+
+            Assert.IsNotNull(userInDb);
+            Assert.AreEqual(registrationCredentials.Name, userInDb.Name);
         }
 
         [TestMethod]
