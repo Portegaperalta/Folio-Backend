@@ -1,109 +1,167 @@
-﻿using Folio.Core.Application.DTOs.User;
+﻿using FluentAssertions;
+using Folio.Core.Application.DTOs.User;
 using Folio.Core.Application.Services;
 using Folio.Core.Domain.Entities;
 using Folio.Core.Domain.Exceptions.User;
 using Folio.Core.Interfaces;
 using NSubstitute;
+using System.Security.Cryptography;
+using System.Text;
+using Xunit;
 
 namespace Folio_Backend_Tests.Core.Application.Services
 {
-    [TestClass]
     public class UserServiceTests
     {
-        private readonly Guid MockUserId = Guid.NewGuid();
-        private readonly string MockUsername = "fakename";
-        private readonly string MockUserEmail = "fake@example.com";
-        private readonly string MockUserPhone = "+18880009999";
 
-        private User MockUser = null!;
-        private UserUpdateDTO MockUserUpdateDTO = null!;
-        private IUserRepository MockUserRepository = null!;
-        private UserService userService = null!;
+        private readonly IUserRepository _mockUserRepository;
+        private readonly UserService _userService;
 
-        [TestInitialize]
-        public void Setup()
+        public UserServiceTests()
         {
-            MockUser = new User(MockUsername, MockUserEmail, "dada", MockUserPhone);
-
-            MockUserUpdateDTO = new UserUpdateDTO
-            {
-                UserId = MockUserId,
-                Name = "newNameMock",
-                Email = "fake@mock.com",
-            };
-
-            MockUserRepository = Substitute.For<IUserRepository>();
-            userService = new UserService(MockUserRepository);
+            _mockUserRepository = Substitute.For<IUserRepository>();
+            _userService = new UserService(_mockUserRepository);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task UpdateUserAsync_ThrowsUserNotFoundException_WhenUserDoesNotExist()
         {
             //Arrange
-            MockUserRepository.GetUserByIdAsync(MockUserId)
-                              .Returns((User?)null);
+            var userId = CreateUserId();
 
-            //Act + Assert
-            await Assert.ThrowsAsync<UserNotFoundException>(() =>
-            userService.UpdateUserAsync(MockUserId, MockUserUpdateDTO));
+            _mockUserRepository.GetUserByIdAsync(userId)
+                               .Returns((User?)null);
+
+            var updateUserDTO = createUserUpdateDTO(userId, "newUserName", "newFake@mock.com", null);
+
+            //Act 
+            Func<Task> act = async () => await _userService.UpdateUserAsync(userId, updateUserDTO);
+
+            //Assert
+            await act.Should().ThrowAsync<UserNotFoundException>();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task UpdateUserAsync_ThrowsArgumentException_WhenUserIdsDoNotMatch()
         {
             //Arrange
-            MockUserRepository.GetUserByIdAsync(MockUserId)
-                              .Returns(MockUser);
+            var userId = CreateUserId();
+            var userName = CreateUserName();
+            var userEmail = CreateUserEmail();
+            var userPassword = CreateUserPassword("!Fakepassword123");
 
-            var mismatchDTO = new UserUpdateDTO
+            var userEntity = CreateUserEntity(userId, userName, userEmail, userPassword);
+
+            _mockUserRepository.GetUserByIdAsync(userId)
+                               .Returns(userEntity);
+
+            var mismatchUpdateDTO = new UserUpdateDTO
             {
                 UserId = Guid.NewGuid(),
                 Name = "fakeUsername"
             };
 
-            //Act + Assert
-            await Assert.ThrowsAsync<ArgumentException>(() =>
-            userService.UpdateUserAsync(MockUserId, mismatchDTO));
+            //Act 
+            Func<Task> act = async () => await _userService.UpdateUserAsync(userId, mismatchUpdateDTO);
+
+            //Assert
+            await act.Should().ThrowAsync<ArgumentException>();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task UpdateUserAsync_CallsUpdateUserAsyncFromUserRepository()
         {
             //Arrange
-            MockUserRepository.GetUserByIdAsync(MockUserId)
-                              .Returns(MockUser);
+            var userId = CreateUserId();
+            var userName = CreateUserName();
+            var userEmail = CreateUserEmail();
+            var userPassword = CreateUserPassword("!Fakepassword123");
+
+            var userEntity = CreateUserEntity(userId, userName, userEmail, userPassword);
+
+            _mockUserRepository.GetUserByIdAsync(userId)
+                               .Returns(userEntity);
+
+            var updateUserDTO = createUserUpdateDTO(userId, "newUserName", "newFake@mock.com", null);
 
             //Act
-            await userService.UpdateUserAsync(MockUserId, MockUserUpdateDTO);
+            await _userService.UpdateUserAsync(userId, updateUserDTO);
 
             //Assert
-            await MockUserRepository.Received(1).UpdateUserAsync(Arg.Any<User>());
+            await _mockUserRepository.Received(1).UpdateUserAsync(Arg.Any<User>());
         }
 
-        [TestMethod]
+        [Fact]
         public async Task DeleteUserAsync_ThrowsUserNotFoundException_WhenUserDoesNotExist()
         {
             //Arrange
-            MockUserRepository.GetUserByIdAsync(MockUserId)
-                              .Returns((User?)null);
+            var userId = CreateUserId();
+            var userEmail = CreateUserEmail();
 
-            //Act + Assert
-            await Assert.ThrowsAsync<UserNotFoundException>(() =>
-            userService.DeleteUserAsync(MockUserId));
+            _mockUserRepository.GetUserByIdAsync(userId)
+                               .Returns((User?)null);
+
+            //Act 
+            Func<Task> act = async () => await _userService.DeleteUserAsync(userId);
+
+            //Assert
+            await act.Should().ThrowAsync<UserNotFoundException>();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task DeleteUserAsync_CallsDeleteUserAsyncFromUserRepository()
         {
             //Arrange
-            MockUserRepository.GetUserByIdAsync(MockUserId)
-                              .Returns(MockUser);
+            var userId = CreateUserId();
+            var userName = CreateUserName();
+            var userEmail = CreateUserEmail();
+            var userPassword = CreateUserPassword("!Fakepassword123");
+
+            var userEntity = CreateUserEntity(userId, userName, userEmail, userPassword);
+
+            _mockUserRepository.GetUserByIdAsync(userId)
+                               .Returns(userEntity);
 
             //Act
-            await userService.DeleteUserAsync(MockUserId);
+            await _userService.DeleteUserAsync(userId);
 
             //Assert
-            await MockUserRepository.Received(1).DeleteUserAsync(Arg.Any<User>());
+            await _mockUserRepository.Received(1).DeleteUserAsync(Arg.Any<User>());
+        }
+
+        private Guid CreateUserId() => new();
+
+        private string CreateUserName() => "mockUserName";
+
+        private string CreateUserEmail() => "fake@example.com";
+
+        private string CreateUserPassword(string password)
+        {
+            var inputBytes = Encoding.UTF8.GetBytes(password);
+
+            var inputHash = SHA256.HashData(inputBytes);
+
+            return Convert.ToHexString(inputHash);
+        }
+
+        private string CreateUserPhone() => "+18880009999";
+
+        private User CreateUserEntity(Guid userId, string userName, string userEmail,
+            string passwordHash, string phonewNumber = null!)
+        {
+            return new User(userName, userEmail, passwordHash, phonewNumber);
+        }
+
+        private UserUpdateDTO createUserUpdateDTO(Guid userId, string? newName, string? newEmail,
+            string? newPhoneNumber)
+        {
+            return new UserUpdateDTO
+            {
+              UserId = userId,
+              Name = newName,
+              Email = newEmail,
+              PhoneNumber = newPhoneNumber
+            };
         }
     }
 }

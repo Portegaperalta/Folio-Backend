@@ -1,4 +1,5 @@
-﻿using Folio.Core.Application.DTOs.Folder;
+﻿using FluentAssertions;
+using Folio.Core.Application.DTOs.Folder;
 using Folio.Core.Application.Mappers;
 using Folio.Core.Application.Services;
 using Folio.Core.Domain.Entities;
@@ -6,250 +7,333 @@ using Folio.Core.Domain.Exceptions.Folder;
 using Folio.Core.Interfaces;
 using NSubstitute;
 using NSubstitute.ReceivedExtensions;
-using System.Security.Cryptography.X509Certificates;
+using Xunit;
 
 namespace Folio_Backend_Tests.Core.Application.Services
 {
-    [TestClass]
     public class FolderServiceTests
     {
-        private readonly Guid MockUserId = Guid.NewGuid();
-        private readonly Guid MockFolderId = Guid.NewGuid();
-        private readonly Guid MockInvalidUserId = Guid.NewGuid();
+        private readonly IFolderRepository _mockfolderRepository;
+        private FolderMapper _folderMapper;
+        private FolderService _folderService;
 
-        private Folder MockFolderEntity = null!;
-        private FolderDTO MockFolderDTO = null!;
-        private FolderCreationDTO MockFolderCreationDTO = null!;
-        private FolderUpdateDTO MockFolderUpdateDTO = null!;
-
-        private IFolderRepository MockfolderRepository = null!;
-        private FolderMapper MockFolderMapper = null!;
-        private IEnumerable<Folder> MockFolderList = null!;
-
-        private FolderService folderService = null!;
-
-        [TestInitialize]
-        public void Setup()
+        public FolderServiceTests()
         {
-            MockFolderEntity = new Folder("folderMock", MockUserId);
-
-            MockfolderRepository = Substitute.For<IFolderRepository>();
-            MockFolderMapper = new FolderMapper();
-
-            MockFolderDTO = MockFolderMapper.ToDto(MockFolderEntity);
-            MockFolderCreationDTO = new FolderCreationDTO { Name = "folderMock" };
-            MockFolderUpdateDTO = new FolderUpdateDTO { Name = "folderMock" };
-
-            MockFolderList = new List<Folder> { MockFolderEntity };
-
-            folderService = new FolderService(MockfolderRepository, MockFolderMapper);
+            _mockfolderRepository = Substitute.For<IFolderRepository>();
+            _folderMapper = new FolderMapper();
+            _folderService = new FolderService(_mockfolderRepository, _folderMapper);
         }
 
         // GetAllFoldersAsync tests
-        [TestMethod]
+        [Fact]
         public async Task GetAllFoldersAsync_ReturnsFolderDTOList()
         {
             //Arrange
-            MockfolderRepository.GetAllAsync(MockUserId).Returns((MockFolderList));
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var folderEntity = CreateFolderEntity("mockFolder", userId);
+            var folderList = CreateFolderList(folderEntity);
+
+            _mockfolderRepository.GetAllAsync(userId).Returns(folderList);
 
             //Act
-            var response = await folderService.GetAllFoldersDTOsAsync(MockUserId);
+            var response = await _folderService.GetAllFoldersDTOsAsync(userId);
 
             //Assert
-            Assert.IsInstanceOfType<IEnumerable<FolderDTO>>(response);
+            response.Should().BeOfType<IEnumerable<FolderDTO>>();
         }
 
         // GetFolderByIdAsync tests
-        [TestMethod]
+        [Fact]
         public async Task 
             GetFolderByIdAsync_ReturnsNull_WhenFolderDoesNotExist()
         {
             //Arrange
-            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
-                                .Returns((Folder?)null);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+
+            _mockfolderRepository.GetByIdAsync(userId, folderId)
+                                 .Returns((Folder?)null);
 
             //Act
-            var response = await folderService.GetFolderDTOByIdAsync(MockUserId, MockFolderId);
+            var response = await _folderService.GetFolderDTOByIdAsync(userId, folderId);
 
             //Assert
-            Assert.IsNull(response);
+            response.Should().BeNull();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task 
             GetFolderDTOByIdAsync_ReturnsNull_WhenFolderDoesNotBelongToUser()
         {
             //Arrange
-            MockfolderRepository.GetByIdAsync(MockInvalidUserId, MockFolderId)
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+
+            _mockfolderRepository.GetByIdAsync(userId, folderId)
                                 .Returns((Folder?)null);
 
             //Act
-            var response = await folderService.GetFolderDTOByIdAsync(MockInvalidUserId, MockFolderId);
+            var response = await _folderService.GetFolderDTOByIdAsync(userId, folderId);
 
             //Assert
-            Assert.IsNull(response);
+            response.Should().BeNull();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task GetFolderDTOByIdAsync_ReturnsFolderDTO()
         {
             //Arrange
-            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
-                                .Returns(MockFolderEntity);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var folderEntity = CreateFolderEntity("mockFolder", userId);
+
+            _mockfolderRepository.GetByIdAsync(userId, folderId)
+                                .Returns(folderEntity);
 
             //Act
-            var result = await folderService.GetFolderDTOByIdAsync(MockUserId, MockFolderId);
+            var result = await _folderService.GetFolderDTOByIdAsync(userId, folderId);
 
             //Assert
-            Assert.IsInstanceOfType<FolderDTO>(result);
+            result.Should().BeOfType<FolderDTO>();
         }
 
         // CountFoldersAsync tests
-        [TestMethod]
+        [Fact]
         public async Task CountFoldersAsync_ReturnsInteger()
         {
             //Arrange
-            MockfolderRepository.CountByUserAsync(MockUserId).Returns(1);
+            var userId = CreateUserId();
+
+            _mockfolderRepository.CountByUserAsync(userId).Returns(1);
 
             //Act
-            var result = await folderService.CountFoldersAsync(MockUserId);
+            var result = await _folderService.CountFoldersAsync(userId);
 
             //Assert
-            Assert.IsInstanceOfType<int>(result);
+            result.Should().BeGreaterThanOrEqualTo(0);
+            result.Should().Be(1);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task CountFolderAsync_CallsCountByUserAsyncFromFolderRepository()
         {
-            //Act 
-            await folderService.CountFoldersAsync(MockUserId);
+            //Arrange
+            var userId = CreateUserId();
+
+            //Act
+            await _folderService.CountFoldersAsync(userId);
 
             //Assert
-            await MockfolderRepository.Received(1).CountByUserAsync(MockUserId);
+            await _mockfolderRepository.Received(1).CountByUserAsync(userId);
         }
 
         // CreateFolder tests
-        [TestMethod]
+        [Fact]
         public async Task CreateFolderAsync_ThrowsArgumentNullException_WhenFolderEntityIsNull()
         {
             //Arrange
-            FolderCreationDTO nullFolderEntity = null!;
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            FolderCreationDTO nullFolderCreationDTO = null!;
 
-            //Act + Assert
-            var result = await Assert.ThrowsAsync <ArgumentNullException> (
-                () => folderService.CreateFolderAsync(MockUserId ,nullFolderEntity));
+            //Act 
+            Func<Task> act = async () => await _folderService.CreateFolderAsync(userId, nullFolderCreationDTO);
+
+            //Assert
+            await act.Should().ThrowAsync<ArgumentNullException>();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task CreateFolderAsync_CallsAddAsyncFromFolderRepository()
         {
             //Act
-            await folderService.CreateFolderAsync(MockUserId, MockFolderCreationDTO);
+            var userId = CreateUserId();
+
+            var folderCreationDTO = CreateFolderCreationDTO("mockFolder");
+
+            await _folderService.CreateFolderAsync(userId, folderCreationDTO);
 
             //Assert
-            await MockfolderRepository.Received(1).AddAsync(Arg.Any<Folder>());
+            await _mockfolderRepository.Received(1).AddAsync(Arg.Any<Folder>());
         }
 
         // UpdateFolderAsync tests
-        [TestMethod]
+        [Fact]
         public async Task 
             UpdateFolderAsync_ThrowsFolderNotFoundException_WhenFolderDoesNotExist()
         {
             //Arrange 
-            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
-                                .Returns((Folder?)null);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
 
-            //Act + Assert
-            await Assert.ThrowsAsync<FolderNotFoundException>(() =>
-            folderService.UpdateFolderAsync(MockFolderId, MockUserId, MockFolderUpdateDTO));
+            _mockfolderRepository.GetByIdAsync(userId, folderId)
+                                 .Returns((Folder?)null);
+
+            var folderUpdateDTO = CreateFolderUpdateDTO("mockFolderUpdate", true);
+
+            //Act 
+            Func<Task> act = async () => await _folderService.UpdateFolderAsync(userId, folderId, folderUpdateDTO);
+
+            //Assert
+            await act.Should().ThrowAsync<FolderNotFoundException>();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task UpdateFolderAsync_CallsUpdateAsyncFromFolderRepository()
         {
             //Arrange
-            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
-                                .Returns(MockFolderEntity);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var folderEntity = CreateFolderEntity("mockUser", userId);
+
+            _mockfolderRepository.GetByIdAsync(userId, folderId)
+                                 .Returns(folderEntity);
+
+            var folderUpdateDTO = CreateFolderUpdateDTO("mockFolderUpdate", true);
 
             //Act
-            await folderService.UpdateFolderAsync(MockFolderId, MockUserId, MockFolderUpdateDTO);
+            await _folderService.UpdateFolderAsync(folderId, userId, folderUpdateDTO);
 
             //Assert
-            await MockfolderRepository.Received(1).UpdateAsync(Arg.Any<Folder>());
+            await _mockfolderRepository.Received(1).UpdateAsync(Arg.Any<Folder>());
         }
 
         // MarkUserFolderAsVisitedAsync tests
-        [TestMethod]
+        [Fact]
         public async Task 
             MarkFolderAsVisitedAsync_ThrowsFolderNotFoundException_WhenFolderDoesNotExist()
         {
             //Arrange
-            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
-                                .Returns((Folder?)null);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
 
-            //Act + Assert
-            await Assert.ThrowsAsync<FolderNotFoundException>(
-                () => folderService.MarkFolderAsVisitedAsync(MockUserId, MockFolderId));
+            _mockfolderRepository.GetByIdAsync(userId, folderId)
+                                 .Returns((Folder?)null);
+
+            var folderUpdateDTO = CreateFolderUpdateDTO("mockFolderUpdate");
+
+            //Act 
+            Func<Task> act = async () => await _folderService.UpdateFolderAsync(userId, folderId, folderUpdateDTO);
+
+            //Assert
+            await act.Should().ThrowAsync<FolderNotFoundException>();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task
             MarkFolderAsVisitedAsync_CallsUpdateAsyncFromFolderRepository()
         {
             //Arrange
-            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
-                                .Returns(MockFolderEntity);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var folderEntity = CreateFolderEntity("mockUser", userId);
+
+
+            _mockfolderRepository.GetByIdAsync(userId, folderId)
+                                 .Returns(folderEntity);
 
             //Act
-            await folderService.MarkFolderAsVisitedAsync(MockUserId, MockFolderId);
+            await _folderService.MarkFolderAsVisitedAsync(userId, folderId);
 
             //Assert
-            await MockfolderRepository.Received(1).UpdateAsync(MockFolderEntity);
+            await _mockfolderRepository.Received(1).UpdateAsync(folderEntity);
         }
 
         // DeleteFolderAsync tests
-        [TestMethod]
+        [Fact]
         public async Task 
             DeleteFolderAsync_ReturnsFalse_WhenFolderDoesNotExists()
         {
             //Arrange
-            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
-                                .Returns((Folder?)null);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+
+            _mockfolderRepository.GetByIdAsync(userId, folderId)
+                                 .Returns((Folder?)null);
 
             //Act
-            var response = await folderService.DeleteFolderAsync(MockUserId, MockFolderId);
+            var response = await _folderService.DeleteFolderAsync(userId, folderId);
 
             //Assert
-            Assert.IsFalse(response);
+            response.Should().BeFalse();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task DeleteFolderAsync_ReturnsTrue_WhenFolderIsDeleted()
         {
             //Arrange
-            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
-                                .Returns(MockFolderEntity);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var folderEntity = CreateFolderEntity("mockUser", userId);
 
+            _mockfolderRepository.GetByIdAsync(userId, folderId)
+                                 .Returns(folderEntity);
+             
             //Act
-            var result = await folderService.DeleteFolderAsync(MockUserId, MockFolderId);
+            var result = await _folderService.DeleteFolderAsync(userId, folderId);
 
             //Assert
-            Assert.IsTrue(result);
+            result.Should().BeTrue();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task DeleteFolderAsync_CallsDeleteAsyncFromFolderRepository()
         {
             //Arrange
-            MockfolderRepository.GetByIdAsync(MockUserId, MockFolderId)
-                                .Returns(MockFolderEntity);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var folderEntity = CreateFolderEntity("mockUser", userId);
+
+            _mockfolderRepository.GetByIdAsync(userId, folderId)
+                                .Returns(folderEntity);
 
             //Act
-            await folderService.DeleteFolderAsync(MockUserId, MockFolderId);
+            await _folderService.DeleteFolderAsync(userId, folderId);
 
             //Assert
-            await MockfolderRepository.Received(1)
-                                      .DeleteAsync(Arg.Any<Folder>());
+            await _mockfolderRepository.Received(1).DeleteAsync(Arg.Any<Folder>());
+        }
+
+        // Helper methods
+        private Guid CreateUserId() => new();
+
+        private Guid CreateFolderId() => new();
+
+        private Folder CreateFolderEntity(string name, Guid userId)
+        {
+            return new Folder(name, userId);
+        }
+
+        private FolderDTO CreateFolderDTO(string name, Guid folderId, DateTime creationDate,
+            bool isMarkedFavorite)
+        {
+            return new FolderDTO
+            {
+                Id = folderId,
+                Name = name,
+                CreationDate = creationDate,
+                IsMarkedFavorite = isMarkedFavorite
+            };
+        }
+
+        private FolderCreationDTO CreateFolderCreationDTO(string name)
+        {
+            return new FolderCreationDTO { Name = name };
+        }
+
+        private FolderUpdateDTO CreateFolderUpdateDTO(string name, bool isMarkedFavorite = false)
+        {
+            return new FolderUpdateDTO
+            {
+                Name = name,
+                IsMarkedFavorite = isMarkedFavorite
+            };
+        }
+
+        private IEnumerable<Folder> CreateFolderList(Folder folderEntity)
+        {
+            return new List<Folder> { folderEntity };
         }
     }
 }

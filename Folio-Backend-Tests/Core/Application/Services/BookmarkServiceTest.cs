@@ -1,297 +1,418 @@
-﻿using Folio.Core.Application.DTOs.Bookmark;
+﻿using FluentAssertions;
+using Folio.Core.Application.DTOs.Bookmark;
 using Folio.Core.Application.Mappers;
 using Folio.Core.Application.Services;
 using Folio.Core.Domain.Entities;
 using Folio.Core.Domain.Exceptions.Bookmark;
 using Folio.Core.Interfaces;
 using NSubstitute;
+using Xunit;
 
 namespace Folio_Backend_Tests.Core.Application.Services
 {
-    [TestClass]
     public class BookmarkServiceTest
     {
-        private readonly Guid MockUserId = Guid.NewGuid();
-        private readonly Guid MockBookmarkId = Guid.NewGuid();
-        private readonly Guid MockFolderId = Guid.NewGuid();
-        private readonly string FakeUrl = "https://fakeurl.com";
+        private readonly BookmarkMapper _bookmarkMapper;
+        private readonly IBookmarkRepository _mockBookmarkRepository;
+        private readonly BookmarkService _bookmarkService;
 
-        private Bookmark MockBookmarkEntity = null!;
-        private Folder MockFolderEntity = null!;
-        private BookmarkDTO MockBookmarkDTO = null!;
-        private BookmarkCreationDTO MockBookmarkCreationDTO = null!;
-        private BookmarkUpdateDTO MockBookmarkUpdateDTO = null!;
-
-        IBookmarkRepository MockBookmarkRepository = null!;
-        private BookmarkMapper MockBookmarkMapper = null!;
-
-        IEnumerable<Bookmark> MockBookmarkList = null!;
-
-        private BookmarkService bookmarkService = null!;
-
-        [TestInitialize]
-        public void Setup()
+        public BookmarkServiceTest()
         {
-            MockBookmarkEntity = new("mockBookmark", FakeUrl, MockFolderId, MockUserId);
-            MockFolderEntity = new("mockFolder", MockUserId);
-
-            MockBookmarkDTO = new BookmarkDTO
-            {
-                Id = MockBookmarkId,
-                Name = "mockBookmark",
-                Url = FakeUrl,
-                IsMarkedFavorite = false,
-                CreationDate = DateTime.UtcNow,
-                LastVisitedTime = null
-            };
-
-            MockBookmarkCreationDTO = new BookmarkCreationDTO 
-            {
-                Name = "mockBookmark",
-                Url = FakeUrl 
-            };
-            MockBookmarkUpdateDTO = new BookmarkUpdateDTO { Id = MockBookmarkId, Name = "mockBookmark" };
-
-            MockBookmarkRepository = Substitute.For<IBookmarkRepository>();
-            MockBookmarkMapper = new BookmarkMapper();
-
-            MockBookmarkList = new List<Bookmark> { MockBookmarkEntity };
-
-            bookmarkService = new(MockBookmarkRepository, MockBookmarkMapper);
+            _bookmarkMapper = new BookmarkMapper();
+            _mockBookmarkRepository = Substitute.For<IBookmarkRepository>();
+            _bookmarkService = new BookmarkService(_mockBookmarkRepository, _bookmarkMapper);
         }
 
         // GetAllUserBookmarksAsync tests
-        [TestMethod]
+        [Fact]
         public async Task GetAllBookmarksAsync_ReturnsIEnumerableBookmark()
         {
             //Arrange
-            MockBookmarkRepository.GetAllByUserAndFolderIdAsync(MockUserId, MockFolderId)
-                                  .Returns(MockBookmarkList);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var fakeUrl = CreateFakeUrl();
+            var boomarkEntity = CreateBookmarkEntity("mockBookmark", fakeUrl, folderId, userId);
+            var bookmarkList = CreateBookmarkList(boomarkEntity);
+
+            _mockBookmarkRepository.GetAllByUserAndFolderIdAsync(userId, folderId)
+                                  .Returns(bookmarkList);
 
             //Act
-            var response = await bookmarkService.GetAllBookmarksAsync(MockUserId, MockFolderId);
+            var response = await _bookmarkService.GetAllBookmarksAsync(userId, folderId);
 
             //Assert
-            Assert.IsInstanceOfType<IEnumerable<BookmarkDTO>>(response);
+            response.Should().BeOfType<IEnumerable<BookmarkDTO>>();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task GetAllBookmarksAsync_CallsGetAllAsyncFromBookmarkRepository()
         {
             //Act
-            await bookmarkService.GetAllBookmarksAsync(MockUserId, MockFolderId);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+
+            await _bookmarkService.GetAllBookmarksAsync(userId, folderId);
 
             //Assert
-            await MockBookmarkRepository.Received(1).GetAllByUserAndFolderIdAsync(MockUserId, MockFolderId);
+            await _mockBookmarkRepository.Received(1).GetAllByUserAndFolderIdAsync(userId, folderId);
         }
 
         // GetUserBookmarkByIdAsync tests
-        [TestMethod]
+        [Fact]
         public async Task GetBookmarkByIdAsync_ReturnsNull_WhenBookmarkDoesNotExist()
         {
             //Arrange
-            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var bookmarkId = CreateBookmarkId();
+
+            _mockBookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId)
                                   .Returns((Bookmark?)null);
 
             //Act
-            var response = await bookmarkService.GetBookmarkByIdAsync(MockUserId, MockFolderId, MockBookmarkId);
+            var response = await _bookmarkService.GetBookmarkByIdAsync(userId, folderId, bookmarkId);
 
             //Assert
-            Assert.IsNull(response);
+            response.Should().BeNull();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task GetBookmarkByIdAsync_ReturnsNull_WhenBookmarkDoesNotBelongToUser()
         {
             //Arrange
             Guid unauthorizedUserId = Guid.NewGuid();
+            var folderId = CreateFolderId();
+            var bookmarkId = CreateBookmarkId();
 
             //Act 
-            var result = await bookmarkService.GetBookmarkByIdAsync(unauthorizedUserId, MockFolderId, MockBookmarkId);
+            var result = await _bookmarkService.GetBookmarkByIdAsync(unauthorizedUserId, folderId, bookmarkId);
 
             //Assert
-            Assert.IsNull(result);
+            result.Should().BeNull();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task GetBookmarkByIdAsync_ReturnsBookmarkDTO()
         {
             //Arrange
-            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
-                                  .Returns(MockBookmarkEntity);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var bookmarkId = CreateBookmarkId();
+            var fakeUrl = CreateFakeUrl();
+
+            var boomarkEntity = CreateBookmarkEntity("mockBookmark", fakeUrl, folderId, userId);
+
+            _mockBookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId)
+                                  .Returns(boomarkEntity);
 
             //Act
-            var result = await bookmarkService.GetBookmarkByIdAsync(MockUserId, MockFolderId, MockBookmarkId);
+            var result = await _bookmarkService.GetBookmarkByIdAsync(userId, folderId, bookmarkId);
 
             //Assert
-            Assert.IsInstanceOfType<BookmarkDTO>(result);
+            result.Should().BeOfType<BookmarkDTO>();
         }
 
         // CountBookmarksByFolderIdAsync tests
-        [TestMethod]
-        public async Task CountBookmarksByFolderIdAsync_CallsCountByFolderAsyncFromBookmarkRepository()
+        [Fact]
+        public async Task 
+            CountBookmarksByFolderIdAsync_CallsCountByFolderAsyncFromBookmarkRepository()
         {
             //Arrange
-            MockBookmarkRepository.CountByFolderAsync(MockUserId, MockFolderId)
-                                  .Returns(1);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+
+            _mockBookmarkRepository.CountByFolderAsync(userId, folderId).Returns(1);
 
             //Act
-            await bookmarkService.CountBookmarksByFolderIdAsync(MockUserId, MockFolderId);
+            await _bookmarkService.CountBookmarksByFolderIdAsync(userId, folderId);
 
             //Assert
-            await MockBookmarkRepository.Received(1).CountByFolderAsync(MockUserId, MockFolderId);
+            await _mockBookmarkRepository.Received(1).CountByFolderAsync(userId, folderId);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task CountBookmarksByFolderIdAsync_ReturnsInteger()
         {
             //Arrange
-            MockBookmarkRepository.CountByFolderAsync(MockUserId, MockFolderId)
-                                  .Returns(1);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+
+            _mockBookmarkRepository.CountByFolderAsync(userId, folderId).Returns(1);
 
             //Act
-            var result = await bookmarkService.CountBookmarksByFolderIdAsync(MockUserId, MockFolderId);
+            var result = await _bookmarkService.CountBookmarksByFolderIdAsync(userId, folderId);
 
             //Assert
-            Assert.IsInstanceOfType<int>(result);
+            result.Should().BeGreaterThanOrEqualTo(0);
+            result.Should().Be(1);
         }
 
         // CreateUserBookmarkAsync tests
-        [TestMethod]
+        [Fact]
         public async Task 
             CreateBookmarkAsync_ThrowsArgumentNullException_WhenBookmarkCreationDTOIsNull()
         {
             //Arrange
-            BookmarkCreationDTO nullBookmarkDTO = null!;
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var fakeUrl = CreateFakeUrl();
 
-            //Act + Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => 
-            bookmarkService.CreateBookmarkAsync(MockUserId, MockFolderId, nullBookmarkDTO));
+            BookmarkCreationDTO nullBookmarkCreationDTO = null!;
+
+            //Act
+            Func<Task> act = async() => await _bookmarkService.CreateBookmarkAsync(userId, folderId, nullBookmarkCreationDTO);
+
+            //Assert
+            await act.Should().ThrowAsync<ArgumentNullException>();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task CreateBookmarkAsync_CallsAddAsyncFromBookmarkRepository()
         {
             //Arrange
-            MockBookmarkRepository.GetFolderByIdAsync(MockFolderId, MockUserId)
-                                  .Returns(MockFolderEntity);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var bookmarkId = CreateBookmarkId();
+            var fakeUrl = CreateFakeUrl();
+
+            var folderEntity = CreateFolderEntity("mockFolder", userId);
+
+            var bookmarkCreationDTO = CreateBookmarkCreationDTO("mockBookmark", fakeUrl);
+
+            _mockBookmarkRepository.GetFolderByIdAsync(folderId, userId)
+                                  .Returns(folderEntity);
 
             //Act
-            await bookmarkService.CreateBookmarkAsync(MockUserId, MockFolderId, MockBookmarkCreationDTO);
+            await _bookmarkService.CreateBookmarkAsync(userId, folderId, bookmarkCreationDTO);
 
             //Assert
-            await MockBookmarkRepository.Received(1).AddAsync(Arg.Any<Bookmark>());
+            await _mockBookmarkRepository.Received(1).AddAsync(Arg.Any<Bookmark>());
         }
 
         // UpdateBookmarkAsync tests
-        [TestMethod]
+        [Fact]
         public async Task 
             UpdateBookmarkAsync_ThrowsArgumentNullException_WhenBookmarkUpdateDTOIsNull()
         {
             //Arrange
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var fakeUrl = CreateFakeUrl();
+
             BookmarkUpdateDTO nullBookmarkUpdateDTO = null!;
 
-            //Act + Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => 
-            bookmarkService.UpdateBookmarkAsync(MockUserId, MockFolderId, nullBookmarkUpdateDTO!));
+            //Act
+            Func<Task> act = async () => await _bookmarkService.UpdateBookmarkAsync(userId, folderId, nullBookmarkUpdateDTO);
+
+            //Assert
+            await act.Should().ThrowAsync<ArgumentNullException>();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task 
             UpdateBookmarkAsync_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
         {
             //Arrange
-            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
-                                  .Returns((Bookmark?)null);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var bookmarkId = CreateBookmarkId();
+            var fakeUrl = CreateFakeUrl();
 
-            //Act + Assert
-            await Assert.ThrowsAsync<BookmarkNotFoundException>(() => 
-            bookmarkService.UpdateBookmarkAsync(MockUserId, MockFolderId, MockBookmarkUpdateDTO));
+            _mockBookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId)
+                                   .Returns((Bookmark?)null);
+
+            var bookmarkUpdateDTO = CreateBookmarkUpdateDTO(bookmarkId, "mockBookmark", fakeUrl, true);
+
+            //Act
+            Func<Task> act = async () => await _bookmarkService.UpdateBookmarkAsync(userId, folderId, bookmarkUpdateDTO);
+
+            //Assert
+            await act.Should().ThrowAsync<BookmarkNotFoundException>();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task UpdateBookmarkAsync_CallsUpdateAsyncFromBookmarkRepository()
         {
             //Arrange
-            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
-                                  .Returns(MockBookmarkEntity);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var bookmarkId = CreateBookmarkId();
+            var fakeUrl = CreateFakeUrl();
+
+            var boomarkEntity = CreateBookmarkEntity("mockBookmark", fakeUrl, folderId, userId);
+
+            _mockBookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId)
+                                  .Returns(boomarkEntity);
+
+            var bookmarkUpdateDTO = CreateBookmarkUpdateDTO(bookmarkId, "mockBookmark", fakeUrl, true);
 
             //Act
-            await bookmarkService.UpdateBookmarkAsync(MockUserId, MockFolderId, MockBookmarkUpdateDTO);
+            await _bookmarkService.UpdateBookmarkAsync(userId, folderId, bookmarkUpdateDTO);
 
             //Assert
-            await MockBookmarkRepository.Received(1).UpdateAsync(Arg.Any<Bookmark>());
+            await _mockBookmarkRepository.Received(1).UpdateAsync(Arg.Any<Bookmark>());
         }
 
         // DeleteUserBookmarkAsync tests
-        [TestMethod]
+        [Fact]
         public async Task 
             DeleteBookmarkAsync_ReturnsFalse_WhenBookmarkDoesNotExist()
         {
             //Arrange
-            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
-                                  .Returns((Bookmark?)null);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var bookmarkId = CreateBookmarkId();
+
+            _mockBookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId)
+                                   .Returns((Bookmark?)null);
 
             //Act
-            var result = await bookmarkService.DeleteBookmarkAsync(MockUserId, MockFolderId, MockBookmarkId);
+            var result = await _bookmarkService.DeleteBookmarkAsync(userId, folderId, bookmarkId);
 
             //Assert
-            Assert.IsFalse(result);
+            result.Should().BeFalse();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task DeleteBookmarkAsync_ReturnsTrue_WhenBookmarkIsDelete()
         {
             //Arrange
-            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
-                                  .Returns(MockBookmarkEntity);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var bookmarkId = CreateBookmarkId();
+            var fakeUrl = CreateFakeUrl();
+
+            var boomarkEntity = CreateBookmarkEntity("mockBookmark", fakeUrl, folderId, userId);
+
+            _mockBookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId)
+                                  .Returns(boomarkEntity);
 
             //Act 
-            var result = await bookmarkService.DeleteBookmarkAsync(MockUserId, MockFolderId, MockBookmarkId);
+            var result = await _bookmarkService.DeleteBookmarkAsync(userId, folderId, bookmarkId);
 
             //Assert
-            Assert.IsTrue(result);
+            result.Should().BeTrue();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task DeleteBookmarkAsync_CallsDeleteAsyncFromBookmarkRepository()
         {
             //Arrange
-            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
-                                  .Returns(MockBookmarkEntity);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var bookmarkId = CreateBookmarkId();
+            var fakeUrl = CreateFakeUrl();
+
+            var boomarkEntity = CreateBookmarkEntity("mockBookmark", fakeUrl, folderId, userId);
+
+            _mockBookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId)
+                                   .Returns(boomarkEntity);
 
             //Act
-            await bookmarkService.DeleteBookmarkAsync(MockUserId, MockFolderId, MockBookmarkId);
+            await _bookmarkService.DeleteBookmarkAsync(userId, folderId, bookmarkId);
 
             //Assert
-            await MockBookmarkRepository.Received(1).DeleteAsync(Arg.Any<Bookmark>());
+            await _mockBookmarkRepository.Received(1).DeleteAsync(Arg.Any<Bookmark>());
         }
 
         // MarkUserBookmarkAsVisitedAsync tests
-        [TestMethod]
+        [Fact]
         public async Task MarkBookmarkAsVisitedAsync_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
         {
             //Arrange
-            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var bookmarkId = CreateBookmarkId();
+            var fakeUrl = CreateFakeUrl();
+
+            _mockBookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId)
                                   .Returns((Bookmark?)null);
 
-            //Act + Assert
-            await Assert.ThrowsAsync<BookmarkNotFoundException>(() =>
-            bookmarkService.MarkBookmarkAsVisitedAsync(MockUserId, MockFolderId, MockBookmarkId));
+            //Act
+            Func<Task> act = async () => await _bookmarkService.MarkBookmarkAsVisitedAsync(userId, folderId, bookmarkId);
+
+            //Assert
+            await act.Should().ThrowAsync<BookmarkNotFoundException>();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task MarkBookmarkAsVisitedAsync_CallsUpdateAsyncFromBookmarkRepository()
         {
             //Arrange
-            MockBookmarkRepository.GetByIdAsync(MockUserId, MockFolderId, MockBookmarkId)
-                                  .Returns(MockBookmarkEntity);
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var bookmarkId = CreateBookmarkId();
+            var fakeUrl = CreateFakeUrl();
+
+            var boomarkEntity = CreateBookmarkEntity("mockBookmark", fakeUrl, folderId, userId);
+
+            _mockBookmarkRepository.GetByIdAsync(userId, folderId, bookmarkId)
+                                  .Returns(boomarkEntity);
 
             //Act
-            await bookmarkService.MarkBookmarkAsVisitedAsync(MockUserId, MockFolderId, MockBookmarkId);
+            await _bookmarkService.MarkBookmarkAsVisitedAsync(userId, folderId, bookmarkId);
 
             //Assert
-            await MockBookmarkRepository.Received(1).UpdateAsync(MockBookmarkEntity);
+            await _mockBookmarkRepository.Received(1).UpdateAsync(boomarkEntity);
+        }
+
+
+        // Helper methods
+        private Guid CreateUserId() => new();
+
+        private Guid CreateBookmarkId() => new();
+
+        private Guid CreateFolderId() => new();
+
+        private string CreateFakeUrl() => "https://fakeurl.com";
+
+        private Bookmark CreateBookmarkEntity(string name, string url, Guid folderId, Guid userId)
+        {
+            return new Bookmark(name, url, folderId, userId);
+        }
+
+        private Folder CreateFolderEntity(string name, Guid userId)
+        {
+            return new Folder(name, userId);
+        }
+
+        private BookmarkDTO CreateBookmarkDTO(Guid bookmarkId, string name, string url)
+        {
+            return new BookmarkDTO
+            {
+               Id = bookmarkId,
+               Name = name,
+               Url = url,
+               IsMarkedFavorite = false,
+               CreationDate = DateTime.UtcNow,
+               LastVisitedTime = null
+            };
+        }
+
+        private BookmarkCreationDTO CreateBookmarkCreationDTO(string name, string url)
+        {
+            return new BookmarkCreationDTO
+            {
+                Name = name,
+                Url = url
+            };
+        }
+
+        private BookmarkUpdateDTO CreateBookmarkUpdateDTO(Guid bookmarkId, 
+            string name, string url, bool isMarkedFavorite = false)
+        {
+            return new BookmarkUpdateDTO
+            {
+                Id = bookmarkId,
+                Name = name,
+                Url = url,
+                IsMarkedFavorite = isMarkedFavorite
+            };
+        }
+
+        private IEnumerable<Bookmark> CreateBookmarkList(Bookmark boomarkEntity)
+        {
+            return new List<Bookmark> { boomarkEntity };
         }
     }
 }
