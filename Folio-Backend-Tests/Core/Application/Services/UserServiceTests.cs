@@ -5,7 +5,7 @@ using Folio.Core.Domain.Exceptions.User;
 using Folio.Core.Interfaces;
 using NSubstitute;
 
-namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
+namespace Folio_Backend_Tests.Core.Application.Services
 {
     [TestClass]
     public class UserServiceTests

@@ -6,7 +6,7 @@ using Folio.Core.Domain.Exceptions.Bookmark;
 using Folio.Core.Interfaces;
 using NSubstitute;
 
-namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
+namespace Folio_Backend_Tests.Core.Application.Services
 {
     [TestClass]
     public class BookmarkServiceTest

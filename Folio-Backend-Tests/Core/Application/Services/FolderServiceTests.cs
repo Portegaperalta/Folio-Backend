@@ -8,7 +8,7 @@ using NSubstitute;
 using NSubstitute.ReceivedExtensions;
 using System.Security.Cryptography.X509Certificates;
 
-namespace Folio_Backend_Tests.Core.Application.Services.UnitTests
+namespace Folio_Backend_Tests.Core.Application.Services
 {
     [TestClass]
     public class FolderServiceTests
