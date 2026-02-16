@@ -1,124 +1,209 @@
-﻿using Folio.Core.Domain.Entities;
+﻿using FluentAssertions;
+using Folio.Core.Domain.Entities;
 using Folio.Core.Domain.Exceptions.User;
+using System.Security.Cryptography;
+using System.Text;
+using Xunit;
 
 namespace Folio_Backend_Tests.Core.Domain.Entities.UnitTests
 {
-    [TestClass]
     public class UserTests
     {
-        private readonly string MockUserName = "fakeName";
-        private readonly string MockUserEmail = "fake@example.com";
-        private readonly string MockPasswordHash = "fakepasswordhash";
-        private readonly string MockPhoneNumber = "+18880009999";
-        private User MockUser = null!;
-
-        [TestInitialize]
-        public void Setup()
-        {
-            MockUser = new(MockUserName, MockUserEmail, MockPasswordHash, MockPhoneNumber);
-        }
-
-        [TestMethod]
-        [DataRow(" ")]
-        [DataRow(null)]
+        [Theory]
+        [InlineData(" ")]
+        [InlineData(null)]
         public void 
             ChangeName_ThrowsEmptyUsernameException_WhenNewNameIsNullOrWhiteSpace(string? newName)
         {
             //Arrange
+            var userName = CreateUserName();
+            var userEmail = CreateUserEmail();
+            var userPassword = CreateUserPassword();
+            var userPhoneNumber = CreateUserPhoneNumber();
+            var userPasswordHash = CreateUserPasswordHash(userPassword);
+
+            var user = CreateUser(userName, userEmail, userPasswordHash, userPhoneNumber);
+
+            //Act
             string newUserName = newName!;
 
-            //Act + Assert
-            Assert.Throws<EmptyUsernameException>(() => MockUser.ChangeName(newUserName));
+            Action act = () => user.ChangeName(newUserName);
+
+            //Assert
+            act.Should().Throw<EmptyUsernameException>();
         }
 
-        [TestMethod]
+        [Fact]
         public void ChangeName_UpdatesUserName()
         {
             //Arrange 
-            string newUserName = "newFakeName";
+            var userName = CreateUserName();
+            var userEmail = CreateUserEmail();
+            var userPassword = CreateUserPassword();
+            var userPhoneNumber = CreateUserPhoneNumber();
+            var userPasswordHash = CreateUserPasswordHash(userPassword);
+
+            var user = CreateUser(userName, userEmail, userPasswordHash, userPhoneNumber);
 
             //Act
-            MockUser.ChangeName(newUserName);
+            string newUserName = "newFakeName";
+
+            user.ChangeName(newUserName);
 
             //Assert
-            Assert.AreEqual(expected: newUserName, actual: MockUser.Name);
+            user.Name.Should().BeSameAs(newUserName);
         }
 
-        [TestMethod]
-        [DataRow(" ")]
-        [DataRow(null)]
+        [Theory]
+        [InlineData(" ")]
+        [InlineData(null)]
         public void 
             ChangeEmail_ThrowsEmptyUserEmailException_WhenNewEmaileIsNullOrWhiteSpace(string? newEmail)
         {
             //Arrange
+            var userName = CreateUserName();
+            var userEmail = CreateUserEmail();
+            var userPassword = CreateUserPassword();
+            var userPhoneNumber = CreateUserPhoneNumber();
+            var userPasswordHash = CreateUserPasswordHash(userPassword);
+
+            var user = CreateUser(userName, userEmail, userPasswordHash, userPhoneNumber);
+
+            //Act
             string newUserEmail = newEmail!;
 
-            //Act + Assert
-            Assert.Throws<EmptyUserEmailException>(() => MockUser.ChangeEmail(newUserEmail));
+            Action act = () => user.ChangeEmail(newUserEmail);
+
+            //Assert
+            act.Should().Throw<EmptyUserEmailException>();
         }
 
-        [TestMethod]
+        [Fact]
         public void ChangeEmail_UpdatesUserEmail()
         {
             //Arrange 
-            string newUserEmail = "newFakeEmail@example.com";
+            var userName = CreateUserName();
+            var userEmail = CreateUserEmail();
+            var userPassword = CreateUserPassword();
+            var userPhoneNumber = CreateUserPhoneNumber();
+            var userPasswordHash = CreateUserPasswordHash(userPassword);
+
+            var user = CreateUser(userName, userEmail, userPasswordHash, userPhoneNumber);
 
             //Act
-            MockUser.ChangeEmail(newUserEmail);
+            string newUserEmail = "newFakeEmail@example.com";
+
+            user.ChangeEmail(newUserEmail);
 
             //Assert
-            Assert.AreEqual(expected: newUserEmail, actual: MockUser.Email);
+            user.Email.Should().BeSameAs(newUserEmail);
         }
 
-        [TestMethod]
-        [DataRow(" ")]
-        [DataRow(null)]
+        [Theory]
+        [InlineData(" ")]
+        [InlineData(null)]
         public void 
             ChangePassword_ThrowsEmptyUserPasswordHashException_WhenNewPasswordHashIsNullOrWhiteSpace(string? newPasswordHash)
         {
             //Arrange
+            var userName = CreateUserName();
+            var userEmail = CreateUserEmail();
+            var userPassword = CreateUserPassword();
+            var userPhoneNumber = CreateUserPhoneNumber();
+            var userPasswordHash = CreateUserPasswordHash(userPassword);
+
+            var user = CreateUser(userName, userEmail, userPasswordHash, userPhoneNumber);
+
+            //Act
             string newUserPasswordHash = newPasswordHash!;
 
-            //Act + Assert
-            Assert.Throws<EmptyUserPasswordHashException>(() => MockUser.ChangePassword(newUserPasswordHash));
+            Action act = () => user.ChangePassword(newUserPasswordHash);
+
+            //Assert
+            act.Should().Throw<EmptyUserPasswordHashException>();
         }
 
-        [TestMethod]
+        [Fact]
         public void ChangePassword_ShouldUpdatesPasswordHash()
         {
             //Arrange
-            string newPasswordHash = "e3d7cf509e5ffc03d30a20cdf3b513119e8f647c1afe49caadc5766fd13f3d18";
+            var userName = CreateUserName();
+            var userEmail = CreateUserEmail();
+            var userPassword = CreateUserPassword();
+            var userPhoneNumber = CreateUserPhoneNumber();
+            var userPasswordHash = CreateUserPasswordHash(userPassword);
+
+            var user = CreateUser(userName, userEmail, userPasswordHash, userPhoneNumber);
 
             //Act
-            MockUser.ChangePassword(newPasswordHash);
+            var newPasswordHash = CreateUserPasswordHash("#Newfakepassword123");
+
+            user.ChangePassword(newPasswordHash);
 
             //Assert
-            Assert.AreEqual(expected: newPasswordHash, actual: MockUser.PasswordHash);
+            user.PasswordHash.Should().BeSameAs(newPasswordHash);
         }
 
-        [TestMethod]
-        [DataRow("+18887778888")]
-        [DataRow(null)]
+        [Theory]
+        [InlineData("+18887778888")]
+        [InlineData(null)]
         public void SetPhoneNumber_UpdatesPhoneNumber(string? PhoneNumber)
         {
             //Arrange 
-            string newPhoneNumber = PhoneNumber!;
+            var userName = CreateUserName();
+            var userEmail = CreateUserEmail();
+            var userPassword = CreateUserPassword();
+            var userPhoneNumber = CreateUserPhoneNumber();
+            var userPasswordHash = CreateUserPasswordHash(userPassword);
+
+            var user = CreateUser(userName, userEmail, userPasswordHash, userPhoneNumber);
 
             //Act 
-            MockUser.SetPhoneNumber(newPhoneNumber);
+            string newPhoneNumber = PhoneNumber!;
+
+            user.SetPhoneNumber(newPhoneNumber);
 
             //Assert
-            Assert.AreEqual(expected: newPhoneNumber, actual: MockUser.PhoneNumber);
+            user.PhoneNumber.Should().BeSameAs(newPhoneNumber);
         }
 
-        [TestMethod]
+        [Fact]
         public void Delete_ShouldSetIsDeletedTrue()
         {
+            //Arrange
+            var userName = CreateUserName();
+            var userEmail = CreateUserEmail();
+            var userPassword = CreateUserPassword();
+            var userPhoneNumber = CreateUserPhoneNumber();
+            var userPasswordHash = CreateUserPasswordHash(userPassword);
+
+            var user = CreateUser(userName, userEmail, userPasswordHash, userPhoneNumber);
+
             //Act
-            MockUser.Delete();
+            user.Delete();
 
             //Assert
-            Assert.IsTrue(MockUser.IsDeleted);
+            user.IsDeleted.Should().BeTrue();
+        }
+
+        //Helper methods
+        private string CreateUserName() => "fakeName";
+        private string CreateUserEmail() => "fake@example.com";
+        private string CreateUserPhoneNumber() => "+18880009999";
+        private string CreateUserPassword() => "#Fakepassword123";
+
+        private string CreateUserPasswordHash(string password)
+        {
+            var inputBytes = Encoding.UTF8.GetBytes(password);
+
+            var inputHash = SHA256.HashData(inputBytes);
+
+            return Convert.ToHexString(inputHash);
+        }
+
+        private User CreateUser(string name, string email, string passwordHash, string? phoneNumber)
+        {
+            return new User(name, email, passwordHash, phoneNumber);
         }
     }
 }
