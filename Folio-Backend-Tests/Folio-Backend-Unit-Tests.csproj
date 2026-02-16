@@ -16,10 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\API\FolioWebAPI\FolioWebAPI.csproj" />
     <ProjectReference Include="..\Core\Folio.Core\Folio.Core.csproj" />
     <ProjectReference Include="..\Infrastructure\Folio.Infrastructure\Folio.Infrastructure.csproj" />
