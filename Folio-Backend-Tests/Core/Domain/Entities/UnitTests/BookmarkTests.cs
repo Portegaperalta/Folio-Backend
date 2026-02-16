@@ -1,98 +1,151 @@
-﻿using Folio.Core.Domain.Entities;
+﻿using FluentAssertions;
+using Folio.Core.Domain.Entities;
 using Folio.Core.Domain.Exceptions.Bookmark;
+using Xunit;
 
 namespace Folio_Backend_Tests.Core.Domain.Entities.UnitTests
 {
-    [TestClass]
     public class BookmarkTests
     {
-        private readonly string MockBookmarkName = "mock bookmark";
-        private readonly string MockBookmarkUrl = "https://fakeurl.com";
-        private readonly Guid MockUserId = Guid.NewGuid();
-        private readonly Guid MockFolderId = Guid.NewGuid();
-        private Bookmark MockBookmark = null!;
-
-        [TestInitialize]
-        public void Setup()
-        {
-            MockBookmark = new(MockBookmarkName, MockBookmarkUrl, MockFolderId, MockUserId);
-        }
-
-        [TestMethod]
-        [DataRow(null)]
-        [DataRow("")]
-        [DataRow(" ")]
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
         public void 
             ChangeName_ThrowsEmptyBookmarkNameException_WhenNewNameIsNullOrEmpty(string? newName)
         {
-            //Act + Assert
-            Assert.Throws<EmptyBookmarkNameException>(() => MockBookmark.ChangeName(newName!));
+            //Arrange
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var bookmarkName = CreateBookmarkName();
+            var bookmarkUrl = CreateBookmarkUrl();
+            var bookmarkEntity = CreateBookmarkEntity(bookmarkName, bookmarkUrl, folderId, userId);
+
+            //Act
+            Action act = () => bookmarkEntity.ChangeName(newName!);
+
+            //Assert
+            act.Should().Throw<EmptyBookmarkNameException>();
         }
 
-        [TestMethod]
+        [Fact]
         public void ChangeName_ShouldUpdateBookmarkName()
         {
             //Arrange
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var bookmarkName = CreateBookmarkName();
+            var bookmarkUrl = CreateBookmarkUrl();
+            var bookmarkEntity = CreateBookmarkEntity(bookmarkName, bookmarkUrl, folderId, userId);
+            
             string newBookmarkName = "newName";
 
             //Act
-            MockBookmark.ChangeName(newBookmarkName);
+            bookmarkEntity.ChangeName(newBookmarkName);
 
             //Assert
-            Assert.AreEqual(expected: newBookmarkName, actual: MockBookmark.Name);
+            bookmarkEntity.Name.Should().BeSameAs(newBookmarkName);
         }
 
-        [TestMethod]
-        [DataRow(null)]
-        [DataRow("")]
-        [DataRow(" ")]
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
         public void ChangeUrl_ThrowsEmptyBookmarkUrlException_WhenNewUrlIsNullOrEmpty(string? newUrl)
         {
-            //Act + Assert
-            Assert.Throws<EmptyBookmarkUrlException>(() => MockBookmark.ChangeUrl(newUrl!));
+            //Arrange
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var bookmarkName = CreateBookmarkName();
+            var bookmarkUrl = CreateBookmarkUrl();
+            var bookmarkEntity = CreateBookmarkEntity(bookmarkName, bookmarkUrl, folderId, userId);
+
+            //Act
+            Action act = () => bookmarkEntity.ChangeUrl(newUrl!);
+
+            //Assert
+            act.Should().Throw<EmptyBookmarkUrlException>();
         }
 
-        [TestMethod]
+        [Fact]
         public void ChangeUrl_ShouldUpdateBookmarkUrl()
         {
             //Arrange
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var bookmarkName = CreateBookmarkName();
+            var bookmarkUrl = CreateBookmarkUrl();
+            var bookmarkEntity = CreateBookmarkEntity(bookmarkName, bookmarkUrl, folderId, userId);
+           
             string newBookmarkUrl = "https://newFakeUrl.com";
 
             //Act
-            MockBookmark.ChangeUrl(newBookmarkUrl);
+            bookmarkEntity.ChangeUrl(newBookmarkUrl);
 
             //Assert
-            Assert.AreEqual(expected: newBookmarkUrl, actual: MockBookmark.Url);
+            bookmarkEntity.Url.Should().BeSameAs(newBookmarkUrl);
         }
 
-        [TestMethod]
+        [Fact]
         public void MarkFavorite_ShouldSetIsMarkedFavoriteTrue()
         {
+            //Arrange
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var bookmarkName = CreateBookmarkName();
+            var bookmarkUrl = CreateBookmarkUrl();
+            var bookmarkEntity = CreateBookmarkEntity(bookmarkName, bookmarkUrl, folderId, userId);
+
             //Act
-            MockBookmark.MarkFavorite();
+            bookmarkEntity.MarkFavorite();
 
             //Assert
-            Assert.IsTrue(MockBookmark.IsMarkedFavorite);
+            bookmarkEntity.IsMarkedFavorite.Should().BeTrue();
         }
 
-        [TestMethod]
+        [Fact]
         public void UnmarkFavorite_ShouldSetIsMarkedFavoriteFalse()
         {
+            //Arrange
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var bookmarkName = CreateBookmarkName();
+            var bookmarkUrl = CreateBookmarkUrl();
+            var bookmarkEntity = CreateBookmarkEntity(bookmarkName, bookmarkUrl, folderId, userId);
+
             //Act
-            MockBookmark.UnmarkFavorite();
+            bookmarkEntity.UnmarkFavorite();
 
             //Assert
-            Assert.IsFalse(MockBookmark.IsMarkedFavorite);
+            bookmarkEntity.IsMarkedFavorite.Should().BeFalse();
         }
 
-        [TestMethod]
+        [Fact]
         public void Visit_ShouldUpdateLastVisitedTime()
         {
+            //Arrange
+            var userId = CreateUserId();
+            var folderId = CreateFolderId();
+            var bookmarkName = CreateBookmarkName();
+            var bookmarkUrl = CreateBookmarkUrl();
+            var bookmarkEntity = CreateBookmarkEntity(bookmarkName, bookmarkUrl, folderId, userId);
+
             //Act
-            MockBookmark.Visit();
+            bookmarkEntity.Visit();
 
             //Assert
-            Assert.IsNotNull(MockBookmark.LastVisitedTime);
+            bookmarkEntity.LastVisitedTime.Should().NotBeNull();
+        }
+
+        //Helper methods
+        private string CreateBookmarkName() => "mockBookmark";
+        private string CreateBookmarkUrl() => "https://fakeurl.com";
+        private Guid CreateUserId() => new();
+        private Guid CreateFolderId() => new();
+
+        private Bookmark CreateBookmarkEntity(string name, string url, Guid folderId, Guid userId)
+        {
+            return new Bookmark(name, url, folderId, userId);
         }
     }
 }
