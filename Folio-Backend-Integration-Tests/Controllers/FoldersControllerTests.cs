@@ -39,6 +39,53 @@ namespace Folio_Backend_Integration_Tests.Controllers
             _output = output;
         }
 
+        [Fact]
+        public async Task GetAll_ReturnsEmptyList_WhenUserHasNoFolders()
+        {
+            //Arrange
+            var (user, token) = await CreateAndLoginUserAsync();
+
+            SetAuthToken(token);
+
+            //Act
+            var response = await _client.GetAsync(baseUrl, TestContext.Current.CancellationToken);
+
+            //Assert
+            var result = await response.Content.ReadFromJsonAsync<List<FolderDTO>>(TestContext.Current.CancellationToken);
+
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            result.Should().NotBeNull();
+            result.Should().BeOfType<List<FolderDTO>>();
+            result.Should().HaveCount(0);
+        }
+
+        [Fact]
+        public async Task GetAll_ReturnsListOfFolderDTOsWhenUserHasFolders()
+        {
+            //Arrange
+            var (user, token) = await CreateAndLoginUserAsync();
+
+            SetAuthToken(token);
+
+            using(var context = BuildContext(dbName))
+            {
+                context.Folders.AddRange( new Folder("funny",user.Id), new Folder("movies",user.Id));
+
+                await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+            }
+
+            //Act
+            var response = await _client.GetAsync(baseUrl, TestContext.Current.CancellationToken);
+
+            //Assert
+            var result = await response.Content.ReadFromJsonAsync<List<FolderDTO>>(TestContext.Current.CancellationToken);
+
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            result.Should().NotBeNull();
+            result.Should().BeOfType<List<FolderDTO>>();
+            result.Should().HaveCount(2);
+        }
+
         //Helper methods
 
         private async Task<(ApplicationUser user, string Token)> 
