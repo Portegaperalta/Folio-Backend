@@ -144,8 +144,6 @@ namespace Folio_Backend_Tests.Core.Application.Services
             return Convert.ToHexString(inputHash);
         }
 
-        private string CreateUserPhone() => "+18880009999";
-
         private User CreateUserEntity(Guid userId, string userName, string userEmail,
             string passwordHash, string phonewNumber = null!)
         {
