@@ -84,7 +84,7 @@ namespace Folio_Backend_Integration_Tests.Controllers
             
             var errorMessages = problemDetails!.Errors.Values.SelectMany(x => x).ToList();
 
-            errorMessages.Should().AllBeEquivalentTo(expectedErrors);
+            errorMessages.Should().BeEquivalentTo(expectedErrors);
         }
 
         [Fact]
@@ -111,7 +111,7 @@ namespace Folio_Backend_Integration_Tests.Controllers
                 .FirstOrDefaultAsync(u => u.Email == registrationCredentials.Email, TestContext.Current.CancellationToken);
 
             userInDb.Should().NotBeNull();
-            userInDb.Name.Should().BeSameAs(registrationCredentials.Name);
+            userInDb.Name.Should().Be(registrationCredentials.Name);
         }
 
         [Fact]
@@ -128,7 +128,7 @@ namespace Folio_Backend_Integration_Tests.Controllers
             var response = await _client.PostAsJsonAsync(loginUrl, invalidLoginCredentials, _jsonSerializerOptions, TestContext.Current.CancellationToken);
 
             //Assert
-            response.Should().Be(HttpStatusCode.Unauthorized);
+            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
         [Fact]
@@ -167,7 +167,7 @@ namespace Folio_Backend_Integration_Tests.Controllers
             var response = await client.PostAsJsonAsync(loginUrl, validLoginCredentials, _jsonSerializerOptions, TestContext.Current.CancellationToken);
 
             //Assert
-            response.Should().Be(HttpStatusCode.OK);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
         [Fact]
