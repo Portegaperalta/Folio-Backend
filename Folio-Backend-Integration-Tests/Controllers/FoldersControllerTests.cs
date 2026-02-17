@@ -1,6 +1,16 @@
-﻿using Folio_Backend_Integration_Tests.Utils;
+﻿using FluentAssertions;
+using Folio.Core.Application.DTOs.Auth;
+using Folio.Core.Application.DTOs.Folder;
+using Folio.Core.Domain.Entities;
+using Folio.Infrastructure.Identity;
+using Folio.Infrastructure.Persistence;
+using Folio_Backend_Integration_Tests.Utils;
 using FolioWebAPI;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using System.Net;
+using System.Net.Http.Json;
 using System.Text.Json;
 using Xunit;
 
@@ -15,8 +25,9 @@ namespace Folio_Backend_Integration_Tests.Controllers
         private readonly JsonSerializerOptions _jsonSerializerOptions;
         private readonly WebApplicationFactory<Program> _webApplicationFactory;
         private readonly HttpClient _client;
+        private readonly ITestOutputHelper _output;
         
-        public FoldersControllerTests()
+        public FoldersControllerTests(ITestOutputHelper output)
         {
             _jsonSerializerOptions = _jsonSerializerOptions = new JsonSerializerOptions
             {
@@ -25,6 +36,48 @@ namespace Folio_Backend_Integration_Tests.Controllers
 
             _webApplicationFactory = BuildWebApplicationFactory(dbName);
             _client = _webApplicationFactory.CreateClient();
+            _output = output;
+        }
+
+        //Helper methods
+
+        private async Task<(ApplicationUser user, string Token)> 
+            CreateAndLoginUserAsync(string email = "fakeUser@test.com", string password = "#fakeUserpassword123")
+        {
+            //User creation
+            var scope = _webApplicationFactory.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var passwordHasher = new PasswordHasher<ApplicationUser>();
+
+            var user = new ApplicationUser
+            {
+                Name = "fakeUser",
+                Email = email,
+                UserName = email,
+                NormalizedEmail = email.ToUpper(),
+                NormalizedUserName = email.ToUpper(),
+                SecurityStamp = Guid.NewGuid().ToString()
+            };
+
+            user.PasswordHash = passwordHasher.HashPassword(user, password);
+
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
+
+            //User login
+            var loginDto = new LoginCredentialsDTO { Email = email, Password = password };
+
+            var response = await _client.PostAsJsonAsync("/api/auth/login", loginDto, _jsonSerializerOptions);
+            response.EnsureSuccessStatusCode();
+
+            var loginResult = await response.Content.ReadFromJsonAsync<AuthenticationResponseDTO>();
+
+            return (user, loginResult!.Token);
+        }
+
+        private void SetAuthToken(string token)
+        {
+            _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
         }
     }
 }
