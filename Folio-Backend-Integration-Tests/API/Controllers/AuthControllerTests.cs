@@ -15,7 +15,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Xunit;
 
-namespace Folio_Backend_Integration_Tests.Controllers
+namespace Folio_Backend_Integration_Tests.API.Controllers
 {
     public class AuthControllerTests : TestsBase
     {
