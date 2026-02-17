@@ -1,117 +1,174 @@
-﻿using Folio.Core.Domain.Entities;
+﻿using FluentAssertions;
+using Folio.Core.Domain.Entities;
+using Folio.Core.Domain.Exceptions.Bookmark;
 using Folio.Core.Domain.Exceptions.Folder;
+using Xunit;
 
 namespace Folio_Backend_Tests.Core.Domain.Entities.UnitTests
 {
-    [TestClass]
     public class FolderTests
     {
-        private readonly Guid MockUserId = Guid.NewGuid();
-        private readonly string MockFolderName = "mock folder";
-        private Bookmark MockBookmark = null!;
-        private Folder MockFolder = null!;
-
-        [TestInitialize]
-        public void Setup()
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        public void
+            ChangeName_ThrowsEmptyFolderNameException_WhenNewNameIsNullOrEmpty(string? newName)
         {
-            MockFolder = new Folder(MockFolderName, MockUserId);
-            MockBookmark = new("mockBookmark", "https://fakeurl.com", MockFolder.Id, MockUserId);
+            //Arrange
+            var userId = CreateUserId();
+            var folderName = CreateFolderName();
+            var folderEntity = CreateFolderEntity(folderName, userId);
+
+            //Act
+            Action act = () => folderEntity.ChangeName(newName!);
+
+            //Assert
+            act.Should().Throw<EmptyFolderNameException>();
         }
 
-        [TestMethod]
-        [DataRow(null)]
-        [DataRow("")]
-        [DataRow(" ")]
-        public void 
-            ChangeName_ThrowsEmptyFolderNameException_WhenNewNameIsNullOrWhiteSpace(string? newName)
-        {
-            //Act + Assert
-            Assert.Throws<EmptyFolderNameException>(() => MockFolder.ChangeName(newName!));
-        }
-
-        [TestMethod]
+        [Fact]
         public void ChangeName_ShouldUpdateName()
         {
+            //Arrange
+            var userId = CreateUserId();
+            var folderName = CreateFolderName();
+            var folderEntity = CreateFolderEntity(folderName, userId);
+
             //Act
             string newFolderName = "new name";
-            MockFolder.ChangeName(newFolderName);
+            folderEntity.ChangeName(newFolderName);
 
             //Assert
-            Assert.AreEqual(expected: newFolderName, actual: MockFolder.Name);
+            folderEntity.Name.Should().BeSameAs(newFolderName);
         }
 
-        [TestMethod]
+        [Fact]
         public void MarkFavorite_ShouldSetIsMarkedFavoriteTrue()
         {
+            //Arrange
+            var userId = CreateUserId();
+            var folderName = CreateFolderName();
+            var folderEntity = CreateFolderEntity(folderName, userId);
+
             //Act
-            MockFolder.MarkFavorite();
+            folderEntity.MarkFavorite();
 
             //Assert
-            Assert.IsTrue(MockFolder.IsMarkedFavorite);
+            folderEntity.IsMarkedFavorite.Should().BeTrue();
         }
 
-        [TestMethod]
+        [Fact]
         public void UnmarkFavorite_ShouldSetIsMarkedFavoriteFalse()
         {
+            //Arrange
+            var userId = CreateUserId();
+            var folderName = CreateFolderName();
+            var folderEntity = CreateFolderEntity(folderName, userId);
+
             //Act
-            MockFolder.UnmarkFavorite();
+            folderEntity.UnmarkFavorite();
 
             //Assert
-            Assert.IsFalse(MockFolder.IsMarkedFavorite);
+            folderEntity.IsMarkedFavorite.Should().BeFalse();
         }
 
-        [TestMethod]
+        [Fact]
         public void Visit_ShouldUpdateLastVisitedTime()
         {
+            //Arrange
+            var userId = CreateUserId();
+            var folderName = CreateFolderName();
+            var folderEntity = CreateFolderEntity(folderName, userId);
+
             //Act
-            MockFolder.Visit();
+            folderEntity.Visit();
 
             //Assert
-            Assert.IsNotNull(MockFolder.LastVisitedTime);
+            folderEntity.LastVisitedTime.Should().NotBeNull();
         }
 
-        [TestMethod]
+        [Fact]
         public void AddBookmark_ThrowsArgumentNullException_WhenNewBookmarkIsNull()
         {
             //Arrange
+            var userId = CreateUserId();
+            var folderName = CreateFolderName();
+            var folderEntity = CreateFolderEntity(folderName, userId);
+
             Bookmark nullBookmarkEntity = null!;
 
-            //Act + Assert
-            Assert.Throws<ArgumentNullException>(() => MockFolder.AddBookmark(nullBookmarkEntity));
+            //Act
+            Action act = () => folderEntity.AddBookmark(nullBookmarkEntity);
+
+            //Assert
+            act.Should().Throw<ArgumentNullException>();
         }
 
-        [TestMethod]
+        [Fact]
         public void AddBookmark_ThrowsArgumentException_WhenBookmarkFolderIsNotEqualToFolderId()
         {
             //Arrange
+            var userId = CreateUserId();
+            var folderName = CreateFolderName();
+            var folderEntity = CreateFolderEntity(folderName, userId);
+
             Guid otherFolderId = Guid.NewGuid();
-            Bookmark unauthorizedBookmark = new("otherFakeBookmark", "https://otherFakeUrl", otherFolderId, MockUserId);
+            Bookmark unauthorizedBookmark = new("otherFakeBookmark", "https://otherFakeUrl", otherFolderId, userId);
 
-            //Act + Assert
-            Assert.Throws<ArgumentException>(() => MockFolder.AddBookmark(unauthorizedBookmark));
-        }
-
-        [TestMethod]
-        public void AddBookmark_ShouldAddBookmarkToList()
-        {
             //Act
-            MockFolder.AddBookmark(MockBookmark);
+            Action act = () => folderEntity.AddBookmark(unauthorizedBookmark);
 
             //Assert
-            CollectionAssert.Contains(MockFolder.Bookmarks.ToList(), MockBookmark);
+            act.Should().Throw<ArgumentException>();
         }
 
-        [TestMethod]
+        [Fact]
+        public void AddBookmark_ShouldAddBookmarkToList()
+        {
+            //Arrange
+            var userId = CreateUserId();
+            var folderName = CreateFolderName();
+            var folderEntity = CreateFolderEntity(folderName, userId);
+            var bookmarkEntity = CreateBookmarkEntity(folderEntity.Id, userId);
+
+            //Act
+            folderEntity.AddBookmark(bookmarkEntity);
+
+            //Assert
+            folderEntity.Bookmarks.Should().AllBeEquivalentTo(bookmarkEntity);
+        }
+
+        [Fact]
         public void RemoveBookmark_ShouldRemoveBookmarkFromListIfBookmarkExistsInList()
         {
             //Arrange
-            MockFolder.AddBookmark(MockBookmark);
+            var userId = CreateUserId();
+            var folderName = CreateFolderName();
+            var folderEntity = CreateFolderEntity(folderName, userId);
+            var bookmarkEntity = CreateBookmarkEntity(folderEntity.Id, userId);
+
+            folderEntity.AddBookmark(bookmarkEntity);
 
             //Act
-            MockFolder.RemoveBookmark(MockBookmark.Id);
+            folderEntity.RemoveBookmark(bookmarkEntity.Id);
 
             //Assert
-            CollectionAssert.DoesNotContain(MockFolder.Bookmarks.ToList(), MockBookmark);
+            folderEntity.Bookmarks.Should().NotContain(bookmarkEntity);
+        }
+
+        //Helper methods
+        private Guid CreateUserId() => new();
+        private string CreateFolderName() => "mock folder";
+        
+        private Folder CreateFolderEntity(string name, Guid userId)
+        {
+            return new Folder(name, userId);
+        }
+
+        private Bookmark CreateBookmarkEntity(Guid folderId, Guid userId)
+        {
+            return new Bookmark("mockBookmark", "https://fakeurl.com", folderId, userId);
         }
     }
 }

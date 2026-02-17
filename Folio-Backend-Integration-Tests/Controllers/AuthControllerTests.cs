@@ -1,18 +1,22 @@
-﻿using Folio.Core.Application.DTOs.Auth;
+﻿using FluentAssertions;
+using Folio.Core.Application.DTOs.Auth;
 using Folio.Infrastructure.Identity;
 using Folio.Infrastructure.Persistence;
 using Folio_Backend_Integration_Tests.Utils;
+using FolioWebAPI;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Xunit;
 
 namespace Folio_Backend_Integration_Tests.Controllers
 {
-    [TestClass]
     public class AuthControllerTests : TestsBase
     {
         private static readonly string registerUrl = "/api/auth/register";
@@ -21,18 +25,25 @@ namespace Folio_Backend_Integration_Tests.Controllers
 
         private readonly string dbName = Guid.NewGuid().ToString();
 
-        private readonly JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
+        private readonly WebApplicationFactory<Program> _webApplicationFactory;
+        private readonly HttpClient _client;
 
-    [TestMethod]
+        public AuthControllerTests()
+        {
+            _jsonSerializerOptions = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            _webApplicationFactory = BuildWebApplicationFactory(dbName);
+            _client = _webApplicationFactory.CreateClient();
+        }
+
+        [Fact]
         public async Task Register_ReturnsStatusCode400_WhenRegistrationFieldsAreInvalid()
         {
             //Arrange
-            var factory = BuildWebApplicationFactory(dbName);
-            var client = factory.CreateClient();
-
             var invalidRegistrationCredentials = new RegisterCredentialsDTO
             {
                 Name = "",
@@ -41,20 +52,16 @@ namespace Folio_Backend_Integration_Tests.Controllers
             };
 
             //Act
-            var response = await client.PostAsJsonAsync(registerUrl, invalidRegistrationCredentials);
+            var response = await _client.PostAsJsonAsync(registerUrl, invalidRegistrationCredentials, TestContext.Current.CancellationToken);
 
             //Assert
-            var statusCode = response.StatusCode;
-            Assert.AreEqual(expected: HttpStatusCode.BadRequest, actual: statusCode);
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Register_ReturnsValidationErrors_WhenRegistrationFieldsAreInvalid()
         {
             //Arrange
-            var factory = BuildWebApplicationFactory(dbName);
-            var client = factory.CreateClient();
-
             var invalidRegistrationCredentials = new RegisterCredentialsDTO
             {
                 Name = "",
@@ -70,22 +77,20 @@ namespace Folio_Backend_Integration_Tests.Controllers
                 ];
 
             //Act
-            var response = await client.PostAsJsonAsync(registerUrl, invalidRegistrationCredentials, jsonSerializerOptions);
+            var response = await _client.PostAsJsonAsync(registerUrl, invalidRegistrationCredentials, _jsonSerializerOptions, TestContext.Current.CancellationToken);
 
             //Assert
-            var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+            var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestContext.Current.CancellationToken);
+            
             var errorMessages = problemDetails!.Errors.Values.SelectMany(x => x).ToList();
 
-            CollectionAssert.AreEquivalent(expectedErrors, errorMessages);
+            errorMessages.Should().BeEquivalentTo(expectedErrors);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Register_PeristsDataInDatabase()
         {
             //Arrage
-            var factory = BuildWebApplicationFactory(dbName);
-            var client = factory.CreateClient();
-
             var registrationCredentials = new RegisterCredentialsDTO
             {
                 Name = "fakeUser",
@@ -94,29 +99,25 @@ namespace Folio_Backend_Integration_Tests.Controllers
             };
 
             //Act
-            var response = await client.PostAsJsonAsync(registerUrl, registrationCredentials, jsonSerializerOptions);
-
-            //Assert
+            var response = await _client.PostAsJsonAsync(registerUrl, registrationCredentials, _jsonSerializerOptions, TestContext.Current.CancellationToken);
             response.EnsureSuccessStatusCode();
 
-            using var scope = factory.Services.CreateScope();
+            //Assert
+            using var scope = _webApplicationFactory.Services.CreateScope();
 
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
             var userInDb = await dbContext.Users
-                .FirstOrDefaultAsync(u => u.Email == registrationCredentials.Email);
+                .FirstOrDefaultAsync(u => u.Email == registrationCredentials.Email, TestContext.Current.CancellationToken);
 
-            Assert.IsNotNull(userInDb);
-            Assert.AreEqual(registrationCredentials.Name, userInDb.Name);
+            userInDb.Should().NotBeNull();
+            userInDb.Name.Should().Be(registrationCredentials.Name);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Login_ReturnsStatusCode401_WhenLoginCredentialsAreInvalid()
         {
             //Arrange
-            var factory = BuildWebApplicationFactory(dbName);
-            var client = factory.CreateClient();
-
             var invalidLoginCredentials = new LoginCredentialsDTO
             {
                 Email = "testUser@test.com",
@@ -124,14 +125,13 @@ namespace Folio_Backend_Integration_Tests.Controllers
             };
 
             //Act
-            var response = await client.PostAsJsonAsync(loginUrl, invalidLoginCredentials, jsonSerializerOptions);
+            var response = await _client.PostAsJsonAsync(loginUrl, invalidLoginCredentials, _jsonSerializerOptions, TestContext.Current.CancellationToken);
 
             //Assert
-            var statusCode = response.StatusCode;
-            Assert.AreEqual(expected: HttpStatusCode.Unauthorized, actual: statusCode);
+            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Login_ReturnsStatusCode200_WhenCredentialsAreValid()
         {
             //Arrage
@@ -154,7 +154,7 @@ namespace Folio_Backend_Integration_Tests.Controllers
                 user.PasswordHash = passwordHasher.HashPassword(user, "#fakeUserpassword123");
 
                 context.Users.Add(user);
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(TestContext.Current.CancellationToken);
             }
 
             var validLoginCredentials = new LoginCredentialsDTO
@@ -164,19 +164,16 @@ namespace Folio_Backend_Integration_Tests.Controllers
             };
 
             //Act
-            var response = await client.PostAsJsonAsync(loginUrl, validLoginCredentials, jsonSerializerOptions);
+            var response = await client.PostAsJsonAsync(loginUrl, validLoginCredentials, _jsonSerializerOptions, TestContext.Current.CancellationToken);
 
             //Assert
-            Assert.AreEqual(expected: HttpStatusCode.OK, actual: response.StatusCode);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Login_ReturnsValidJWT_WhenCredentialsAreValid()
         {
             //Arrange
-            var factory = BuildWebApplicationFactory(dbName);
-            var client = factory.CreateClient();
-
             using (var context = BuildContext(dbName))
             {
                 var passwordHasher = new PasswordHasher<ApplicationUser>();
@@ -193,7 +190,7 @@ namespace Folio_Backend_Integration_Tests.Controllers
                 user.PasswordHash = passwordHasher.HashPassword(user, "#fakeUserpassword123");
 
                 context.Users.Add(user);
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(TestContext.Current.CancellationToken);
             }
 
             var validLoginCredentials = new LoginCredentialsDTO
@@ -203,16 +200,75 @@ namespace Folio_Backend_Integration_Tests.Controllers
             };
 
             //Act
-            var response = await client.PostAsJsonAsync(loginUrl, validLoginCredentials, jsonSerializerOptions);
+            var response = await _client.PostAsJsonAsync(loginUrl, validLoginCredentials, _jsonSerializerOptions, TestContext.Current.CancellationToken);
 
             //Assert
-            var authResponse = await response.Content.ReadFromJsonAsync<AuthenticationResponseDTO>();
+            var authResponse = await response.Content.ReadFromJsonAsync<AuthenticationResponseDTO>(TestContext.Current.CancellationToken);
 
-            Assert.IsFalse(string.IsNullOrEmpty(authResponse!.Token));
+            authResponse!.Token.Should().NotBeNullOrEmpty();
 
             var tokenParts = authResponse.Token.Split('.');
 
-            Assert.HasCount(expected: 3, tokenParts);
+            tokenParts.Should().HaveCount(3);
+        }
+
+        [Fact]
+        public async Task RenewToken_ReturnsNewValidToken()
+        {
+            //Arrange
+            using (var context = BuildContext(dbName))
+            {
+                var passwordHasher = new PasswordHasher<ApplicationUser>();
+                var user = new ApplicationUser
+                {
+                    Name = "fakeUser",
+                    Email = "fakeUser@test.com",
+                    UserName = "fakeUser@test.com",
+                    NormalizedEmail = "FAKEUSER@TEST.COM",
+                    NormalizedUserName = "FAKEUSER@TEST.COM",
+                    SecurityStamp = Guid.NewGuid().ToString()
+                };
+
+                user.PasswordHash = passwordHasher.HashPassword(user, "#fakeUserpassword123");
+
+                context.Users.Add(user);
+                await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+            }
+
+            var validLoginCredentials = new LoginCredentialsDTO
+            {
+                Email = "fakeUser@test.com",
+                Password = "#fakeUserpassword123"!,
+            };
+
+            //Act
+
+            var loginResponse = await _client.PostAsJsonAsync(loginUrl, validLoginCredentials, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+            loginResponse.EnsureSuccessStatusCode();
+
+             // extracts token from login response
+            var loginContent = await loginResponse.Content.ReadFromJsonAsync<AuthenticationResponseDTO>(TestContext.Current.CancellationToken);
+            var oldToken = loginContent?.Token;
+
+            // waits for the clock to tick to the next second
+            await Task.Delay(1001, TestContext.Current.CancellationToken);
+
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", oldToken);
+            var tokenRenewResponse = await _client.GetAsync(renewTokenUrl, TestContext.Current.CancellationToken);
+
+            //Assert
+            tokenRenewResponse.EnsureSuccessStatusCode();
+
+             // extracts new token from renew-token response
+            var renewContent = await tokenRenewResponse.Content.ReadFromJsonAsync<AuthenticationResponseDTO>(TestContext.Current.CancellationToken);
+            var newToken = renewContent?.Token;
+
+            newToken.Should().NotBeNull();
+
+            var newTokenParts = newToken.Split('.');
+
+            newTokenParts.Should().HaveCount(3);
+            oldToken.Should().NotBeSameAs(newToken);
         }
     }
 }
