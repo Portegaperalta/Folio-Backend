@@ -86,6 +86,49 @@ namespace Folio_Backend_Integration_Tests.Controllers
             result.Should().HaveCount(2);
         }
 
+        [Fact]
+        public async Task Count_ReturnsZero_WhenUserHasNoFolders()
+        {
+            //Arrange
+            var (user, token) = await CreateAndLoginUserAsync();
+
+            SetAuthToken(token);
+
+            //Act
+            var response = await _client.GetAsync($"{baseUrl}/count", TestContext.Current.CancellationToken);
+
+            //Arrange
+            var result = await response.Content.ReadFromJsonAsync<int>(TestContext.Current.CancellationToken);
+
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            result.Should().Be(0);
+        }
+
+        [Fact]
+        public async Task Count_ReturnsTotalNumberOfFoldersInDatabase_WhenUserHasFolders()
+        {
+            //Arrange
+            var (user, token) = await CreateAndLoginUserAsync();
+
+            SetAuthToken(token);
+
+            using (var context = BuildContext(dbName))
+            {
+                context.Folders.AddRange(new Folder("funny", user.Id));
+
+                await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+            }
+
+            //Act
+            var response = await _client.GetAsync($"{baseUrl}/count", TestContext.Current.CancellationToken);
+
+            //Assert
+            var result = await response.Content.ReadFromJsonAsync<int>(TestContext.Current.CancellationToken);
+
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            result.Should().BeGreaterThan(0);
+        }
+
         //Helper methods
 
         private async Task<(ApplicationUser user, string Token)> 
