@@ -376,19 +376,6 @@ namespace Folio_Backend_Tests.Core.Application.Services
             return new Folder(name, userId);
         }
 
-        private BookmarkDTO CreateBookmarkDTO(Guid bookmarkId, string name, string url)
-        {
-            return new BookmarkDTO
-            {
-               Id = bookmarkId,
-               Name = name,
-               Url = url,
-               IsMarkedFavorite = false,
-               CreationDate = DateTime.UtcNow,
-               LastVisitedTime = null
-            };
-        }
-
         private BookmarkCreationDTO CreateBookmarkCreationDTO(string name, string url)
         {
             return new BookmarkCreationDTO
