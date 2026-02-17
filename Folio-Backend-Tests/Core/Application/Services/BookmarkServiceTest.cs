@@ -41,7 +41,7 @@ namespace Folio_Backend_Tests.Core.Application.Services
             var response = await _bookmarkService.GetAllBookmarksAsync(userId, folderId);
 
             //Assert
-            response.Should().BeOfType<IEnumerable<BookmarkDTO>>();
+            response.Should().BeAssignableTo<IEnumerable<BookmarkDTO>>();
         }
 
         [Fact]
