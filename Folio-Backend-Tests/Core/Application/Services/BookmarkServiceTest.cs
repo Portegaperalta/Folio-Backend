@@ -25,7 +25,7 @@ namespace Folio_Backend_Tests.Core.Application.Services
 
         // GetAllUserBookmarksAsync tests
         [Fact]
-        public async Task GetAllBookmarksAsync_ReturnsIEnumerableBookmark()
+        public async Task GetAllBookmarksAsync_ReturnsBookmarkList()
         {
             //Arrange
             var userId = CreateUserId();
