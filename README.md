@@ -23,3 +23,7 @@ Folio-Backend/
 │   └── Repositories/         # Concrete Implementation of repositories
 └── Folio-Backend-Integration-Tests/   # End-to-end testing of API endpoints and DB persistence.
 └── Folio-Backend-Unit-Tests/          # Isolated logic testing for Domain and Application layers.
+```
+
+# Previous Requirements
+.NET 10.0 or latest
