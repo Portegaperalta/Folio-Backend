@@ -30,7 +30,6 @@ namespace Folio_Backend_Tests.Core.Application.Services
         {
             //Arrange
             var userId = CreateUserId();
-            var folderId = CreateFolderId();
             var folderEntity = CreateFolderEntity("mockFolder", userId);
             var folderList = CreateFolderList(folderEntity);
 
@@ -40,7 +39,7 @@ namespace Folio_Backend_Tests.Core.Application.Services
             var response = await _folderService.GetAllFoldersDTOsAsync(userId);
 
             //Assert
-            response.Should().BeOfType<IEnumerable<FolderDTO>>();
+            response.Should().BeAssignableTo<IEnumerable<FolderDTO>>();
         }
 
         // GetFolderByIdAsync tests
