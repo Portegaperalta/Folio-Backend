@@ -7,7 +7,9 @@ using Folio.Infrastructure.Persistence;
 using Folio_Backend_Integration_Tests.Utils;
 using FolioWebAPI;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http.Json;
@@ -127,6 +129,100 @@ namespace Folio_Backend_Integration_Tests.API.Controllers
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             result.Should().BeGreaterThan(0);
+        }
+
+        [Fact]
+        public async Task Create_ReturnsStatusCode400_WhenCreationFieldsAreInvalid()
+        {
+            //Arrange
+            var (user, token) = await CreateAndLoginUserAsync();
+
+            SetAuthToken(token);
+
+            var invalidFolderCreationDTO = new FolderCreationDTO { Name = "" };
+
+            //Act
+            var response = await _client.PostAsJsonAsync(baseUrl, invalidFolderCreationDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+
+            //Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async Task Create_ReturnValidationErrors_WhenCreationFieldsAreInvalid()
+        {
+            //Arrange
+            var (user, token) = await CreateAndLoginUserAsync();
+
+            SetAuthToken(token);
+
+            var invalidFolderCreationDTO = new FolderCreationDTO { Name = "" };
+
+            string[] expectedErrorMessages = ["The field Name is required"];
+
+            //Act
+            var response = await _client.PostAsJsonAsync(baseUrl, invalidFolderCreationDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+
+            //Assert
+            var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestContext.Current.CancellationToken);
+
+            var errorMessages = problemDetails!.Errors.Values.SelectMany(x => x).ToList();
+
+            errorMessages.Should().BeEquivalentTo(expectedErrorMessages);
+        }
+
+        [Fact]
+        public async Task Create_ReturnsStatusCode200_WhenFolderIsCreated()
+        {
+            //Arrange
+            var (user, token) = await CreateAndLoginUserAsync();
+
+            SetAuthToken(token);
+
+            var folderCreationDTO = new FolderCreationDTO { Name = "test folder" };
+
+            //Act
+            var response = await _client.PostAsJsonAsync(baseUrl, folderCreationDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+
+            //Assert
+            response.StatusCode.Should().Be(HttpStatusCode.Created);
+        }
+
+        [Fact]
+        public async Task Create_PersistsDataInDatabase()
+        {
+            //Arrange
+            var (user, token) = await CreateAndLoginUserAsync();
+
+            SetAuthToken(token);
+
+            var folderCreationDTO = new FolderCreationDTO { Name = "test folder" };
+
+            //Act
+            var response = await _client.PostAsJsonAsync(baseUrl, folderCreationDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            //Assert
+            using var scope = _webApplicationFactory.Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+            var folderInDb = await dbContext.Folders.Where(f => f.UserId == user.Id).FirstOrDefaultAsync(TestContext.Current.CancellationToken);
+
+            folderInDb.Should().NotBeNull();
+            folderInDb.Name.Should().Be(folderCreationDTO.Name);
+        }
+
+        [Fact]
+        public async Task Create_ReturnsStatusCode401_WhenUserIsUnauthorized()
+        {
+            //Arrange
+            var folderCreationDTO = new FolderCreationDTO { Name = "test folder" };
+
+            //Act
+            var response = await _client.PostAsJsonAsync(baseUrl, folderCreationDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+
+            //Assert
+            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
         //Helper methods
