@@ -1,0 +1,219 @@
+using System;
+using System.Net;
+using System.Net.Http.Json;
+using System.Text.Json;
+using FluentAssertions;
+using Folio.Core.Application.DTOs.Bookmark;
+using Folio.Core.Application.DTOs.Auth;
+using Folio.Core.Domain.Entities;
+using Folio.Infrastructure.Identity;
+using Folio.Infrastructure.Persistence;
+using Folio_Backend_Integration_Tests.Utils;
+using FolioWebAPI;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Xunit;
+
+namespace Folio_Backend_Integration_Tests.API.Controllers;
+
+public class BookmarksControllerTests : TestsBase
+{
+  // Bookmark Controller uses nested route:
+  // /api/{folderId}/bookmarks
+
+  private readonly string baseUrl = "/api/{folderId}/bookmarks";
+
+  private readonly string dbName = Guid.NewGuid().ToString();
+  private readonly JsonSerializerOptions _jsonSerializerOptions;
+  private readonly WebApplicationFactory<Program> _webApplicationFactory;
+  private readonly HttpClient _client;
+  private readonly ITestOutputHelper _output;
+  public BookmarksControllerTests(ITestOutputHelper output)
+  {
+    _jsonSerializerOptions = _jsonSerializerOptions = new JsonSerializerOptions
+    {
+      PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+
+    _webApplicationFactory = BuildWebApplicationFactory(dbName);
+    _client = _webApplicationFactory.CreateClient();
+    _output = output;
+  }
+
+  [Fact]
+  public async Task GetAll_ReturnsEmptyList_WhenUserHasNoBookmarks()
+  {
+    //Arrange
+    var (user, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    Guid folderId;
+    using (var context = BuildContext(dbName))
+    {
+      var folder = new Folder("test folder", user.Id);
+      context.Folders.Add(folder);
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+      folderId = folder.Id;
+    }
+
+    //Act
+    var response = await _client.GetAsync($"/api/{folderId}/bookmarks", TestContext.Current.CancellationToken);
+    response.EnsureSuccessStatusCode();
+
+    //Assert
+    var result = await response.Content.ReadFromJsonAsync<List<BookmarkDTO>>(TestContext.Current.CancellationToken);
+
+    result.Should().NotBeNull();
+    result.Should().BeOfType<List<BookmarkDTO>>();
+    result.Should().HaveCount(0);
+  }
+
+  [Fact]
+  public async Task GetAll_ReturnsStatusCode200_WhenRequestIsSuccessful()
+  {
+    //Arrange
+    var (user, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    Guid folderId;
+    using (var context = BuildContext(dbName))
+    {
+      var folder = new Folder("test folder", user.Id);
+      context.Folders.Add(folder);
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+      folderId = folder.Id;
+    }
+
+    //Act
+    var response = await _client.GetAsync($"/api/{folderId}/bookmarks", TestContext.Current.CancellationToken);
+
+    //Assert
+    response.StatusCode.Should().Be(HttpStatusCode.OK);
+  }
+
+  [Fact]
+  public async Task GetAll_ReturnsListOfBookmarkDTOs_WhenUserHasBookmarks()
+  {
+    //Arrange
+    var (user, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    Guid folderId;
+    using (var context = BuildContext(dbName))
+    {
+      var folder = new Folder("test folder", user.Id);
+      context.Folders.Add(folder);
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+      folderId = folder.Id;
+
+      context.Bookmarks.Add(new Bookmark("https://example.com", "Example", folder.Id, user.Id));
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+    }
+
+    //Act
+    var response = await _client.GetAsync($"/api/{folderId}/bookmarks", TestContext.Current.CancellationToken);
+    response.EnsureSuccessStatusCode();
+
+    //Assert
+    var result = await response.Content.ReadFromJsonAsync<List<BookmarkDTO>>(TestContext.Current.CancellationToken);
+
+    result.Should().NotBeNull();
+    result.Should().BeOfType<List<BookmarkDTO>>();
+    result.Should().HaveCount(1);
+  }
+
+  [Fact]
+  public async Task Count_ReturnsZero_WhenUserHasNoBookmarks()
+  {
+    //Arrange
+    var (user, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    Guid folderId;
+    using (var context = BuildContext(dbName))
+    {
+      var folder = new Folder("test folder", user.Id);
+      context.Folders.Add(folder);
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+      folderId = folder.Id;
+    }
+
+    //Act
+    var response = await _client.GetAsync($"/api/{folderId}/bookmarks/count", TestContext.Current.CancellationToken);
+    response.EnsureSuccessStatusCode();
+
+    //Assert
+    var result = await response.Content.ReadFromJsonAsync<int>(TestContext.Current.CancellationToken);
+
+    result.Should().Be(0);
+  }
+
+  [Fact]
+  public async Task Count_ReturnsTotalNumberOfBookmarksInDatabase_WhenUserHasBookmarks()
+  {
+    //Arrange
+    var (user, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    Guid folderId;
+    using (var context = BuildContext(dbName))
+    {
+      var folder = new Folder("test folder", user.Id);
+      context.Folders.Add(folder);
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+      folderId = folder.Id;
+
+      context.Bookmarks.Add(new Bookmark("https://example1.com", "Example 1", folder.Id, user.Id));
+      context.Bookmarks.Add(new Bookmark("https://example2.com", "Example 2", folder.Id, user.Id));
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+    }
+
+    //Act
+    var response = await _client.GetAsync($"/api/{folderId}/bookmarks/count", TestContext.Current.CancellationToken);
+    response.EnsureSuccessStatusCode();
+
+    //Assert
+    var result = await response.Content.ReadFromJsonAsync<int>(TestContext.Current.CancellationToken);
+
+    result.Should().Be(2);
+  }
+
+  private async Task<(ApplicationUser user, string Token)>
+      CreateAndLoginUserAsync(string email = "fakeUser@test.com", string password = "#fakeUserpassword123")
+  {
+    var scope = _webApplicationFactory.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var passwordHasher = new PasswordHasher<ApplicationUser>();
+
+    var user = new ApplicationUser
+    {
+      Name = "fakeUser",
+      Email = email,
+      UserName = email,
+      NormalizedEmail = email.ToUpper(),
+      NormalizedUserName = email.ToUpper(),
+      SecurityStamp = Guid.NewGuid().ToString()
+    };
+
+    user.PasswordHash = passwordHasher.HashPassword(user, password);
+
+    context.Users.Add(user);
+    await context.SaveChangesAsync();
+
+    var loginDto = new LoginCredentialsDTO { Email = email, Password = password };
+
+    var response = await _client.PostAsJsonAsync("/api/auth/login", loginDto, _jsonSerializerOptions);
+    response.EnsureSuccessStatusCode();
+
+    var loginResult = await response.Content.ReadFromJsonAsync<AuthenticationResponseDTO>();
+
+    return (user, loginResult!.Token);
+  }
+
+  private void SetAuthToken(string token)
+  {
+    _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+  }
+}
