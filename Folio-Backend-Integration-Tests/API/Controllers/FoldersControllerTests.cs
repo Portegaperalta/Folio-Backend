@@ -225,9 +225,6 @@ namespace Folio_Backend_Integration_Tests.API.Controllers
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
-        [Fact]
-
-
         //Helper methods
 
         private async Task<(ApplicationUser user, string Token)> 
