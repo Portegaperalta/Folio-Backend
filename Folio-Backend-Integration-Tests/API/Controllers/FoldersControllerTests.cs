@@ -89,6 +89,22 @@ namespace Folio_Backend_Integration_Tests.API.Controllers
         }
 
         [Fact]
+        public async Task GetById_ReturnsStatusCode404_WhenFolderDoesNotExist()
+        {
+            //Arrange
+            var (user, token) = await CreateAndLoginUserAsync();
+            SetAuthToken(token);
+
+            var folderId = Guid.NewGuid();
+
+            //Act
+            var response = await _client.GetAsync($"{baseUrl}/{folderId}", TestContext.Current.CancellationToken);
+
+            //Assert
+            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        }
+
+        [Fact]
         public async Task Count_ReturnsZero_WhenUserHasNoFolders()
         {
             //Arrange
