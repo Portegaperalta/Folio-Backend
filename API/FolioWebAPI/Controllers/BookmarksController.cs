@@ -18,7 +18,7 @@ namespace FolioWebAPI.Controllers
         private readonly IOutputCacheStore _outputCacheStore;
         private const string cacheKey = "get-bookmark";
 
-        public BookmarksController(IBookmarkService bookmarkService, 
+        public BookmarksController(IBookmarkService bookmarkService,
             ICurrentUserService currentUserService, IOutputCacheStore outputCacheStore)
         {
             _bookmarkService = bookmarkService;
@@ -76,7 +76,7 @@ namespace FolioWebAPI.Controllers
 
         // POST
         [HttpPost]
-        public async Task<ActionResult> 
+        public async Task<ActionResult>
             Create([FromRoute] Guid folderId, [FromBody] BookmarkCreationDTO bookmarkCreationDTO)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -94,14 +94,14 @@ namespace FolioWebAPI.Controllers
                     new { Message = "Something went wrong while creating bookmark" });
             }
 
-            return CreatedAtRoute("GetUserBookmark", 
+            return CreatedAtRoute("GetUserBookmark",
                 new { folderId = folderId, bookmarkId = CreatedBookmarkDTO.Id }, CreatedBookmarkDTO);
         }
 
         // PUT
         [HttpPut("{bookmarkId:guid}")]
         public async Task<ActionResult> Update
-            ([FromRoute] Guid bookmarkId,[FromRoute] Guid folderId, [FromBody] BookmarkUpdateDTO bookmarkUpdateDTO)
+            ([FromRoute] Guid bookmarkId, [FromRoute] Guid folderId, [FromBody] BookmarkUpdateDTO bookmarkUpdateDTO)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
 
