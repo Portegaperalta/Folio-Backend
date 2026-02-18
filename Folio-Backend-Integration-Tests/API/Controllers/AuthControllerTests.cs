@@ -88,7 +88,7 @@ namespace Folio_Backend_Integration_Tests.API.Controllers
         }
 
         [Fact]
-        public async Task Register_PeristsDataInDatabase()
+        public async Task Register_PersistsDataInDatabase()
         {
             //Arrage
             var registrationCredentials = new RegisterCredentialsDTO
