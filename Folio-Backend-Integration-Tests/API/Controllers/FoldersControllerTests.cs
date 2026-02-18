@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Folio.Core.Application.DTOs.Auth;
 using Folio.Core.Application.DTOs.Folder;
 using Folio.Core.Domain.Entities;
@@ -28,7 +28,7 @@ namespace Folio_Backend_Integration_Tests.API.Controllers
         private readonly WebApplicationFactory<Program> _webApplicationFactory;
         private readonly HttpClient _client;
         private readonly ITestOutputHelper _output;
-        
+
         public FoldersControllerTests(ITestOutputHelper output)
         {
             _jsonSerializerOptions = _jsonSerializerOptions = new JsonSerializerOptions
@@ -69,9 +69,9 @@ namespace Folio_Backend_Integration_Tests.API.Controllers
 
             SetAuthToken(token);
 
-            using(var context = BuildContext(dbName))
+            using (var context = BuildContext(dbName))
             {
-                context.Folders.AddRange( new Folder("funny",user.Id), new Folder("movies",user.Id));
+                context.Folders.AddRange(new Folder("funny", user.Id), new Folder("movies", user.Id));
 
                 await context.SaveChangesAsync(TestContext.Current.CancellationToken);
             }
@@ -225,9 +225,67 @@ namespace Folio_Backend_Integration_Tests.API.Controllers
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
+        [Fact]
+        public async Task Update_SuccessfullyUpdatesPersistedData()
+        {
+            //Arrange
+            var (user, token) = await CreateAndLoginUserAsync();
+
+            SetAuthToken(token);
+
+            var folderCreationDTO = new FolderCreationDTO { Name = "original folder" };
+
+            var response = await _client.PostAsJsonAsync(baseUrl, folderCreationDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            var createdFolder = await response.Content.ReadFromJsonAsync<FolderDTO>(TestContext.Current.CancellationToken);
+
+            var folderUpdateDTO = new FolderUpdateDTO { Name = "updated folder", IsMarkedFavorite = true };
+
+            //Act
+            var updateResponse = await _client.PutAsJsonAsync($"{baseUrl}/{createdFolder!.Id}", folderUpdateDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+
+            //Assert
+            updateResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+            using var scope = _webApplicationFactory.Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+            var folderInDb = await dbContext.Folders.Where(f => f.Id == createdFolder.Id).FirstOrDefaultAsync(TestContext.Current.CancellationToken);
+
+            folderInDb.Should().NotBeNull();
+            folderInDb.Name.Should().Be(folderUpdateDTO.Name);
+            folderInDb.IsMarkedFavorite.Should().Be(folderUpdateDTO.IsMarkedFavorite!.Value);
+            folderInDb.UserId.Should().Be(user.Id);
+        }
+
+        [Fact]
+        public async Task Update_ReturnsStatusCode204_WhenUpdateIsSuccessfull()
+        {
+            //Arrange
+            var (user, token) = await CreateAndLoginUserAsync();
+
+            SetAuthToken(token);
+
+            var folderCreationDTO = new FolderCreationDTO { Name = "original folder" };
+
+            var createResponse = await _client.PostAsJsonAsync(baseUrl, folderCreationDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+            createResponse.EnsureSuccessStatusCode();
+
+            var createdFolder = await createResponse.Content.ReadFromJsonAsync<FolderDTO>(TestContext.Current.CancellationToken);
+
+            var folderUpdateDTO = new FolderUpdateDTO { Name = "updated folder", IsMarkedFavorite = true };
+
+            //Act
+            var updateResponse = await _client.PutAsJsonAsync($"{baseUrl}/{createdFolder!.Id}", folderUpdateDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+
+            //Assert
+            updateResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        }
+
         //Helper methods
 
-        private async Task<(ApplicationUser user, string Token)> 
+        private async Task<(ApplicationUser user, string Token)>
             CreateAndLoginUserAsync(string email = "fakeUser@test.com", string password = "#fakeUserpassword123")
         {
             //User creation
