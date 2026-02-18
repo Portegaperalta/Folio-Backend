@@ -124,6 +124,62 @@ public class BookmarksControllerTests : TestsBase
     result.Should().HaveCount(1);
   }
 
+  [Fact]
+  public async Task Count_ReturnsZero_WhenUserHasNoBookmarks()
+  {
+    //Arrange
+    var (user, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    Guid folderId;
+    using (var context = BuildContext(dbName))
+    {
+      var folder = new Folder("test folder", user.Id);
+      context.Folders.Add(folder);
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+      folderId = folder.Id;
+    }
+
+    //Act
+    var response = await _client.GetAsync($"/api/{folderId}/bookmarks/count", TestContext.Current.CancellationToken);
+    response.EnsureSuccessStatusCode();
+
+    //Assert
+    var result = await response.Content.ReadFromJsonAsync<int>(TestContext.Current.CancellationToken);
+
+    result.Should().Be(0);
+  }
+
+  [Fact]
+  public async Task Count_ReturnsTotalNumberOfBookmarksInDatabase_WhenUserHasBookmarks()
+  {
+    //Arrange
+    var (user, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    Guid folderId;
+    using (var context = BuildContext(dbName))
+    {
+      var folder = new Folder("test folder", user.Id);
+      context.Folders.Add(folder);
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+      folderId = folder.Id;
+
+      context.Bookmarks.Add(new Bookmark("https://example1.com", "Example 1", folder.Id, user.Id));
+      context.Bookmarks.Add(new Bookmark("https://example2.com", "Example 2", folder.Id, user.Id));
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+    }
+
+    //Act
+    var response = await _client.GetAsync($"/api/{folderId}/bookmarks/count", TestContext.Current.CancellationToken);
+    response.EnsureSuccessStatusCode();
+
+    //Assert
+    var result = await response.Content.ReadFromJsonAsync<int>(TestContext.Current.CancellationToken);
+
+    result.Should().Be(2);
+  }
+
   private async Task<(ApplicationUser user, string Token)>
       CreateAndLoginUserAsync(string email = "fakeUser@test.com", string password = "#fakeUserpassword123")
   {
