@@ -283,6 +283,56 @@ namespace Folio_Backend_Integration_Tests.API.Controllers
             updateResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
 
+        [Fact]
+        public async Task Delete_ReturnsStatusCode204_WhenDeletionIsSuccessful()
+        {
+            //Arrange
+            var (user, token) = await CreateAndLoginUserAsync();
+
+            SetAuthToken(token);
+
+            var folderCreationDTO = new FolderCreationDTO { Name = "folder to delete" };
+
+            var createResponse = await _client.PostAsJsonAsync(baseUrl, folderCreationDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+            createResponse.EnsureSuccessStatusCode();
+
+            var createdFolder = await createResponse.Content.ReadFromJsonAsync<FolderDTO>(TestContext.Current.CancellationToken);
+
+            //Act
+            var deleteResponse = await _client.DeleteAsync($"{baseUrl}/{createdFolder!.Id}", TestContext.Current.CancellationToken);
+
+            //Assert
+            deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        }
+
+        [Fact]
+        public async Task Delete_RemovesFolderFromPersistenceLayer_WhenDeletionIsSuccessful()
+        {
+            //Arrange
+            var (user, token) = await CreateAndLoginUserAsync();
+
+            SetAuthToken(token);
+
+            var folderCreationDTO = new FolderCreationDTO { Name = "folder to delete" };
+
+            var createResponse = await _client.PostAsJsonAsync(baseUrl, folderCreationDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+            createResponse.EnsureSuccessStatusCode();
+
+            var createdFolder = await createResponse.Content.ReadFromJsonAsync<FolderDTO>(TestContext.Current.CancellationToken);
+
+            //Act
+            var deleteResponse = await _client.DeleteAsync($"{baseUrl}/{createdFolder!.Id}", TestContext.Current.CancellationToken);
+            deleteResponse.EnsureSuccessStatusCode();
+
+            //Assert
+            using var scope = _webApplicationFactory.Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+            var folderInDb = await dbContext.Folders.Where(f => f.Id == createdFolder.Id).FirstOrDefaultAsync(TestContext.Current.CancellationToken);
+
+            folderInDb.Should().BeNull();
+        }
+
         //Helper methods
 
         private async Task<(ApplicationUser user, string Token)>
