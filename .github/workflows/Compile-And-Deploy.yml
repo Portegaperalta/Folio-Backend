@@ -1,0 +1,39 @@
+name: Compile And Deploy
+
+on: 
+  workflow_dispatch: 
+  push: 
+    branches:
+      - main
+      - dev
+    paths:
+      - 'Core/Folio.Core/**'
+      - 'Infrastructure/Folio.Infrastructure/**'
+      - 'API/FolioWebAPI/**'
+      - 'Folio-Backend-Tests/**'
+      - 'Folio-Backend-Integration-Tests/**'
+      - '.github/workflows/Compile-And-Deploy.yml'
+
+env:
+  DOTNET_VERSION: '10'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v5.1.0
+        with:
+          dotnet-version: ${{env.DOTNET_VERSION}}
+          
+      - name: Obtaining Dependencies
+        run: dotnet restore
+
+      - name: Compile
+        run:  dotnet build --no-restore
+
+      - name: Run Tests
+        run:  dotnet test --no-build
