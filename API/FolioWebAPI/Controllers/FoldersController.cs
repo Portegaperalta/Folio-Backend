@@ -2,7 +2,6 @@
 using Folio.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.AspNetCore.RateLimiting;
 
 namespace FolioWebAPI.Controllers
@@ -15,20 +14,15 @@ namespace FolioWebAPI.Controllers
     {
         private readonly IFolderService _folderService;
         private readonly ICurrentUserService _currentUserService;
-        private readonly IOutputCacheStore _outputCacheStore;
-        private const string cacheKey = "get-folder";
 
-        public FoldersController(IFolderService folderService, 
-            ICurrentUserService currentUserService, IOutputCacheStore outputCacheStore)
+        public FoldersController(IFolderService folderService, ICurrentUserService currentUserService)
         {
             _folderService = folderService;
             _currentUserService = currentUserService;
-            _outputCacheStore = outputCacheStore;
         }
 
         //GET
         [HttpGet(Name = "GetAllUserFolders")]
-        [OutputCache(Tags = [cacheKey])]
         public async Task<ActionResult<IEnumerable<FolderDTO>>> GetAll()
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -42,7 +36,6 @@ namespace FolioWebAPI.Controllers
         }
 
         [HttpGet("{folderId:guid}", Name = "GetUserFolder")]
-        [OutputCache(Tags = [cacheKey])]
         public async Task<ActionResult<FolderDTO?>> GetById([FromRoute] Guid folderId)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -59,7 +52,6 @@ namespace FolioWebAPI.Controllers
         }
 
         [HttpGet("count")]
-        [OutputCache(Tags = [cacheKey])]
         public async Task<ActionResult<int>> Count()
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -81,8 +73,6 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            await _outputCacheStore.EvictByTagAsync(cacheKey, default);
-
             var CreatedFolderDTO = await _folderService.CreateFolderAsync(currentUser.Id, folderCreationDTO);
 
             if (CreatedFolderDTO is null)
@@ -102,8 +92,6 @@ namespace FolioWebAPI.Controllers
 
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
-
-            await _outputCacheStore.EvictByTagAsync(cacheKey, default);
 
             await _folderService.UpdateFolderAsync(folderId, currentUser.Id, folderUpdateDTO);
 
@@ -131,8 +119,6 @@ namespace FolioWebAPI.Controllers
 
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
-
-            await _outputCacheStore.EvictByTagAsync(cacheKey, default);
 
             var isDeleted = await _folderService.DeleteFolderAsync(currentUser.Id, folderId);
 

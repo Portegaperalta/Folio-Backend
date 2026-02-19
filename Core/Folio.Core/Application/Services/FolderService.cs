@@ -9,24 +9,45 @@ namespace Folio.Core.Application.Services
     {
         private readonly IFolderRepository _folderRepository;
         private readonly FolderMapper _folderMapper;
+        private readonly ICacheService _cacheService;
 
-        public FolderService(IFolderRepository folderRepository, FolderMapper folderMapper)
+        public FolderService(IFolderRepository folderRepository, FolderMapper folderMapper, ICacheService cacheService)
         {
             _folderRepository = folderRepository;
             _folderMapper = folderMapper;
+            _cacheService = cacheService;
         }
 
         public async Task<IEnumerable<FolderDTO>> GetAllFoldersDTOsAsync(Guid userId)
         {
+            var versionKey = $"folio:folders:{userId}:v";
+            var version = await _cacheService.GetAsync<long?>(versionKey) ?? 1;
+            var cacheKey = $"folio:folders:{userId}:all:v{version}";
+
+            var cached = await _cacheService.GetAsync<List<FolderDTO>>(cacheKey);
+
+            if (cached is not null)
+                return cached;
+
             var folders = await _folderRepository.GetAllAsync(userId);
 
             var foldersDTOs = folders.Select(f => _folderMapper.ToDto(f));
+
+            await _cacheService.SetAsync(cacheKey, foldersDTOs, TimeSpan.FromMinutes(5));
 
             return foldersDTOs;
         }
 
         public async Task<FolderDTO?> GetFolderDTOByIdAsync(Guid userId, Guid folderId)
         {
+            var versionKey = $"folio:folders:{userId}:v";
+            var version = await _cacheService.GetAsync<long?>(versionKey) ?? 1;
+
+            var cacheKey = $"folio:folders:{userId}:byid:{folderId}:v{version}";
+            var cached = await _cacheService.GetAsync<FolderDTO>(cacheKey);
+            if (cached is not null)
+                return cached;
+
             var folder = await _folderRepository.GetByIdAsync(userId, folderId);
 
             if (folder is null)
@@ -34,11 +55,15 @@ namespace Folio.Core.Application.Services
 
             var folderDTO = _folderMapper.ToDto(folder);
 
+            await _cacheService.SetAsync(cacheKey, folderDTO, TimeSpan.FromMinutes(5));
+
             return folderDTO;
         }
 
         public async Task<int> CountFoldersAsync(Guid userId)
         {
+            await _cacheService.IncrementAsync($"folio:folders:{userId}:v");
+
             return await _folderRepository.CountByUserAsync(userId);
         }
 
@@ -49,6 +74,8 @@ namespace Folio.Core.Application.Services
             var folderEntity = _folderMapper.ToEntity(userId, folderCreationDTO);
 
             await _folderRepository.AddAsync(folderEntity);
+
+            await _cacheService.IncrementAsync($"folio:folders:{userId}:v");
 
             var folderDTO = _folderMapper.ToDto(folderEntity);
 
@@ -80,6 +107,8 @@ namespace Folio.Core.Application.Services
                 }
             }
 
+            await _cacheService.IncrementAsync($"folio:folders:{userId}:v");
+
             await _folderRepository.UpdateAsync(folderEntity);
         }
 
@@ -92,6 +121,8 @@ namespace Folio.Core.Application.Services
 
             folder.Visit();
 
+            await _cacheService.IncrementAsync($"folio:folders:{userId}:v");
+
             await _folderRepository.UpdateAsync(folder);
         }
 
@@ -102,7 +133,9 @@ namespace Folio.Core.Application.Services
             if (folderEntity is null)
             {
                 return false;
-            }    
+            }
+
+            await _cacheService.IncrementAsync($"folio:folders:{userId}:v");
 
             await _folderRepository.DeleteAsync(folderEntity);
 
