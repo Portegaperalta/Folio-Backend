@@ -11,6 +11,7 @@ using Folio.Infrastructure.Persistence;
 using Folio_Backend_Integration_Tests.Utils;
 using FolioWebAPI;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +24,7 @@ public class BookmarksControllerTests : TestsBase
   // Bookmark Controller uses nested route:
   // /api/{folderId}/bookmarks
 
-  private readonly string baseUrl = "/api/{folderId}/bookmarks";
+  private readonly string baseUrl = "/api";
 
   private readonly string dbName = Guid.NewGuid().ToString();
   private readonly JsonSerializerOptions _jsonSerializerOptions;
@@ -125,6 +126,32 @@ public class BookmarksControllerTests : TestsBase
   }
 
   [Fact]
+  public async Task GetById_ReturnsStatusCode404_WhenBookmarkDoesNotExist()
+  {
+    //Arrange
+    var (user, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    Guid folderId;
+    using (var context = BuildContext(dbName))
+    {
+      var folder = new Folder("test folder", user.Id);
+      context.Folders.Add(folder);
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+      folderId = folder.Id;
+
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+    }
+
+    //Act
+    Guid nonExistentBookmarkId = new();
+    var response = await _client.GetAsync($"/api/{folderId}/bookmarks/{nonExistentBookmarkId}", TestContext.Current.CancellationToken);
+
+    //Assert
+    response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+  }
+
+  [Fact]
   public async Task Count_ReturnsZero_WhenUserHasNoBookmarks()
   {
     //Arrange
@@ -178,6 +205,312 @@ public class BookmarksControllerTests : TestsBase
     var result = await response.Content.ReadFromJsonAsync<int>(TestContext.Current.CancellationToken);
 
     result.Should().Be(2);
+  }
+
+  [Fact]
+  public async Task Create_ReturnsStatusCode400_WhenBookmarkCreationFieldsAreInvalid()
+  {
+    //Arrange
+    var (user, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    Guid folderId;
+    using (var context = BuildContext(dbName))
+    {
+      var folder = new Folder("test folder", user.Id);
+      context.Folders.Add(folder);
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+      folderId = folder.Id;
+
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+    }
+
+    var bookmarkCreationDTO = new BookmarkCreationDTO
+    {
+      Name = "",
+      Url = "invalidUrl.com"
+    };
+
+    //Act
+    var response = await _client.PostAsJsonAsync($"{baseUrl}/{folderId}/bookmarks", bookmarkCreationDTO, TestContext.Current.CancellationToken);
+
+    //Assert
+    response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+  }
+
+  [Fact]
+  public async Task Create_ReturnValidationErrors_WhenBookmarkCreationFieldsAreInvalid()
+  {
+    //Arrange
+    var (user, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    Guid folderId;
+    using (var context = BuildContext(dbName))
+    {
+      var folder = new Folder("test folder", user.Id);
+      context.Folders.Add(folder);
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+      folderId = folder.Id;
+    }
+
+    var bookmarkCreationDTO = new BookmarkCreationDTO
+    {
+      Name = "",
+      Url = "invalidUrl.com"
+    };
+
+    string[] expectedErrorMessages =
+    [
+      "The field Name is required",
+      "The field Url must be a valid Url"
+    ];
+
+    //Act
+    var response = await _client.PostAsJsonAsync($"{baseUrl}/{folderId}/bookmarks", bookmarkCreationDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+
+    //Assert
+    var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestContext.Current.CancellationToken);
+    var errorMessages = problemDetails!.Errors.Values.SelectMany(x => x).ToList();
+
+    errorMessages.Should().BeEquivalentTo(expectedErrorMessages);
+  }
+
+  [Fact]
+  public async Task Create_PersistsDataInDatabase()
+  {
+    //Arrange
+    var (user, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    Guid folderId;
+    using (var context = BuildContext(dbName))
+    {
+      var folder = new Folder("test folder", user.Id);
+      context.Folders.Add(folder);
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+      folderId = folder.Id;
+    }
+
+    var bookmarkCreationDTO = new BookmarkCreationDTO
+    {
+      Name = "Example bookmark",
+      Url = "https://example.com"
+    };
+
+    //Act
+    var response = await _client.PostAsJsonAsync($"{baseUrl}/{folderId}/bookmarks", bookmarkCreationDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+    response.EnsureSuccessStatusCode();
+
+    //Assert
+    using var scope = _webApplicationFactory.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+    var bookmarkInDb = await dbContext.Bookmarks
+      .Where(b => b.UserId == user.Id && b.FolderId == folderId)
+      .FirstOrDefaultAsync(TestContext.Current.CancellationToken);
+
+    bookmarkInDb.Should().NotBeNull();
+    bookmarkInDb!.Name.Should().Be(bookmarkCreationDTO.Name);
+    bookmarkInDb.Url.Should().Be(bookmarkCreationDTO.Url);
+  }
+
+  [Fact]
+  public async Task Create_ReturnsStatusCode201_WhenBookmarkIsCreated()
+  {
+    //Arrange
+    var (user, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    Guid folderId;
+    using (var context = BuildContext(dbName))
+    {
+      var folder = new Folder("test folder", user.Id);
+      context.Folders.Add(folder);
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+      folderId = folder.Id;
+    }
+
+    var bookmarkCreationDTO = new BookmarkCreationDTO
+    {
+      Name = "Example bookmark",
+      Url = "https://example.com"
+    };
+
+    //Act
+    var response = await _client.PostAsJsonAsync($"{baseUrl}/{folderId}/bookmarks", bookmarkCreationDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+
+    //Assert
+    response.StatusCode.Should().Be(HttpStatusCode.Created);
+  }
+
+  [Fact]
+  public async Task Update_ReturnsStatusCode204_WhenUpdateIsSuccessful()
+  {
+    //Arrange
+    var (user, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    Guid folderId;
+    using (var context = BuildContext(dbName))
+    {
+      var folder = new Folder("test folder", user.Id);
+      context.Folders.Add(folder);
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+      folderId = folder.Id;
+    }
+
+    var bookmarkCreationDTO = new BookmarkCreationDTO
+    {
+      Name = "Original bookmark",
+      Url = "https://example.com"
+    };
+
+    var createResponse = await _client.PostAsJsonAsync($"{baseUrl}/{folderId}/bookmarks", bookmarkCreationDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+    createResponse.EnsureSuccessStatusCode();
+    var createdBookmark = await createResponse.Content.ReadFromJsonAsync<BookmarkDTO>(TestContext.Current.CancellationToken);
+
+    var bookmarkUpdateDTO = new BookmarkUpdateDTO
+    {
+      Id = createdBookmark!.Id,
+      Name = "Updated bookmark",
+      Url = "https://updated-example.com",
+      IsMarkedFavorite = true
+    };
+
+    //Act
+    var updateResponse = await _client.PutAsJsonAsync($"{baseUrl}/{folderId}/bookmarks/{createdBookmark.Id}", bookmarkUpdateDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+
+    //Assert
+    updateResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+  }
+
+  [Fact]
+  public async Task Update_PersistsModifiedDataInDatabase()
+  {
+    //Arrange
+    var (user, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    Guid folderId;
+    using (var context = BuildContext(dbName))
+    {
+      var folder = new Folder("test folder", user.Id);
+      context.Folders.Add(folder);
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+      folderId = folder.Id;
+    }
+
+    var bookmarkCreationDTO = new BookmarkCreationDTO
+    {
+      Name = "Original bookmark",
+      Url = "https://example.com"
+    };
+
+    var createResponse = await _client.PostAsJsonAsync($"{baseUrl}/{folderId}/bookmarks", bookmarkCreationDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+    createResponse.EnsureSuccessStatusCode();
+    var createdBookmark = await createResponse.Content.ReadFromJsonAsync<BookmarkDTO>(TestContext.Current.CancellationToken);
+
+    var bookmarkUpdateDTO = new BookmarkUpdateDTO
+    {
+      Id = createdBookmark!.Id,
+      Name = "Updated bookmark",
+      Url = "https://updated-example.com",
+      IsMarkedFavorite = true
+    };
+
+    //Act
+    var updateResponse = await _client.PutAsJsonAsync($"{baseUrl}/{folderId}/bookmarks/{createdBookmark.Id}", bookmarkUpdateDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+    updateResponse.EnsureSuccessStatusCode();
+
+    //Assert
+    using var scope = _webApplicationFactory.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+    var bookmarkInDb = await dbContext.Bookmarks
+      .Where(b => b.Id == createdBookmark.Id)
+      .FirstOrDefaultAsync(TestContext.Current.CancellationToken);
+
+    bookmarkInDb.Should().NotBeNull();
+    bookmarkInDb!.Name.Should().Be(bookmarkUpdateDTO.Name);
+    bookmarkInDb.Url.Should().Be(bookmarkUpdateDTO.Url);
+    bookmarkInDb.IsMarkedFavorite.Should().Be(bookmarkUpdateDTO.IsMarkedFavorite!.Value);
+    bookmarkInDb.UserId.Should().Be(user.Id);
+    bookmarkInDb.FolderId.Should().Be(folderId);
+  }
+
+  [Fact]
+  public async Task Delete_RemovesBookmarkFromPersistenceLayer_WhenDeletionIsSuccessful()
+  {
+    //Arrange
+    var (user, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    Guid folderId;
+    using (var context = BuildContext(dbName))
+    {
+      var folder = new Folder("test folder", user.Id);
+      context.Folders.Add(folder);
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+      folderId = folder.Id;
+    }
+
+    var bookmarkCreationDTO = new BookmarkCreationDTO
+    {
+      Name = "Bookmark to delete",
+      Url = "https://example.com"
+    };
+
+    var createResponse = await _client.PostAsJsonAsync($"{baseUrl}/{folderId}/bookmarks", bookmarkCreationDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+    createResponse.EnsureSuccessStatusCode();
+    var createdBookmark = await createResponse.Content.ReadFromJsonAsync<BookmarkDTO>(TestContext.Current.CancellationToken);
+
+    //Act
+    var deleteResponse = await _client.DeleteAsync($"{baseUrl}/{folderId}/bookmarks/{createdBookmark!.Id}", TestContext.Current.CancellationToken);
+    deleteResponse.EnsureSuccessStatusCode();
+
+    //Assert
+    using var scope = _webApplicationFactory.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+    var bookmarkInDb = await dbContext.Bookmarks
+      .Where(b => b.Id == createdBookmark.Id)
+      .FirstOrDefaultAsync(TestContext.Current.CancellationToken);
+
+    bookmarkInDb.Should().BeNull();
+  }
+
+  [Fact]
+  public async Task Delete_ReturnsStatusCode204_WhenDeletionIsSuccessful()
+  {
+    //Arrange
+    var (user, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    Guid folderId;
+    using (var context = BuildContext(dbName))
+    {
+      var folder = new Folder("test folder", user.Id);
+      context.Folders.Add(folder);
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+      folderId = folder.Id;
+    }
+
+    var bookmarkCreationDTO = new BookmarkCreationDTO
+    {
+      Name = "Bookmark to delete",
+      Url = "https://example.com"
+    };
+
+    var createResponse = await _client.PostAsJsonAsync($"{baseUrl}/{folderId}/bookmarks", bookmarkCreationDTO, _jsonSerializerOptions, TestContext.Current.CancellationToken);
+    createResponse.EnsureSuccessStatusCode();
+    var createdBookmark = await createResponse.Content.ReadFromJsonAsync<BookmarkDTO>(TestContext.Current.CancellationToken);
+
+    //Act
+    var deleteResponse = await _client.DeleteAsync($"{baseUrl}/{folderId}/bookmarks/{createdBookmark!.Id}", TestContext.Current.CancellationToken);
+
+    //Assert
+    deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
   }
 
   private async Task<(ApplicationUser user, string Token)>
