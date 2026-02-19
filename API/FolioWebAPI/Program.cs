@@ -13,6 +13,8 @@ using Folio.Infrastructure.Repositories;
 using FolioWebAPI.Middlewares;
 using Folio.Core.Application.Mappers;
 using System.Threading.RateLimiting;
+using StackExchange.Redis;
+using Folio.Infrastructure.Caching;
 
 namespace FolioWebAPI
 {
@@ -84,6 +86,10 @@ namespace FolioWebAPI
             builder.Services.AddControllers().AddNewtonsoftJson();
 
             // services, repositories and mapper services
+            builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
+                ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("redis")!));
+
+            builder.Services.AddScoped<ICacheService, RedisCacheService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
             builder.Services.AddScoped<FolderMapper>();
