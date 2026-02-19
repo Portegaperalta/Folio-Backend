@@ -21,7 +21,7 @@ Folio-Backend/
 │   ├── Migrations/           # EF Core Migrations
 │   └── Persistence/          # DB Context
 │   └── Repositories/         # Concrete Implementation of repositories
-└── Folio-Backend-Integration-Tests/   # End-to-end testing of API endpoints and DB persistence.
+└── Folio-Backend-Integration-Tests/   # End-to-end testing of API, Services and DB persistence.
 └── Folio-Backend-Unit-Tests/          # Isolated logic testing for Domain and Application layers.
 ```
 
