@@ -126,6 +126,32 @@ public class BookmarksControllerTests : TestsBase
   }
 
   [Fact]
+  public async Task GetById_ReturnsStatusCode404_WhenBookmarkDoesNotExist()
+  {
+    //Arrange
+    var (user, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    Guid folderId;
+    using (var context = BuildContext(dbName))
+    {
+      var folder = new Folder("test folder", user.Id);
+      context.Folders.Add(folder);
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+      folderId = folder.Id;
+
+      await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+    }
+
+    //Act
+    Guid nonExistentBookmarkId = new();
+    var response = await _client.GetAsync($"/api/{folderId}/bookmarks/{nonExistentBookmarkId}", TestContext.Current.CancellationToken);
+
+    //Assert
+    response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+  }
+
+  [Fact]
   public async Task Count_ReturnsZero_WhenUserHasNoBookmarks()
   {
     //Arrange
