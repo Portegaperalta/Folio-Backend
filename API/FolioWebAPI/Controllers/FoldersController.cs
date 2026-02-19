@@ -18,7 +18,7 @@ namespace FolioWebAPI.Controllers
         private readonly IOutputCacheStore _outputCacheStore;
         private const string cacheKey = "get-folder";
 
-        public FoldersController(IFolderService folderService, 
+        public FoldersController(IFolderService folderService,
             ICurrentUserService currentUserService, IOutputCacheStore outputCacheStore)
         {
             _folderService = folderService;
@@ -87,11 +87,11 @@ namespace FolioWebAPI.Controllers
 
             if (CreatedFolderDTO is null)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, 
-                    new { Message = "Something went wrong while creating folder"} );
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { Message = "Something went wrong while creating folder" });
             }
 
-            return CreatedAtRoute("GetUserFolder", new {folderId = CreatedFolderDTO.Id }, CreatedFolderDTO);
+            return CreatedAtRoute("GetUserFolder", new { folderId = CreatedFolderDTO.Id }, CreatedFolderDTO);
         }
 
         // PUT
