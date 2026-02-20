@@ -65,7 +65,7 @@ namespace Folio.Core.Application.Services
         {
             var versionKey = $"folio:folders:{userId}:v";
             var version = await _cacheService.GetAsync<long?>(versionKey) ?? 1;
-            var cacheKey = $"folio:folders:{userId}:all:v{version}";
+            var cacheKey = $"folio:folders:{userId}:count:v{version}";
 
             var cached = await _cacheService.GetAsync<int?>(cacheKey);
 
