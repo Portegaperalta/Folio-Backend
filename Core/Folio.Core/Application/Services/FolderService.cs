@@ -113,7 +113,8 @@ namespace Folio.Core.Application.Services
                 if (folderUpdateDTO.IsMarkedFavorite is true)
                 {
                     folderEntity.MarkFavorite();
-                } else
+                }
+                else
                 {
                     folderEntity.UnmarkFavorite();
                 }
