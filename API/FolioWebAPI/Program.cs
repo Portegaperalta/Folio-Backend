@@ -94,8 +94,8 @@ namespace FolioWebAPI
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
             builder.Services.AddScoped<FolderMapper>();
             builder.Services.AddScoped<BookmarkMapper>();
-            builder.Services.AddScoped<IFolderService,FolderService>();
-            builder.Services.AddScoped<IBookmarkService,BookmarkService>();
+            builder.Services.AddScoped<IFolderService, FolderService>();
+            builder.Services.AddScoped<IBookmarkService, BookmarkService>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IFolderRepository, FolderRepository>();
             builder.Services.AddScoped<IBookmarkRepository, BookmarkRepository>();
@@ -127,9 +127,9 @@ namespace FolioWebAPI
                     ValidateAudience = false,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = 
+                    IssuerSigningKey =
                      new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["jwtKey"]!)),
-                     ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.Zero
                 };
             });
 

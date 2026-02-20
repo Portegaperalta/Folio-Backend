@@ -77,11 +77,11 @@ namespace FolioWebAPI.Controllers
 
             if (CreatedFolderDTO is null)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, 
-                    new { Message = "Something went wrong while creating folder"} );
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { Message = "Something went wrong while creating folder" });
             }
 
-            return CreatedAtRoute("GetUserFolder", new {folderId = CreatedFolderDTO.Id }, CreatedFolderDTO);
+            return CreatedAtRoute("GetUserFolder", new { folderId = CreatedFolderDTO.Id }, CreatedFolderDTO);
         }
 
         // PUT

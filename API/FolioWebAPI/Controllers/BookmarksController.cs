@@ -126,6 +126,8 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
+            await _outputCacheStore.EvictByTagAsync(cacheKey, default);
+
             await _bookmarkService.MarkBookmarkAsVisitedAsync(currentUser.Id, folderId, bookmarkId);
 
             return NoContent();
