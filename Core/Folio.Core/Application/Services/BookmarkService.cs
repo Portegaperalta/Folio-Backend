@@ -106,6 +106,7 @@ namespace Folio.Core.Application.Services
             var bookmarkEntity = _bookmarkMapper.ToEntity(userId, folderId, bookmarkCreationDTO);
 
             await _bookmarkRepository.AddAsync(bookmarkEntity);
+
             await _cacheService.IncrementAsync($"folio:bookmarks:{userId}:v");
 
             var bookmarkDTO = _bookmarkMapper.ToDto(bookmarkEntity);
@@ -144,9 +145,9 @@ namespace Folio.Core.Application.Services
                 }
             }
 
-            await _cacheService.IncrementAsync($"folio:bookmarks:{userId}:v");
-
             await _bookmarkRepository.UpdateAsync(bookmarkEntity);
+
+            await _cacheService.IncrementAsync($"folio:bookmarks:{userId}:v");
         }
 
         public async Task<bool> DeleteBookmarkAsync(Guid userId, Guid folderId, Guid bookmarkId)
@@ -158,9 +159,9 @@ namespace Folio.Core.Application.Services
                 return false;
             }
 
-            await _cacheService.IncrementAsync($"folio:bookmarks:{userId}:v");
-
             await _bookmarkRepository.DeleteAsync(bookmarkEntity);
+
+            await _cacheService.IncrementAsync($"folio:bookmarks:{userId}:v");
 
             return true;
         }
@@ -177,9 +178,9 @@ namespace Folio.Core.Application.Services
 
             bookmark.Visit();
 
-            await _cacheService.IncrementAsync($"folio:bookmarks:{userId}:v");
-
             await _bookmarkRepository.UpdateAsync(bookmark);
+
+            await _cacheService.IncrementAsync($"folio:bookmarks:{userId}:v");
         }
     }
 }

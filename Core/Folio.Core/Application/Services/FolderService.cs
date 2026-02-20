@@ -120,9 +120,9 @@ namespace Folio.Core.Application.Services
                 }
             }
 
-            await _cacheService.IncrementAsync($"folio:folders:{userId}:v");
-
             await _folderRepository.UpdateAsync(folderEntity);
+
+            await _cacheService.IncrementAsync($"folio:folders:{userId}:v");
         }
 
         public async Task MarkFolderAsVisitedAsync(Guid userId, Guid folderId)
@@ -134,9 +134,9 @@ namespace Folio.Core.Application.Services
 
             folder.Visit();
 
-            await _cacheService.IncrementAsync($"folio:folders:{userId}:v");
-
             await _folderRepository.UpdateAsync(folder);
+
+            await _cacheService.IncrementAsync($"folio:folders:{userId}:v");
         }
 
         public async Task<bool> DeleteFolderAsync(Guid userId, Guid folderId)
@@ -148,9 +148,9 @@ namespace Folio.Core.Application.Services
                 return false;
             }
 
-            await _cacheService.IncrementAsync($"folio:folders:{userId}:v");
-
             await _folderRepository.DeleteAsync(folderEntity);
+
+            await _cacheService.IncrementAsync($"folio:folders:{userId}:v");
 
             return true;
         }
