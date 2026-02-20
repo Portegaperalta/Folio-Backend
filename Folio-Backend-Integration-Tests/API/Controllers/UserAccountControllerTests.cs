@@ -124,6 +124,44 @@ public class UserAccountControllerTests : TestsBase
     //Assert
     response.StatusCode.Should().Be(HttpStatusCode.NoContent);
   }
+
+  [Fact]
+  public async Task Delete_ReturnsStatusCode204()
+  {
+    // Arrange
+    var (_, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    // Act
+    var response = await _client.DeleteAsync(deleteAccountUrl, TestContext.Current.CancellationToken);
+
+    // Assert
+    response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+  }
+
+  [Fact]
+  public async Task Delete_RemovesUserFromDatabase()
+  {
+    // Arrange
+    var (user, token) = await CreateAndLoginUserAsync();
+    SetAuthToken(token);
+
+    using var scope = _webApplicationFactory.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var userInDb = await dbContext.Users.FirstAsync(u => u.Id == user.Id, TestContext.Current.CancellationToken);
+
+    // Act
+    var response = await _client.DeleteAsync(deleteAccountUrl, TestContext.Current.CancellationToken);
+    response.EnsureSuccessStatusCode();
+
+    // Assert
+    using var afterDeleteScope = _webApplicationFactory.Services.CreateScope();
+    using var afterDeleteDbContext = afterDeleteScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var deletedUserInDb = await afterDeleteDbContext.Users.FirstOrDefaultAsync(u => u.Id == user.Id, TestContext.Current.CancellationToken);
+
+    deletedUserInDb.Should().BeNull();
+  }
+
   //Helper methods
 
   private async Task<(ApplicationUser user, string Token)>

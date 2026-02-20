@@ -35,9 +35,12 @@ namespace Folio.Infrastructure.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task DeleteUserAsync(User userEntity)
+        public async Task DeleteUserAsync(Guid userId)
         {
-            var applicationUser = UserMapper.ToApplicationUser(userEntity);
+            var applicationUser = await _dbContext.Users.FindAsync(userId);
+
+            if (applicationUser is null)
+                return;
 
             _dbContext.Users.Remove(applicationUser);
             await _dbContext.SaveChangesAsync();

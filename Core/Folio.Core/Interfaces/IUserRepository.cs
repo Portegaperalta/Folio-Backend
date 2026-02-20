@@ -6,6 +6,6 @@ namespace Folio.Core.Interfaces
     {
         Task<User?> GetUserByIdAsync(Guid userId);
         Task UpdateUserAsync(User userEntity);
-        Task DeleteUserAsync(User userEntity);
+        Task DeleteUserAsync(Guid userId);
     }
 }

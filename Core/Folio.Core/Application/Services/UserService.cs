@@ -60,7 +60,7 @@ namespace Folio.Core.Application.Services
             if (userEntity is null)
                 throw new UserNotFoundException(userId);
 
-            await _userRepository.DeleteUserAsync(userEntity);
+            await _userRepository.DeleteUserAsync(userId);
         }
     }
 }
