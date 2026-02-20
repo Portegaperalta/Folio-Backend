@@ -13,6 +13,24 @@ namespace Folio.Core.Application.Services
             _userRepository = userRepository;
         }
 
+        public async Task<UserProfileDetailsDTO> GetUserProfileDetails(Guid userId)
+        {
+            var userEntity = await _userRepository.GetUserByIdAsync(userId);
+
+            if (userEntity is null)
+                throw new UserNotFoundException(userId);
+
+            var userProfileDetails = new UserProfileDetailsDTO
+            {
+                Name = userEntity.Name,
+                Email = userEntity.Email,
+                PhoneNumber = userEntity.PhoneNumber!,
+                CreationDate = userEntity.CreationDate,
+            };
+
+            return userProfileDetails;
+        }
+
         public async Task UpdateUserAsync(Guid userId, UserUpdateDTO userUpdateDTO)
         {
             var userEntity = await _userRepository.GetUserByIdAsync(userId);
