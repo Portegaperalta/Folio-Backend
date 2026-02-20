@@ -22,6 +22,19 @@ namespace FolioWebAPI.Controllers
             _currentUserService = currentUserService;
         }
 
+        [HttpGet("profile/details")]
+        public async Task<ActionResult<UserProfileDetailsDTO>> GetProfileDetails()
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+
+            if (currentUser is null)
+                return Unauthorized("Authorization Failed");
+
+            var userProfileDetails = await _userService.GetUserProfileDetails(currentUser.Id);
+
+            return userProfileDetails;
+        }
+
         [HttpPut("update")]
         public async Task<ActionResult> Update([FromBody] UserUpdateDTO userUpdateDTO)
         {
