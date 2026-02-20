@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace FolioWebAPI.Controllers
 {
-    [Route("api/users")]
+    [Route("api/account")]
     [ApiController]
     [Authorize]
     [EnableRateLimiting("Authenticated")]
@@ -22,7 +22,7 @@ namespace FolioWebAPI.Controllers
             _currentUserService = currentUserService;
         }
 
-        [HttpGet("profile/details")]
+        [HttpGet("profile")]
         public async Task<ActionResult<UserProfileDetailsDTO>> GetProfileDetails()
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
@@ -35,7 +35,7 @@ namespace FolioWebAPI.Controllers
             return userProfileDetails;
         }
 
-        [HttpPut("update")]
+        [HttpPut("profile")]
         public async Task<ActionResult> Update([FromBody] UserUpdateDTO userUpdateDTO)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
