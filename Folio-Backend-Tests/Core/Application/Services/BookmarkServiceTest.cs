@@ -14,13 +14,15 @@ namespace Folio_Backend_Tests.Core.Application.Services
     {
         private readonly BookmarkMapper _bookmarkMapper;
         private readonly IBookmarkRepository _mockBookmarkRepository;
+        private readonly ICacheService _mockCacheService;
         private readonly BookmarkService _bookmarkService;
 
         public BookmarkServiceTest()
         {
             _bookmarkMapper = new BookmarkMapper();
             _mockBookmarkRepository = Substitute.For<IBookmarkRepository>();
-            _bookmarkService = new BookmarkService(_mockBookmarkRepository, _bookmarkMapper);
+            _mockCacheService = Substitute.For<ICacheService>();
+            _bookmarkService = new BookmarkService(_mockBookmarkRepository, _bookmarkMapper, _mockCacheService);
         }
 
         // GetAllUserBookmarksAsync tests

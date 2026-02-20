@@ -14,14 +14,16 @@ namespace Folio_Backend_Tests.Core.Application.Services
     public class FolderServiceTests
     {
         private readonly IFolderRepository _mockfolderRepository;
+        private readonly ICacheService _mockCacheService;
         private FolderMapper _folderMapper;
         private FolderService _folderService;
 
         public FolderServiceTests()
         {
             _mockfolderRepository = Substitute.For<IFolderRepository>();
+            _mockCacheService = Substitute.For<ICacheService>();
             _folderMapper = new FolderMapper();
-            _folderService = new FolderService(_mockfolderRepository, _folderMapper);
+            _folderService = new FolderService(_mockfolderRepository, _folderMapper, _mockCacheService);
         }
 
         // GetAllFoldersAsync tests
