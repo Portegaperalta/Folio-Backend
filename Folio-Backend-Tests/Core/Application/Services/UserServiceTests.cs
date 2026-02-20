@@ -126,7 +126,7 @@ namespace Folio_Backend_Tests.Core.Application.Services
             await _userService.DeleteUserAsync(userId);
 
             //Assert
-            await _mockUserRepository.Received(1).DeleteUserAsync(Arg.Any<User>());
+            await _mockUserRepository.Received(1).DeleteUserAsync(userId);
         }
 
         private Guid CreateUserId() => new();
@@ -155,10 +155,10 @@ namespace Folio_Backend_Tests.Core.Application.Services
         {
             return new UserUpdateDTO
             {
-              UserId = userId,
-              Name = newName,
-              Email = newEmail,
-              PhoneNumber = newPhoneNumber
+                UserId = userId,
+                Name = newName,
+                Email = newEmail,
+                PhoneNumber = newPhoneNumber
             };
         }
     }
