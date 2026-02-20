@@ -1,6 +1,5 @@
 ﻿using Folio.Core.Application.DTOs.User;
 using Folio.Core.Interfaces;
-using FolioWebAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -11,12 +10,12 @@ namespace FolioWebAPI.Controllers
     [ApiController]
     [Authorize]
     [EnableRateLimiting("Authenticated")]
-    public class UsersController : ControllerBase
+    public class UserAccountController : ControllerBase
     {
         private readonly IUserService _userService;
         private readonly ICurrentUserService _currentUserService;
 
-        public UsersController(IUserService userService, ICurrentUserService currentUserService)
+        public UserAccountController(IUserService userService, ICurrentUserService currentUserService)
         {
             _userService = userService;
             _currentUserService = currentUserService;
