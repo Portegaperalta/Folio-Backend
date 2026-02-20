@@ -1,4 +1,5 @@
 ﻿using Folio.Core.Application.DTOs.Bookmark;
+using Folio.Core.Application.DTOs.Pagination;
 using Folio.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,8 @@ namespace FolioWebAPI.Controllers
         // GET
         [HttpGet]
         [HttpGet("~/api/bookmarks")]
-        public async Task<ActionResult<IEnumerable<BookmarkDTO>>> GetAll([FromRoute] Guid? folderId)
+        public async Task<ActionResult<IEnumerable<BookmarkDTO>>>
+        GetAll([FromRoute] Guid? folderId, [FromQuery] PaginationDTO paginationDTO)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
 
