@@ -10,6 +10,7 @@ namespace Folio.Core.Application.Services
         private readonly IFolderRepository _folderRepository;
         private readonly FolderMapper _folderMapper;
         private readonly ICacheService _cacheService;
+        private readonly TimeSpan cacheDuration = TimeSpan.FromMinutes(5);
 
         public FolderService(IFolderRepository folderRepository, FolderMapper folderMapper, ICacheService cacheService)
         {
@@ -33,7 +34,7 @@ namespace Folio.Core.Application.Services
 
             var foldersDTOs = folders.Select(f => _folderMapper.ToDto(f));
 
-            await _cacheService.SetAsync(cacheKey, foldersDTOs, TimeSpan.FromMinutes(5));
+            await _cacheService.SetAsync(cacheKey, foldersDTOs, cacheDuration);
 
             return foldersDTOs;
         }
@@ -55,7 +56,7 @@ namespace Folio.Core.Application.Services
 
             var folderDTO = _folderMapper.ToDto(folder);
 
-            await _cacheService.SetAsync(cacheKey, folderDTO, TimeSpan.FromMinutes(5));
+            await _cacheService.SetAsync(cacheKey, folderDTO, cacheDuration);
 
             return folderDTO;
         }
@@ -73,7 +74,7 @@ namespace Folio.Core.Application.Services
 
             var folderCount = await _folderRepository.CountByUserAsync(userId);
 
-            await _cacheService.SetAsync(cacheKey, folderCount, TimeSpan.FromMinutes(5));
+            await _cacheService.SetAsync(cacheKey, folderCount, cacheDuration);
 
             return folderCount;
         }
