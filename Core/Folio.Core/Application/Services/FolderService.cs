@@ -62,9 +62,20 @@ namespace Folio.Core.Application.Services
 
         public async Task<int> CountFoldersAsync(Guid userId)
         {
-            await _cacheService.IncrementAsync($"folio:folders:{userId}:v");
+            var versionKey = $"folio:folders:{userId}:v";
+            var version = await _cacheService.GetAsync<long?>(versionKey) ?? 1;
+            var cacheKey = $"folio:folders:{userId}:all:v{version}";
 
-            return await _folderRepository.CountByUserAsync(userId);
+            var cached = await _cacheService.GetAsync<int?>(cacheKey);
+
+            if (cached.HasValue)
+                return cached.Value;
+
+            var folderCount = await _folderRepository.CountByUserAsync(userId);
+
+            await _cacheService.SetAsync(cacheKey, folderCount, TimeSpan.FromMinutes(5));
+
+            return folderCount;
         }
 
         public async Task<FolderDTO> CreateFolderAsync(Guid userId, FolderCreationDTO folderCreationDTO)
