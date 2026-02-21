@@ -17,9 +17,14 @@ namespace Folio.Infrastructure.Repositories
 
         public async Task<IEnumerable<Folder>> GetAllAsync(Guid userId, PaginationDTO paginationDTO)
         {
-            return await _dbContext.Folders.Where(f => f.UserId == userId)
-                                           .Include(f => f.Bookmarks)
-                                           .ToListAsync();
+            int skip = (paginationDTO.Page - 1) * paginationDTO.RecordsPerPage;
+
+            return await _dbContext.Folders
+                                   .Where(f => f.UserId == userId)
+                                   .OrderByDescending(f => f.CreationDate)
+                                   .Skip(skip)
+                                   .Take(paginationDTO.RecordsPerPage)
+                                   .ToListAsync();
         }
 
         public async Task<Folder?> GetByIdAsync(Guid userId, Guid folderId)
