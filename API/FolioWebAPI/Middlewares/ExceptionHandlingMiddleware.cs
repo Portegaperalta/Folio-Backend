@@ -1,7 +1,9 @@
-﻿using Folio.Core.Domain.Exceptions;
+﻿using Folio.Core.Domain.Entities;
+using Folio.Core.Domain.Exceptions;
 using Folio.Core.Domain.Exceptions.Bookmark;
 using Folio.Core.Domain.Exceptions.Folder;
 using Folio.Core.Domain.Exceptions.User;
+using Folio.Infrastructure.Persistence;
 
 namespace FolioWebAPI.Middlewares
 {
@@ -28,7 +30,7 @@ namespace FolioWebAPI.Middlewares
             }
         }
 
-        private Task HandleExceptionAsync(HttpContext context, Exception exception)
+        private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             var (statusCode, message) = exception switch
             {
@@ -49,7 +51,9 @@ namespace FolioWebAPI.Middlewares
             if (statusCode >= 500)
             {
                 _logger.LogError(exception, "Unhandled Exception at {Path}", context.Request.Path);
-            } else
+                await PersistServerErrorsAsync(context, exception);
+            }
+            else
             {
                 _logger.LogWarning("Client error ({StatusCode}) at {Path}: {Message}", statusCode, context.Request.Path, message);
             }
@@ -57,11 +61,33 @@ namespace FolioWebAPI.Middlewares
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = statusCode;
 
-            return context.Response.WriteAsJsonAsync(new
+            await context.Response.WriteAsJsonAsync(new
             {
                 error = message,
                 status = statusCode
             });
+        }
+
+        private static async Task PersistServerErrorsAsync(HttpContext httpContext, Exception exception)
+        {
+            try
+            {
+                await using var scope = httpContext.RequestServices.CreateAsyncScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+                dbContext.Errors.Add(new Error
+                {
+                    ErrorMessage = exception.Message,
+                    StackTrace = exception.StackTrace,
+                    Date = DateTime.UtcNow
+                });
+
+                await dbContext.SaveChangesAsync();
+            }
+            catch
+            {
+                throw;
+            }
         }
     }
 }
