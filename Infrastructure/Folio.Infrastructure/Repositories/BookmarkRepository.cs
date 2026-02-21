@@ -117,6 +117,15 @@ namespace Folio.Infrastructure.Repositories
             return bookmarkCount;
         }
 
+        public async Task<int> CountByUserIdAsync(Guid userId)
+        {
+            var bookmarkCount = await _dbContext.Bookmarks
+                                                .Where(b => b.UserId == userId)
+                                                .CountAsync();
+
+            return bookmarkCount;
+        }
+
         public async Task<Folder?> GetFolderByIdAsync(Guid folderId, Guid userId)
         {
             return await _dbContext.Folders.Where(

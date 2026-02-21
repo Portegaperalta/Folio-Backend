@@ -78,6 +78,23 @@ namespace Folio.Core.Application.Services
             return bookmarkDTO;
         }
 
+        public async Task<int> CountBookmarksByUserIdAsync(Guid userId)
+        {
+            var versionKey = $"folio:bookmarks:{userId}:v";
+            var version = await _cacheService.GetAsync<long?>(versionKey) ?? 1;
+
+            var cacheKey = $"folio:bookmarks:{userId}:count:v{version}";
+            var cached = await _cacheService.GetAsync<int?>(cacheKey);
+
+            if (cached.HasValue)
+                return cached.Value;
+
+            var bookmarkCount = await _bookmarkRepository.CountByUserIdAsync(userId);
+            await _cacheService.SetAsync(cacheKey, bookmarkCount, cacheDuration);
+
+            return bookmarkCount;
+        }
+
         public async Task<int> CountBookmarksByFolderIdAsync(Guid userId, Guid folderId)
         {
             var versionKey = $"folio:bookmarks:{userId}:v";
