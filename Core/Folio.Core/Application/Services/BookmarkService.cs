@@ -27,8 +27,8 @@ namespace Folio.Core.Application.Services
             var version = await _cacheService.GetAsync<long?>(versionKey) ?? 1;
 
             var cacheKey = folderId is null
-                ? $"folio:bookmarks:{userId}:all:v{version}"
-                : $"folio:bookmarks:{userId}:folder:{folderId}:all:v{version}";
+                ? $"folio:bookmarks:{userId}:all:p{paginationDTO.Page}:r{paginationDTO.RecordsPerPage}:v{version}"
+                : $"folio:bookmarks:{userId}:folder:{folderId}:all:p{paginationDTO.Page}:r{paginationDTO.RecordsPerPage}:v{version}";
 
             var cached = await _cacheService.GetAsync<List<BookmarkDTO>>(cacheKey);
 
