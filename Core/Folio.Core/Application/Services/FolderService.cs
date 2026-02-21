@@ -31,7 +31,7 @@ namespace Folio.Core.Application.Services
             if (cached is not null)
                 return cached;
 
-            var folders = await _folderRepository.GetAllAsync(userId);
+            var folders = await _folderRepository.GetAllAsync(userId, paginationDTO);
 
             var foldersDTOs = folders.Select(f => _folderMapper.ToDto(f));
 

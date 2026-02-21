@@ -1,4 +1,5 @@
-﻿using Folio.Core.Domain.Entities;
+﻿using Folio.Core.Application.DTOs.Pagination;
+using Folio.Core.Domain.Entities;
 using Folio.Core.Interfaces;
 using Folio.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ namespace Folio.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<Folder>> GetAllAsync(Guid userId)
+        public async Task<IEnumerable<Folder>> GetAllAsync(Guid userId, PaginationDTO paginationDTO)
         {
             return await _dbContext.Folders.Where(f => f.UserId == userId)
                                            .Include(f => f.Bookmarks)
@@ -26,7 +27,7 @@ namespace Folio.Infrastructure.Repositories
             return await _dbContext.Folders
                                    .Where(f => f.Id == folderId)
                                    .Include(f => f.Bookmarks)
-                                   .FirstOrDefaultAsync(f => 
+                                   .FirstOrDefaultAsync(f =>
                                    f.UserId == userId);
         }
 
