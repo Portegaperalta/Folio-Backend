@@ -31,6 +31,9 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
+            var total = await _folderService.CountFoldersAsync(currentUser.Id);
+            HttpContext.Response.Headers.Append("total-records-amount", total.ToString());
+
             var foldersDTOs = await _folderService.GetAllFoldersDTOsAsync(currentUser.Id, paginationDTO);
 
             return Ok(foldersDTOs);
