@@ -1,4 +1,5 @@
-﻿using Folio.Core.Domain.Entities;
+﻿using Folio.Core.Application.DTOs.Pagination;
+using Folio.Core.Domain.Entities;
 using Folio.Core.Interfaces;
 using Folio.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ namespace Folio.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<Bookmark>> GetAllByUserIdAsync(Guid userId)
+        public async Task<IEnumerable<Bookmark>> GetAllByUserIdAsync(Guid userId, PaginationDTO paginationDTO)
         {
             return await _dbContext.Bookmarks
                                    .Include(b => b.Folder)
@@ -22,17 +23,17 @@ namespace Folio.Infrastructure.Repositories
                                    .ToListAsync();
         }
 
-        public async Task<IEnumerable<Bookmark>> GetAllByUserAndFolderIdAsync(Guid userId, Guid folderId) 
+        public async Task<IEnumerable<Bookmark>> GetAllByUserAndFolderIdAsync(Guid userId, Guid folderId, PaginationDTO paginationDTO)
         {
             return await _dbContext.Bookmarks
                                    .Include(b => b.Folder)
-                                   .Where(b => 
+                                   .Where(b =>
                                    b.FolderId == folderId &&
                                    b.UserId == userId)
                                    .ToListAsync();
         }
 
-        public async Task<Bookmark?> GetByIdAsync(Guid userId, Guid folderId, Guid bookmarkId) 
+        public async Task<Bookmark?> GetByIdAsync(Guid userId, Guid folderId, Guid bookmarkId)
         {
             return await _dbContext.Bookmarks
                                    .Include(b => b.Folder)
@@ -67,7 +68,7 @@ namespace Folio.Infrastructure.Repositories
         }
 
         public async Task UpdateAsync(Bookmark bookmarkEntity)
-        { 
+        {
             _dbContext.Bookmarks.Update(bookmarkEntity);
             await _dbContext.SaveChangesAsync();
         }
@@ -98,7 +99,7 @@ namespace Folio.Infrastructure.Repositories
         public async Task<int> CountByFolderAsync(Guid userId, Guid folderId)
         {
             var bookmarkCount = await _dbContext.Bookmarks
-                                                .Where(b => 
+                                                .Where(b =>
                                                 b.FolderId == folderId &&
                                                 b.UserId == userId)
                                                 .CountAsync();
@@ -110,7 +111,7 @@ namespace Folio.Infrastructure.Repositories
         {
             return await _dbContext.Folders.Where(
                                             f => f.Id == folderId &&
-                                            f.UserId == userId )
+                                            f.UserId == userId)
                                            .FirstOrDefaultAsync();
         }
     }

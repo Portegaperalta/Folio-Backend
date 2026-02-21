@@ -3,6 +3,7 @@ using Folio.Core.Application.Mappers;
 using Folio.Core.Domain.Exceptions.Folder;
 using Folio.Core.Domain.Exceptions.Bookmark;
 using Folio.Core.Interfaces;
+using Folio.Core.Application.DTOs.Pagination;
 
 namespace Folio.Core.Application.Services
 {
@@ -20,7 +21,7 @@ namespace Folio.Core.Application.Services
             _cacheService = cacheService;
         }
 
-        public async Task<IEnumerable<BookmarkDTO>> GetAllBookmarksAsync(Guid userId, Guid? folderId)
+        public async Task<IEnumerable<BookmarkDTO>> GetAllBookmarksAsync(Guid userId, Guid? folderId, PaginationDTO paginationDTO)
         {
             var versionKey = $"folio:bookmarks:{userId}:v";
             var version = await _cacheService.GetAsync<long?>(versionKey) ?? 1;
@@ -38,12 +39,12 @@ namespace Folio.Core.Application.Services
 
             if (folderId is null)
             {
-                var bookmarksByUserId = await _bookmarkRepository.GetAllByUserIdAsync(userId);
+                var bookmarksByUserId = await _bookmarkRepository.GetAllByUserIdAsync(userId, paginationDTO);
                 bookmarksDTO = bookmarksByUserId.Select(b => _bookmarkMapper.ToDto(b));
             }
             else
             {
-                var bookmarks = await _bookmarkRepository.GetAllByUserAndFolderIdAsync(userId, folderId.Value);
+                var bookmarks = await _bookmarkRepository.GetAllByUserAndFolderIdAsync(userId, folderId.Value, paginationDTO);
                 bookmarksDTO = bookmarks.Select(b => _bookmarkMapper.ToDto(b));
             }
 
