@@ -1,5 +1,6 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Folio.Core.Application.DTOs.Folder;
+using Folio.Core.Application.DTOs.Pagination;
 using Folio.Core.Application.Mappers;
 using Folio.Core.Application.Services;
 using Folio.Core.Domain.Entities;
@@ -32,21 +33,37 @@ namespace Folio_Backend_Tests.Core.Application.Services
         {
             //Arrange
             var userId = CreateUserId();
+            var paginationDTO = new PaginationDTO();
             var folderEntity = CreateFolderEntity("mockFolder", userId);
             var folderList = CreateFolderList(folderEntity);
 
-            _mockfolderRepository.GetAllAsync(userId).Returns(folderList);
+            _mockfolderRepository.GetAllAsync(userId, paginationDTO).Returns(folderList);
 
             //Act
-            var response = await _folderService.GetAllFoldersDTOsAsync(userId);
+            var response = await _folderService.GetAllFoldersDTOsAsync(userId, paginationDTO);
 
             //Assert
             response.Should().BeAssignableTo<IEnumerable<FolderDTO>>();
         }
 
+
+        [Fact]
+        public async Task GetAllFoldersAsync_CallsGetAllAsyncFromFolderRepository()
+        {
+            //Arrange
+            var userId = CreateUserId();
+            var paginationDTO = new PaginationDTO();
+
+            //Act
+            await _folderService.GetAllFoldersDTOsAsync(userId, paginationDTO);
+
+            //Assert
+            await _mockfolderRepository.Received(1).GetAllAsync(userId, paginationDTO);
+        }
+
         // GetFolderByIdAsync tests
         [Fact]
-        public async Task 
+        public async Task
             GetFolderByIdAsync_ReturnsNull_WhenFolderDoesNotExist()
         {
             //Arrange
@@ -64,7 +81,7 @@ namespace Folio_Backend_Tests.Core.Application.Services
         }
 
         [Fact]
-        public async Task 
+        public async Task
             GetFolderDTOByIdAsync_ReturnsNull_WhenFolderDoesNotBelongToUser()
         {
             //Arrange
@@ -161,7 +178,7 @@ namespace Folio_Backend_Tests.Core.Application.Services
 
         // UpdateFolderAsync tests
         [Fact]
-        public async Task 
+        public async Task
             UpdateFolderAsync_ThrowsFolderNotFoundException_WhenFolderDoesNotExist()
         {
             //Arrange 
@@ -202,7 +219,7 @@ namespace Folio_Backend_Tests.Core.Application.Services
 
         // MarkUserFolderAsVisitedAsync tests
         [Fact]
-        public async Task 
+        public async Task
             MarkFolderAsVisitedAsync_ThrowsFolderNotFoundException_WhenFolderDoesNotExist()
         {
             //Arrange
@@ -243,7 +260,7 @@ namespace Folio_Backend_Tests.Core.Application.Services
 
         // DeleteFolderAsync tests
         [Fact]
-        public async Task 
+        public async Task
             DeleteFolderAsync_ReturnsFalse_WhenFolderDoesNotExists()
         {
             //Arrange
@@ -270,7 +287,7 @@ namespace Folio_Backend_Tests.Core.Application.Services
 
             _mockfolderRepository.GetByIdAsync(userId, folderId)
                                  .Returns(folderEntity);
-             
+
             //Act
             var result = await _folderService.DeleteFolderAsync(userId, folderId);
 
@@ -338,3 +355,5 @@ namespace Folio_Backend_Tests.Core.Application.Services
         }
     }
 }
+
+
