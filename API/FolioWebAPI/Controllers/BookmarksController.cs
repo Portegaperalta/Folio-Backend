@@ -33,6 +33,9 @@ namespace FolioWebAPI.Controllers
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
+            var total = await _bookmarkService.CountBookmarksByFolderIdAsync(currentUser.Id, folderId.Value);
+            HttpContext.Response.Headers.Append("total-records-amount", total.ToString());
+
             var bookmarksDTOs = await _bookmarkService.GetAllBookmarksAsync(currentUser.Id, folderId, paginationDTO);
 
             return Ok(bookmarksDTOs);
