@@ -39,5 +39,6 @@ namespace Folio.Infrastructure.Persistence
 
         public DbSet<Folder> Folders { get; set; }
         public DbSet<Bookmark> Bookmarks { get; set; }
+        public DbSet<Error> Errors { get; set; }
     }
 }

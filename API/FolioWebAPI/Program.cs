@@ -15,6 +15,7 @@ using Folio.Core.Application.Mappers;
 using System.Threading.RateLimiting;
 using StackExchange.Redis;
 using Folio.Infrastructure.Caching;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace FolioWebAPI
 {
@@ -117,7 +118,7 @@ namespace FolioWebAPI
             builder.Services.AddScoped<SignInManager<ApplicationUser>>();
             builder.Services.AddHttpContextAccessor();
 
-            builder.Services.AddAuthentication().AddJwtBearer(options =>
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
                 options.MapInboundClaims = false;
 
@@ -133,6 +134,8 @@ namespace FolioWebAPI
                 };
             });
 
+            builder.Services.AddAuthorization();
+
             builder.Services.AddOpenApi();
 
             //swagger services
@@ -141,7 +144,7 @@ namespace FolioWebAPI
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey,
+                    Type = SecuritySchemeType.Http,
                     Scheme = "Bearer",
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
