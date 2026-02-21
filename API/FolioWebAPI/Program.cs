@@ -69,18 +69,18 @@ namespace FolioWebAPI
 
             builder.Services.AddDataProtection();
 
-            //var allowedOrigins = builder.Configuration.GetSection("allowedOrigins").Get<string[]>()!;
+            var allowedOrigins = builder.Configuration.GetSection("allowedOrigins").Get<string[]>()!;
 
-            //builder.Services.AddCors(options =>
-            //{
-            //    options.AddDefaultPolicy(CORSOptions =>
-            //    {
-            //        CORSOptions.WithOrigins(allowedOrigins)
-            //                   .AllowAnyMethod()
-            //                   .AllowAnyHeader()
-            //                   .WithExposedHeaders("total-records-amount");
-            //    });
-            //});
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(CORSOptions =>
+                {
+                    CORSOptions.WithOrigins(allowedOrigins)
+                               .AllowAnyMethod()
+                               .AllowAnyHeader()
+                               .WithExposedHeaders("total-records-amount");
+                });
+            });
 
             // controllers services
             builder.Services.AddControllers().AddNewtonsoftJson();

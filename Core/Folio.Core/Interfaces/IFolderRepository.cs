@@ -1,10 +1,11 @@
-﻿using Folio.Core.Domain.Entities;
+﻿using Folio.Core.Application.DTOs.Pagination;
+using Folio.Core.Domain.Entities;
 
 namespace Folio.Core.Interfaces
 {
     public interface IFolderRepository
     {
-        Task<IEnumerable<Folder>> GetAllAsync(Guid userId);
+        Task<IEnumerable<Folder>> GetAllAsync(Guid userId, PaginationDTO paginationDTO);
         Task<Folder?> GetByIdAsync(Guid userId, Guid folderId);
         Task AddAsync(Folder folderEntity);
         Task UpdateAsync(Folder folderEntity);

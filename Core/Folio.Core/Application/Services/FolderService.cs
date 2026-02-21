@@ -1,4 +1,5 @@
 ﻿using Folio.Core.Application.DTOs.Folder;
+using Folio.Core.Application.DTOs.Pagination;
 using Folio.Core.Application.Mappers;
 using Folio.Core.Domain.Exceptions.Folder;
 using Folio.Core.Interfaces;
@@ -19,18 +20,18 @@ namespace Folio.Core.Application.Services
             _cacheService = cacheService;
         }
 
-        public async Task<IEnumerable<FolderDTO>> GetAllFoldersDTOsAsync(Guid userId)
+        public async Task<IEnumerable<FolderDTO>> GetAllFoldersDTOsAsync(Guid userId, PaginationDTO paginationDTO)
         {
             var versionKey = $"folio:folders:{userId}:v";
             var version = await _cacheService.GetAsync<long?>(versionKey) ?? 1;
-            var cacheKey = $"folio:folders:{userId}:all:v{version}";
+            var cacheKey = $"folio:folders:{userId}:p{paginationDTO.Page}:r:{paginationDTO.RecordsPerPage}:v{version}";
 
             var cached = await _cacheService.GetAsync<List<FolderDTO>>(cacheKey);
 
             if (cached is not null)
                 return cached;
 
-            var folders = await _folderRepository.GetAllAsync(userId);
+            var folders = await _folderRepository.GetAllAsync(userId, paginationDTO);
 
             var foldersDTOs = folders.Select(f => _folderMapper.ToDto(f));
 
@@ -65,7 +66,7 @@ namespace Folio.Core.Application.Services
         {
             var versionKey = $"folio:folders:{userId}:v";
             var version = await _cacheService.GetAsync<long?>(versionKey) ?? 1;
-            var cacheKey = $"folio:folders:{userId}:all:v{version}";
+            var cacheKey = $"folio:folders:{userId}:count:v{version}";
 
             var cached = await _cacheService.GetAsync<int?>(cacheKey);
 

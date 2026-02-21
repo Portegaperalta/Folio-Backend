@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Folio.Core.Application.DTOs.Bookmark;
+using Folio.Core.Application.DTOs.Pagination;
 using Folio.Core.Application.Mappers;
 using Folio.Core.Application.Services;
 using Folio.Core.Domain.Entities;
@@ -36,11 +37,13 @@ namespace Folio_Backend_Tests.Core.Application.Services
             var boomarkEntity = CreateBookmarkEntity("mockBookmark", fakeUrl, folderId, userId);
             var bookmarkList = CreateBookmarkList(boomarkEntity);
 
-            _mockBookmarkRepository.GetAllByUserAndFolderIdAsync(userId, folderId)
+            var paginationDTO = new PaginationDTO();
+
+            _mockBookmarkRepository.GetAllByUserAndFolderIdAsync(userId, folderId, paginationDTO)
                                   .Returns(bookmarkList);
 
             //Act
-            var response = await _bookmarkService.GetAllBookmarksAsync(userId, folderId);
+            var response = await _bookmarkService.GetAllBookmarksAsync(userId, folderId, paginationDTO);
 
             //Assert
             response.Should().BeAssignableTo<IEnumerable<BookmarkDTO>>();
@@ -53,10 +56,12 @@ namespace Folio_Backend_Tests.Core.Application.Services
             var userId = CreateUserId();
             var folderId = CreateFolderId();
 
-            await _bookmarkService.GetAllBookmarksAsync(userId, folderId);
+            var paginationDTO = new PaginationDTO();
+
+            await _bookmarkService.GetAllBookmarksAsync(userId, folderId, paginationDTO);
 
             //Assert
-            await _mockBookmarkRepository.Received(1).GetAllByUserAndFolderIdAsync(userId, folderId);
+            await _mockBookmarkRepository.Received(1).GetAllByUserAndFolderIdAsync(userId, folderId, paginationDTO);
         }
 
         // GetUserBookmarkByIdAsync tests
@@ -116,7 +121,7 @@ namespace Folio_Backend_Tests.Core.Application.Services
 
         // CountBookmarksByFolderIdAsync tests
         [Fact]
-        public async Task 
+        public async Task
             CountBookmarksByFolderIdAsync_CallsCountByFolderAsyncFromBookmarkRepository()
         {
             //Arrange
@@ -151,7 +156,7 @@ namespace Folio_Backend_Tests.Core.Application.Services
 
         // CreateUserBookmarkAsync tests
         [Fact]
-        public async Task 
+        public async Task
             CreateBookmarkAsync_ThrowsArgumentNullException_WhenBookmarkCreationDTOIsNull()
         {
             //Arrange
@@ -162,7 +167,7 @@ namespace Folio_Backend_Tests.Core.Application.Services
             BookmarkCreationDTO nullBookmarkCreationDTO = null!;
 
             //Act
-            Func<Task> act = async() => await _bookmarkService.CreateBookmarkAsync(userId, folderId, nullBookmarkCreationDTO);
+            Func<Task> act = async () => await _bookmarkService.CreateBookmarkAsync(userId, folderId, nullBookmarkCreationDTO);
 
             //Assert
             await act.Should().ThrowAsync<ArgumentNullException>();
@@ -193,7 +198,7 @@ namespace Folio_Backend_Tests.Core.Application.Services
 
         // UpdateBookmarkAsync tests
         [Fact]
-        public async Task 
+        public async Task
             UpdateBookmarkAsync_ThrowsArgumentNullException_WhenBookmarkUpdateDTOIsNull()
         {
             //Arrange
@@ -211,7 +216,7 @@ namespace Folio_Backend_Tests.Core.Application.Services
         }
 
         [Fact]
-        public async Task 
+        public async Task
             UpdateBookmarkAsync_ThrowsBookmarkNotFoundException_WhenBookmarkDoesNotExist()
         {
             //Arrange
@@ -257,7 +262,7 @@ namespace Folio_Backend_Tests.Core.Application.Services
 
         // DeleteUserBookmarkAsync tests
         [Fact]
-        public async Task 
+        public async Task
             DeleteBookmarkAsync_ReturnsFalse_WhenBookmarkDoesNotExist()
         {
             //Arrange
@@ -387,7 +392,7 @@ namespace Folio_Backend_Tests.Core.Application.Services
             };
         }
 
-        private BookmarkUpdateDTO CreateBookmarkUpdateDTO(Guid bookmarkId, 
+        private BookmarkUpdateDTO CreateBookmarkUpdateDTO(Guid bookmarkId,
             string name, string url, bool isMarkedFavorite = false)
         {
             return new BookmarkUpdateDTO

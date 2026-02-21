@@ -1,4 +1,5 @@
 ﻿using Folio.Core.Application.DTOs.Bookmark;
+using Folio.Core.Application.DTOs.Pagination;
 using Folio.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,14 +25,26 @@ namespace FolioWebAPI.Controllers
         // GET
         [HttpGet]
         [HttpGet("~/api/bookmarks")]
-        public async Task<ActionResult<IEnumerable<BookmarkDTO>>> GetAll([FromRoute] Guid? folderId)
+        public async Task<ActionResult<IEnumerable<BookmarkDTO>>>
+        GetAll([FromRoute] Guid? folderId, [FromQuery] PaginationDTO paginationDTO)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
 
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var bookmarksDTOs = await _bookmarkService.GetAllBookmarksAsync(currentUser.Id, folderId);
+            if (folderId.HasValue)
+            {
+                var total = await _bookmarkService.CountBookmarksByFolderIdAsync(currentUser.Id, folderId.Value);
+                HttpContext.Response.Headers.Append("total-records-amount", total.ToString());
+            }
+            else
+            {
+                var total = await _bookmarkService.CountBookmarksByUserIdAsync(currentUser.Id); // add this method
+                HttpContext.Response.Headers.Append("total-records-amount", total.ToString());
+            }
+
+            var bookmarksDTOs = await _bookmarkService.GetAllBookmarksAsync(currentUser.Id, folderId, paginationDTO);
 
             return Ok(bookmarksDTOs);
         }

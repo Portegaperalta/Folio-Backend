@@ -1,4 +1,5 @@
 ﻿using Folio.Core.Application.DTOs.Folder;
+using Folio.Core.Application.DTOs.Pagination;
 using Folio.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,14 +24,17 @@ namespace FolioWebAPI.Controllers
 
         //GET
         [HttpGet(Name = "GetAllUserFolders")]
-        public async Task<ActionResult<IEnumerable<FolderDTO>>> GetAll()
+        public async Task<ActionResult<IEnumerable<FolderDTO>>> GetAll([FromQuery] PaginationDTO paginationDTO)
         {
             var currentUser = await _currentUserService.GetCurrentUserAsync();
 
             if (currentUser is null)
                 return Unauthorized("Authorization failed");
 
-            var foldersDTOs = await _folderService.GetAllFoldersDTOsAsync(currentUser.Id);
+            var total = await _folderService.CountFoldersAsync(currentUser.Id);
+            HttpContext.Response.Headers.Append("total-records-amount", total.ToString());
+
+            var foldersDTOs = await _folderService.GetAllFoldersDTOsAsync(currentUser.Id, paginationDTO);
 
             return Ok(foldersDTOs);
         }
