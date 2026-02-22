@@ -16,6 +16,7 @@ using System.Threading.RateLimiting;
 using StackExchange.Redis;
 using Folio.Infrastructure.Caching;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Azure.Identity;
 
 namespace FolioWebAPI
 {
@@ -70,7 +71,7 @@ namespace FolioWebAPI
 
             builder.Services.AddDataProtection();
 
-            var allowedOrigins = builder.Configuration.GetSection("allowedOrigins").Get<string[]>()!;
+            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()!;
 
             builder.Services.AddCors(options =>
             {
@@ -104,9 +105,18 @@ namespace FolioWebAPI
 
             // db context services
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(
-                builder.Configuration.GetConnectionString("DefaultConnection"))
-            );
+            {
+                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+                if (builder.Environment.IsDevelopment())
+                {
+                    options.UseNpgsql(connectionString);
+                }
+                else
+                {
+                    options.UseSqlServer(connectionString);
+                }
+            });
 
             // auth and identity services
             builder.Services.AddIdentityCore<ApplicationUser>()
@@ -129,7 +139,7 @@ namespace FolioWebAPI
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey =
-                     new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["jwtKey"]!)),
+                     new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtOptions:SecretKey"]!)),
                     ClockSkew = TimeSpan.Zero
                 };
             });
@@ -161,6 +171,17 @@ namespace FolioWebAPI
             });
 
             var app = builder.Build();
+
+            if (app.Environment.IsProduction())
+            {
+                var keyVaultUri = builder.Configuration["AzureKeyVaultURI"];
+                if (!string.IsNullOrEmpty(keyVaultUri))
+                {
+                    builder.Configuration.AddAzureKeyVault(
+                        new Uri(keyVaultUri),
+                        new DefaultAzureCredential());
+                }
+            }
 
             using (var scope = app.Services.CreateScope())
             {
