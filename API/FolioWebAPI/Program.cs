@@ -61,6 +61,7 @@ namespace FolioWebAPI
                 });
             });
 
+            // Cache services
             builder.Services.AddOutputCache(options =>
             {
                 options.DefaultExpirationTimeSpan = TimeSpan.FromMinutes(5);
@@ -128,6 +129,7 @@ namespace FolioWebAPI
             builder.Services.AddScoped<SignInManager<ApplicationUser>>();
             builder.Services.AddHttpContextAccessor();
 
+            // Auth/JWT options
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
                 options.MapInboundClaims = false;
