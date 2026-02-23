@@ -16,10 +16,20 @@ namespace Folio.Infrastructure.Persistence
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<ApplicationUser>()
+            if (Database.IsSqlServer())
+            {
+                modelBuilder.Entity<ApplicationUser>()
+                    .Property(u => u.Id)
+                    .ValueGeneratedOnAdd()
+                    .HasDefaultValueSql("NEWID()");
+            }
+            else if (Database.IsNpgsql())
+            {
+                modelBuilder.Entity<ApplicationUser>()
                         .Property(u => u.Id)
                         .ValueGeneratedOnAdd()
                         .HasDefaultValueSql("gen_random_uuid()");
+            }
 
             modelBuilder.Entity<Folder>()
                         .HasOne<ApplicationUser>()
