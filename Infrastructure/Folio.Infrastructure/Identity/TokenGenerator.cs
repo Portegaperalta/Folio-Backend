@@ -20,6 +20,7 @@ namespace Folio.Infrastructure.Identity
         public string GenerateJwt(User userEntity)
         {
             var jwtOptions = _configuration.GetSection("JwtOptions");
+            var secretKey = jwtOptions.GetValue<string>("SecretKey");
 
             var claims = new List<Claim>
             {
@@ -27,7 +28,7 @@ namespace Folio.Infrastructure.Identity
                 new Claim("email", userEntity.Email),
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["jwtKey"]!));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!));
 
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 

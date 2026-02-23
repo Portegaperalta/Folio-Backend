@@ -16,6 +16,7 @@ using System.Threading.RateLimiting;
 using StackExchange.Redis;
 using Folio.Infrastructure.Caching;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Azure.Identity;
 
 namespace FolioWebAPI
 {
@@ -60,6 +61,7 @@ namespace FolioWebAPI
                 });
             });
 
+            // Cache services
             builder.Services.AddOutputCache(options =>
             {
                 options.DefaultExpirationTimeSpan = TimeSpan.FromMinutes(5);
@@ -70,7 +72,7 @@ namespace FolioWebAPI
 
             builder.Services.AddDataProtection();
 
-            var allowedOrigins = builder.Configuration.GetSection("allowedOrigins").Get<string[]>()!;
+            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()!;
 
             builder.Services.AddCors(options =>
             {
@@ -104,9 +106,18 @@ namespace FolioWebAPI
 
             // db context services
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(
-                builder.Configuration.GetConnectionString("DefaultConnection"))
-            );
+            {
+                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+                if (builder.Environment.IsDevelopment())
+                {
+                    options.UseNpgsql(connectionString);
+                }
+                else
+                {
+                    options.UseSqlServer(connectionString);
+                }
+            });
 
             // auth and identity services
             builder.Services.AddIdentityCore<ApplicationUser>()
@@ -118,6 +129,7 @@ namespace FolioWebAPI
             builder.Services.AddScoped<SignInManager<ApplicationUser>>();
             builder.Services.AddHttpContextAccessor();
 
+            // Auth/JWT options
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
                 options.MapInboundClaims = false;
@@ -129,7 +141,7 @@ namespace FolioWebAPI
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey =
-                     new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["jwtKey"]!)),
+                     new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtOptions:SecretKey"]!)),
                     ClockSkew = TimeSpan.Zero
                 };
             });
@@ -161,7 +173,7 @@ namespace FolioWebAPI
             });
 
             var app = builder.Build();
-
+           
             using (var scope = app.Services.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();

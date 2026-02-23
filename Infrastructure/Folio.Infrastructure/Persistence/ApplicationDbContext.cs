@@ -17,9 +17,9 @@ namespace Folio.Infrastructure.Persistence
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<ApplicationUser>()
-                        .Property(u => u.Id)
-                        .ValueGeneratedOnAdd()
-                        .HasDefaultValueSql("gen_random_uuid()");
+                    .Property(u => u.Id)
+                    .ValueGeneratedOnAdd()
+                    .HasDefaultValueSql("NEWID()");
 
             modelBuilder.Entity<Folder>()
                         .HasOne<ApplicationUser>()
