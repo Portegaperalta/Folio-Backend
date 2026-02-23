@@ -173,17 +173,6 @@ namespace FolioWebAPI
             });
 
             var app = builder.Build();
-
-            if (app.Environment.IsProduction())
-            {
-                var keyVaultUri = builder.Configuration["AzureKeyVaultURI"];
-                if (!string.IsNullOrEmpty(keyVaultUri))
-                {
-                    builder.Configuration.AddAzureKeyVault(
-                            new Uri(keyVaultUri),
-                            new DefaultAzureCredential());
-                }
-            }
            
             using (var scope = app.Services.CreateScope())
             {
