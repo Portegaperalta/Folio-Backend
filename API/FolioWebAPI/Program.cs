@@ -109,14 +109,7 @@ namespace FolioWebAPI
             {
                 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-                if (builder.Environment.IsDevelopment())
-                {
-                    options.UseNpgsql(connectionString);
-                }
-                else
-                {
-                    options.UseSqlServer(connectionString);
-                }
+                options.UseSqlServer(connectionString);
             });
 
             // auth and identity services
