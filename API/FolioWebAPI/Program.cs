@@ -180,11 +180,11 @@ namespace FolioWebAPI
                 if (!string.IsNullOrEmpty(keyVaultUri))
                 {
                     builder.Configuration.AddAzureKeyVault(
-                        new Uri(keyVaultUri),
-                        new DefaultAzureCredential());
+                            new Uri(keyVaultUri),
+                            new DefaultAzureCredential());
                 }
             }
-
+           
             using (var scope = app.Services.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
