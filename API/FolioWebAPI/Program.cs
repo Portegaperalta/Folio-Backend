@@ -26,6 +26,23 @@ namespace FolioWebAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            //Loads user secrets and environment variables
+            builder.Configuration
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddUserSecrets<Program>(optional: true)
+                .AddEnvironmentVariables();
+
+            Console.WriteLine("AzureKeyVaultURI from env: " + builder.Configuration["AzureKeyVaultURI"]);
+
+            //Connects to azure key vault
+            var keyVaultUri = builder.Configuration["AzureKeyVaultURI"];
+            if (!string.IsNullOrEmpty(keyVaultUri))
+            {
+                builder.Configuration.AddAzureKeyVault(
+                     new Uri(keyVaultUri),
+                     new DefaultAzureCredential());
+            }
+
             // SERVICES AREA
 
             // Rate Limiting services
@@ -166,7 +183,7 @@ namespace FolioWebAPI
             });
 
             var app = builder.Build();
-           
+
             using (var scope = app.Services.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -174,14 +191,6 @@ namespace FolioWebAPI
                 {
                     dbContext.Database.Migrate();
                 }
-            }
-
-            var keyVaultUri = builder.Configuration["AzureKeyVaultURI"];
-            if (!string.IsNullOrEmpty(keyVaultUri))
-            {
-                builder.Configuration.AddAzureKeyVault(
-                     new Uri(keyVaultUri),
-                     new DefaultAzureCredential());
             }
 
             if (app.Environment.IsDevelopment())
