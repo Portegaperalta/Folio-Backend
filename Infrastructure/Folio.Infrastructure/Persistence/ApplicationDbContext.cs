@@ -28,10 +28,10 @@ namespace Folio.Infrastructure.Persistence
                         .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Bookmark>()
-                        .HasOne<ApplicationUser>()
+                        .HasOne<Folder>()
                         .WithMany()
-                        .HasForeignKey(b => b.UserId)
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey(b => b.FolderId)
+                        .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ApplicationUser>().ToTable("Users");
             modelBuilder.Entity<IdentityRole<Guid>>().ToTable("Roles");
