@@ -1,5 +1,6 @@
 ﻿using Folio.Core.Application.DTOs.Auth;
 using Folio.Core.Domain.Entities;
+using Folio.Core.Domain.Exceptions.User;
 using Folio.Core.Interfaces;
 using Folio.Infrastructure.Identity.Mappers;
 using Microsoft.AspNetCore.Identity;
@@ -34,7 +35,7 @@ namespace Folio.Infrastructure.Identity
             if (result.Succeeded is false)
             {
                 var errorMessages = string.Join(",", result.Errors.Select(e => e.Description));
-                throw new Exception($"Registration failed: {errorMessages}");
+                throw new RegistrationFailedException();
             }
 
             var applicationUser = await _userManager.FindByEmailAsync(email);
