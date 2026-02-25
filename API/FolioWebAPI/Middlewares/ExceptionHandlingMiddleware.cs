@@ -35,6 +35,7 @@ namespace FolioWebAPI.Middlewares
             var (statusCode, message) = exception switch
             {
                 UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized Access"),
+                RegistrationFailedException => (StatusCodes.Status409Conflict, "Registration Failed, one ore more fields are invalid"),
                 UserNotFoundException => (StatusCodes.Status404NotFound, "User not found"),
                 FolderNotFoundException => (StatusCodes.Status404NotFound, "Folder not found"),
                 BookmarkNotFoundException => (StatusCodes.Status404NotFound, "Bookmark not found"),

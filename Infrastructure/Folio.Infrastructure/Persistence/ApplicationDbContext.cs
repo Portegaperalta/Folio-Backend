@@ -24,12 +24,14 @@ namespace Folio.Infrastructure.Persistence
             modelBuilder.Entity<Folder>()
                         .HasOne<ApplicationUser>()
                         .WithMany()
-                        .HasForeignKey(f => f.UserId);
+                        .HasForeignKey(f => f.UserId)
+                        .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Bookmark>()
-                        .HasOne<ApplicationUser>()
+                        .HasOne<Folder>()
                         .WithMany()
-                        .HasForeignKey(b => b.UserId);
+                        .HasForeignKey(b => b.FolderId)
+                        .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ApplicationUser>().ToTable("Users");
             modelBuilder.Entity<IdentityRole<Guid>>().ToTable("Roles");
