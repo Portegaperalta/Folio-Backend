@@ -1,7 +1,7 @@
 ﻿namespace Folio.Core.Domain.Exceptions.User
 {
-    public class DuplicatedUsernameException : Exception
+    public class RegistrationFailedException : Exception
     {
-        public DuplicatedUsernameException() : base("Username is already taken.") { }
+        public RegistrationFailedException() : base("Registration failed, one or more fields are invalid") { }
     }
 }
