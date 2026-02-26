@@ -47,14 +47,14 @@ namespace Folio.Infrastructure.Identity
             return new AuthenticationResponseDTO { Token = token};
         }
 
-        public async Task<AuthenticationResponseDTO?> LoginAsync(string email, string password)
+        public async Task<AuthenticationResponseDTO?> LoginAsync(LoginCredentialsDTO loginCredentialsDTO)
         {
-            var applicationUser = await _userManager.FindByEmailAsync(email);
+            var applicationUser = await _userManager.FindByEmailAsync(loginCredentialsDTO.Email);
 
             if (applicationUser is null)
                 throw new UnauthorizedAccessException("Invalid credentials");
 
-            var validPassword = await _userManager.CheckPasswordAsync(applicationUser, password);
+            var validPassword = await _userManager.CheckPasswordAsync(applicationUser, loginCredentialsDTO.Password);
 
             if (validPassword is false)
                 throw new UnauthorizedAccessException("Invalid credentials");

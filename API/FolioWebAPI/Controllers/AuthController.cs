@@ -41,7 +41,7 @@ namespace FolioWebAPI.Controllers
         {
 
             var authenticationResponseDTO = await _authenticationService
-                                                 .LoginAsync(loginCredentialsDTO.Email, loginCredentialsDTO.Password);
+                                                 .LoginAsync(loginCredentialsDTO);
 
             if (authenticationResponseDTO is null)
             {
