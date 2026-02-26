@@ -19,18 +19,18 @@ namespace Folio.Infrastructure.Identity
         }
 
         public async Task<AuthenticationResponseDTO> 
-            RegisterAsync(string name, string email, string password, string? phoneNumber)
+            RegisterAsync(RegisterCredentialsDTO registerCredentialsDTO)
         {
             var newApplicationUser = new ApplicationUser
             {
-                Name = name,
-                UserName = email,
-                Email = email,
-                PhoneNumber = phoneNumber,
+                Name = registerCredentialsDTO.Name,
+                UserName = registerCredentialsDTO.Email,
+                Email = registerCredentialsDTO.Email,
+                PhoneNumber = registerCredentialsDTO.PhoneNumber,
                 CreationDate = DateTime.UtcNow
             };
 
-            var result = await _userManager.CreateAsync(newApplicationUser, password);
+            var result = await _userManager.CreateAsync(newApplicationUser, registerCredentialsDTO.Password);
 
             if (result.Succeeded is false)
             {
@@ -38,7 +38,7 @@ namespace Folio.Infrastructure.Identity
                 throw new RegistrationFailedException();
             }
 
-            var applicationUser = await _userManager.FindByEmailAsync(email);
+            var applicationUser = await _userManager.FindByEmailAsync(registerCredentialsDTO.Email);
 
             var userEntity = UserMapper.ToDomainEntity(applicationUser!);
 

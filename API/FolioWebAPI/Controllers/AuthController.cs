@@ -25,12 +25,7 @@ namespace FolioWebAPI.Controllers
         public async Task<ActionResult<AuthenticationResponseDTO>>
             Register([FromBody] RegisterCredentialsDTO registerCredentialsDTO)
         {
-
-            var authenticationResponseDTO = await _authenticationService.RegisterAsync(
-                                               registerCredentialsDTO.Name,
-                                               registerCredentialsDTO.Email,
-                                               registerCredentialsDTO.Password,
-                                               registerCredentialsDTO.PhoneNumber);
+            var authenticationResponseDTO = await _authenticationService.RegisterAsync(registerCredentialsDTO);
 
             return Ok(authenticationResponseDTO);
         }
