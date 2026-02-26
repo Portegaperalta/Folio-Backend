@@ -69,7 +69,7 @@ namespace Folio_Backend_Integration_Tests.API.Controllers
                 Password = "invalidPassword"
             };
 
-            string[] expectedErrors = 
+            string[] expectedErrors =
                 [
                 "The field Name is required",
                 "The field Email must be a valid email address",
@@ -81,7 +81,7 @@ namespace Folio_Backend_Integration_Tests.API.Controllers
 
             //Assert
             var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestContext.Current.CancellationToken);
-            
+
             var errorMessages = problemDetails!.Errors.Values.SelectMany(x => x).ToList();
 
             errorMessages.Should().BeEquivalentTo(expectedErrors);
@@ -148,7 +148,7 @@ namespace Folio_Backend_Integration_Tests.API.Controllers
                     UserName = "fakeUser@test.com",
                     NormalizedEmail = "FAKEUSER@TEST.COM",
                     NormalizedUserName = "FAKEUSER@TEST.COM",
-                    SecurityStamp = Guid.NewGuid().ToString() 
+                    SecurityStamp = Guid.NewGuid().ToString()
                 };
 
                 user.PasswordHash = passwordHasher.HashPassword(user, "#fakeUserpassword123");
@@ -171,7 +171,7 @@ namespace Folio_Backend_Integration_Tests.API.Controllers
         }
 
         [Fact]
-        public async Task Login_ReturnsValidJWT_WhenCredentialsAreValid()
+        public async Task Login_AppendsAuthTokenCookie_WhenCredentialsAreValid()
         {
             //Arrange
             using (var context = BuildContext(dbName))
@@ -184,7 +184,7 @@ namespace Folio_Backend_Integration_Tests.API.Controllers
                     UserName = "fakeUser@test.com",
                     NormalizedEmail = "FAKEUSER@TEST.COM",
                     NormalizedUserName = "FAKEUSER@TEST.COM",
-                    SecurityStamp = Guid.NewGuid().ToString() 
+                    SecurityStamp = Guid.NewGuid().ToString()
                 };
 
                 user.PasswordHash = passwordHasher.HashPassword(user, "#fakeUserpassword123");
@@ -203,17 +203,25 @@ namespace Folio_Backend_Integration_Tests.API.Controllers
             var response = await _client.PostAsJsonAsync(loginUrl, validLoginCredentials, _jsonSerializerOptions, TestContext.Current.CancellationToken);
 
             //Assert
-            var authResponse = await response.Content.ReadFromJsonAsync<AuthenticationResponseDTO>(TestContext.Current.CancellationToken);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            authResponse!.Token.Should().NotBeNullOrEmpty();
+            var token = ExtractAuthTokenFromSetCookie(response);
+            token.Should().NotBeNullOrWhiteSpace();
 
-            var tokenParts = authResponse.Token.Split('.');
+            var setCookieHeader = response.Headers.GetValues("Set-Cookie")
+                                                  .Single(header => header.StartsWith("auth_token="));
+
+            setCookieHeader.Contains("httponly", StringComparison.OrdinalIgnoreCase).Should().BeTrue();
+            setCookieHeader.Contains("secure", StringComparison.OrdinalIgnoreCase).Should().BeTrue();
+            setCookieHeader.Contains("samesite=strict", StringComparison.OrdinalIgnoreCase).Should().BeTrue();
+
+            var tokenParts = token.Split('.');
 
             tokenParts.Should().HaveCount(3);
         }
 
         [Fact]
-        public async Task RenewToken_ReturnsNewValidToken()
+        public async Task RenewToken_AppendsNewAuthTokenCookie_WhenRequestIsAuthorized()
         {
             //Arrange
             using (var context = BuildContext(dbName))
@@ -246,9 +254,7 @@ namespace Folio_Backend_Integration_Tests.API.Controllers
             var loginResponse = await _client.PostAsJsonAsync(loginUrl, validLoginCredentials, _jsonSerializerOptions, TestContext.Current.CancellationToken);
             loginResponse.EnsureSuccessStatusCode();
 
-             // extracts token from login response
-            var loginContent = await loginResponse.Content.ReadFromJsonAsync<AuthenticationResponseDTO>(TestContext.Current.CancellationToken);
-            var oldToken = loginContent?.Token;
+            var oldToken = ExtractAuthTokenFromSetCookie(loginResponse);
 
             // waits for the clock to tick to the next second
             await Task.Delay(1001, TestContext.Current.CancellationToken);
@@ -259,16 +265,32 @@ namespace Folio_Backend_Integration_Tests.API.Controllers
             //Assert
             tokenRenewResponse.EnsureSuccessStatusCode();
 
-             // extracts new token from renew-token response
-            var renewContent = await tokenRenewResponse.Content.ReadFromJsonAsync<AuthenticationResponseDTO>(TestContext.Current.CancellationToken);
-            var newToken = renewContent?.Token;
+            var newToken = ExtractAuthTokenFromSetCookie(tokenRenewResponse);
 
             newToken.Should().NotBeNull();
 
             var newTokenParts = newToken.Split('.');
 
             newTokenParts.Should().HaveCount(3);
-            oldToken.Should().NotBeSameAs(newToken);
+            oldToken.Should().NotBe(newToken);
+        }
+
+        private static string ExtractAuthTokenFromSetCookie(HttpResponseMessage response)
+        {
+            response.Headers.TryGetValues("Set-Cookie", out var setCookieHeaders).Should().BeTrue();
+
+            var authCookieHeader = setCookieHeaders!
+                .Single(header => header.StartsWith("auth_token="));
+
+            var cookieValue = authCookieHeader["auth_token=".Length..];
+            var semicolonIndex = cookieValue.IndexOf(';');
+
+            if (semicolonIndex >= 0)
+            {
+                cookieValue = cookieValue[..semicolonIndex];
+            }
+
+            return cookieValue;
         }
     }
 }

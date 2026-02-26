@@ -25,14 +25,18 @@ namespace FolioWebAPI.Controllers
         public async Task<ActionResult<AuthenticationResponseDTO>>
             Register([FromBody] RegisterCredentialsDTO registerCredentialsDTO)
         {
+            var authenticationResponseDTO = await _authenticationService.RegisterAsync(registerCredentialsDTO);
 
-            var authenticationResponseDTO = await _authenticationService.RegisterAsync(
-                                               registerCredentialsDTO.Name,
-                                               registerCredentialsDTO.Email,
-                                               registerCredentialsDTO.Password,
-                                               registerCredentialsDTO.PhoneNumber);
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+            };
 
-            return Ok(authenticationResponseDTO);
+            Response.Cookies.Append("auth_token", authenticationResponseDTO.Token, cookieOptions);
+
+            return Ok(new {message = "Registration Successfull"});
         }
 
         [HttpPost("login")]
@@ -41,14 +45,23 @@ namespace FolioWebAPI.Controllers
         {
 
             var authenticationResponseDTO = await _authenticationService
-                                                 .LoginAsync(loginCredentialsDTO.Email, loginCredentialsDTO.Password);
+                                                 .LoginAsync(loginCredentialsDTO);
 
             if (authenticationResponseDTO is null)
             {
                 return Unauthorized("Authentication failed");
             }
 
-            return Ok(authenticationResponseDTO);
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+            };
+
+            Response.Cookies.Append("auth_token", authenticationResponseDTO.Token, cookieOptions);
+
+            return Ok(new {message = "Login Successful"});
         }
 
         [HttpGet("renew-token")]
@@ -59,11 +72,20 @@ namespace FolioWebAPI.Controllers
             var currentUser = await _currentUserService.GetCurrentUserAsync();
 
             if (currentUser is null)
-                return Unauthorized("Authentication failed");
+                return Unauthorized("Authentication Failed");
 
             var authenticationResponseDTO = _authenticationService.RenewToken(currentUser);
 
-            return Ok(authenticationResponseDTO);
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+            };
+
+            Response.Cookies.Append("auth_token", authenticationResponseDTO.Token, cookieOptions);
+
+            return Ok(new {message = "Token Renewed Successfully"});
         }
     }
 }

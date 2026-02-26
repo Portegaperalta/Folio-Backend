@@ -540,13 +540,31 @@ public class BookmarksControllerTests : TestsBase
     var response = await _client.PostAsJsonAsync("/api/auth/login", loginDto, _jsonSerializerOptions);
     response.EnsureSuccessStatusCode();
 
-    var loginResult = await response.Content.ReadFromJsonAsync<AuthenticationResponseDTO>();
+    var token = ExtractAuthTokenFromSetCookie(response);
 
-    return (user, loginResult!.Token);
+    return (user, token);
   }
 
   private void SetAuthToken(string token)
   {
     _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+  }
+
+  private static string ExtractAuthTokenFromSetCookie(HttpResponseMessage response)
+  {
+    response.Headers.TryGetValues("Set-Cookie", out var setCookieHeaders).Should().BeTrue();
+
+    var authCookieHeader = setCookieHeaders!
+      .Single(header => header.StartsWith("auth_token=", StringComparison.OrdinalIgnoreCase));
+
+    var cookieValue = authCookieHeader["auth_token=".Length..];
+    var semicolonIndex = cookieValue.IndexOf(';');
+
+    if (semicolonIndex >= 0)
+    {
+      cookieValue = cookieValue[..semicolonIndex];
+    }
+
+    return cookieValue;
   }
 }
