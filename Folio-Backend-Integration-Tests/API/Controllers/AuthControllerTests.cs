@@ -211,9 +211,9 @@ namespace Folio_Backend_Integration_Tests.API.Controllers
             var setCookieHeader = response.Headers.GetValues("Set-Cookie")
                                                   .Single(header => header.StartsWith("auth_token="));
 
-            setCookieHeader.Should().Contain("HttpOnly");
-            setCookieHeader.Should().Contain("Secure");
-            setCookieHeader.Should().Contain("SameSite=Strict");
+            setCookieHeader.Contains("httponly", StringComparison.OrdinalIgnoreCase).Should().BeTrue();
+            setCookieHeader.Contains("secure", StringComparison.OrdinalIgnoreCase).Should().BeTrue();
+            setCookieHeader.Contains("samesite=strict", StringComparison.OrdinalIgnoreCase).Should().BeTrue();
 
             var tokenParts = token.Split('.');
 
