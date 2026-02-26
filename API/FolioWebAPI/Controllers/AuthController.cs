@@ -31,7 +31,7 @@ namespace FolioWebAPI.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
             };
 
             Response.Cookies.Append("auth_token", authenticationResponseDTO.Token, cookieOptions);
@@ -56,7 +56,7 @@ namespace FolioWebAPI.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
             };
 
             Response.Cookies.Append("auth_token", authenticationResponseDTO.Token, cookieOptions);
@@ -80,7 +80,7 @@ namespace FolioWebAPI.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
             };
 
             Response.Cookies.Append("auth_token", authenticationResponseDTO.Token, cookieOptions);
