@@ -209,10 +209,9 @@ namespace FolioWebAPI
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
-
-            app.UseSwagger();
-            app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
 
