@@ -22,7 +22,7 @@ namespace FolioWebAPI
 {
     public partial class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -195,9 +195,14 @@ namespace FolioWebAPI
             using (var scope = app.Services.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var strategy = dbContext.Database.CreateExecutionStrategy();
+
                 if (dbContext.Database.IsRelational())
                 {
-                    dbContext.Database.Migrate();
+                    await strategy.ExecuteAsync(async () =>
+                    {
+                        await dbContext.Database.MigrateAsync();
+                    });
                 }
             }
 
