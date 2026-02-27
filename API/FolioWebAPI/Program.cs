@@ -98,7 +98,8 @@ namespace FolioWebAPI
                     CORSOptions.WithOrigins(allowedOrigins)
                                .AllowAnyMethod()
                                .AllowAnyHeader()
-                               .WithExposedHeaders("total-records-amount");
+                               .WithExposedHeaders("total-records-amount")
+                               .AllowCredentials();
                 });
             });
 
