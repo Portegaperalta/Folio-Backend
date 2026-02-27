@@ -194,25 +194,14 @@ namespace FolioWebAPI
                 }
             }
 
-            if (app.Environment.IsDevelopment())
-            {
-                using var scope = app.Services.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                if (dbContext.Database.IsRelational())
-                {
-                    dbContext.Database.Migrate();
-                }
-            }
-
             // MIDDLEWARES AREA
 
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
-
-            app.UseSwagger();
-            app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
 
